@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, HeartHandshake, CheckCircle2, User, Building } from 'lucide-react';
 import { feedbackService } from '../../services/feedback.service';
 import { InlineLoader, Loader } from '../../components/common/Loader';
-import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const Feedback = () => {
     const [feedbacks, setFeedbacks] = useState([]);
@@ -59,10 +58,10 @@ const Feedback = () => {
         <div style={{
             position: 'relative',
             minHeight: '100vh',
-            background: 'transparent',
+            background: 'linear-gradient(180deg, #090e1a 0%, #0d1527 50%, #080d19 100%)',
+            color: '#ffffff',
             paddingBottom: '4rem'
         }}>
-            <AnimatedGlassBackground isFixed={true} opacity={0.88} />
             <div style={{ position: 'relative', zIndex: 10 }}>
             {/* Hero Header */}
             <div className="landing-hero" style={{ padding: '3.5rem 1rem 2rem' }}>

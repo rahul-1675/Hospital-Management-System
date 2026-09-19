@@ -22,7 +22,6 @@ import DepthCarousel from '../../components/ui/DepthCarousel';
 import { InlineLoader } from '../../components/common/Loader';
 import { doctorService } from '../../services/doctor.service';
 import { hospitalService } from '../../services/hospital.service';
-import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const FALLBACK_DOCTOR_IMAGES = [
     'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600',
@@ -190,9 +189,7 @@ const PatientPortal = () => {
     };
 
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: '#08090d', color: '#f8fafc' }}>
-            <AnimatedGlassBackground isFixed={true} opacity={0.9} />
-
+        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: 'linear-gradient(180deg, #090e1a 0%, #0d1527 50%, #080d19 100%)', color: '#f8fafc' }}>
             <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '2.5rem' }}>
                 {/* Hero Header */}
                 <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 2.5rem' }}>
