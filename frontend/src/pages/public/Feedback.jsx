@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, HeartHandshake, CheckCircle2, User, Building } from 'lucide-react';
 import { feedbackService } from '../../services/feedback.service';
 import { InlineLoader, Loader } from '../../components/common/Loader';
-import HomeBg from '../../assets/Home.png';
+import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const Feedback = () => {
     const [feedbacks, setFeedbacks] = useState([]);
@@ -57,14 +57,13 @@ const Feedback = () => {
 
     return (
         <div style={{
-            backgroundImage: `url(${HomeBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            position: 'relative',
             minHeight: '100vh',
-            backgroundAttachment: 'fixed',
+            background: 'transparent',
             paddingBottom: '4rem'
         }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.88} />
+            <div style={{ position: 'relative', zIndex: 10 }}>
             {/* Hero Header */}
             <div className="landing-hero" style={{ padding: '3.5rem 1rem 2rem' }}>
                 <div className="hero-content" style={{ textAlign: 'center' }}>
@@ -326,6 +325,7 @@ const Feedback = () => {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );

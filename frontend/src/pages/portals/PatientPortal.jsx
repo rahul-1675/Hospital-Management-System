@@ -18,11 +18,11 @@ import {
     SlidersHorizontal,
     RefreshCw
 } from 'lucide-react';
-import HomeBg from '../../assets/Home.png';
 import DepthCarousel from '../../components/ui/DepthCarousel';
 import { InlineLoader } from '../../components/common/Loader';
 import { doctorService } from '../../services/doctor.service';
 import { hospitalService } from '../../services/hospital.service';
+import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const FALLBACK_DOCTOR_IMAGES = [
     'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=600',
@@ -190,35 +190,8 @@ const PatientPortal = () => {
     };
 
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: '#0a0f1d', color: '#f8fafc' }}>
-            {/* Background image & gradient overlay */}
-            <div
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '650px',
-                    backgroundImage: `url(${HomeBg})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center top',
-                    opacity: 0.15,
-                    zIndex: 0,
-                    pointerEvents: 'none'
-                }}
-            />
-            <div
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: '650px',
-                    background: 'linear-gradient(180deg, rgba(10, 15, 29, 0.4) 0%, #0a0f1d 100%)',
-                    zIndex: 0,
-                    pointerEvents: 'none'
-                }}
-            />
+        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: '#08090d', color: '#f8fafc' }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.9} />
 
             <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '2.5rem' }}>
                 {/* Hero Header */}

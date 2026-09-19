@@ -12,7 +12,7 @@ import {
     CheckCircle2,
     ArrowRight
 } from 'lucide-react';
-import HomeBg from '../../assets/Home.png';
+import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const INFRASTRUCTURE = [
     {
@@ -51,13 +51,13 @@ const ACCREDITATIONS = [
 const About = () => {
     return (
         <div style={{
+            position: 'relative',
             minHeight: '100vh',
-            backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.9)), url(${HomeBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            background: 'transparent',
             paddingBottom: '5rem'
         }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.88} />
+            <div style={{ position: 'relative', zIndex: 10 }}>
             {/* Header */}
             <div style={{ padding: '4rem 1rem 3rem', textAlign: 'center', color: '#ffffff' }}>
                 <div className="container" style={{ maxWidth: '850px' }}>
@@ -253,6 +253,7 @@ const About = () => {
                         </button>
                     </Link>
                 </div>
+            </div>
             </div>
         </div>
     );

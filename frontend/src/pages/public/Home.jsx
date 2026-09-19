@@ -16,7 +16,7 @@ import {
     Sparkles,
     Building2
 } from 'lucide-react';
-import HomeBg from '../../assets/Home.png';
+import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const DEPARTMENTS = [
     { name: 'Cardiology', icon: HeartPulse, count: '14 Specialists', desc: 'Comprehensive cardiac care, ECG, angioplasty, and cardiac rehab.', color: '#ef4444', bg: '#fef2f2' },
@@ -37,15 +37,17 @@ const STATS = [
 const Home = () => {
     return (
         <div style={{
+            position: 'relative',
             minHeight: '100vh',
-            backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url(${HomeBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            background: 'transparent',
             paddingBottom: '5rem'
         }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.88} />
+
             {/* HERO SECTION */}
             <section style={{
+                position: 'relative',
+                zIndex: 10,
                 padding: '5rem 1rem 4rem',
                 textAlign: 'center',
                 color: '#ffffff'
