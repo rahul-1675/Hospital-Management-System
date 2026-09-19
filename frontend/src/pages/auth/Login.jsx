@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { Lock, AlertCircle, ShieldCheck, Mail, KeyRound, Eye, EyeOff, Building2 } from 'lucide-react';
+import BrandLogo from '../../components/common/BrandLogo';
 import Button from '../../components/common/Button';
 import LoginBg from '../../assets/LoginBg.png';
 
@@ -75,27 +76,14 @@ const Login = () => {
 
     return (
         <div className="login-wrapper" style={{ backgroundImage: `url(${LoginBg})` }}>
-            <div className="login-glass-card" style={{ maxWidth: '440px', width: '100%' }}>
-                {/* Header Section */}
-                <div className="login-header" style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
-                    <div style={{
-                        width: '52px',
-                        height: '52px',
-                        borderRadius: '14px',
-                        background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1rem',
-                        color: '#ffffff',
-                        boxShadow: '0 8px 20px rgba(2, 132, 199, 0.35)'
-                    }}>
-                        <ShieldCheck size={28} />
-                    </div>
-                    <h1 className="login-brand" style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                        ProHealth HMS
-                    </h1>
-                    <p style={{ color: '#64748b', fontSize: '0.9rem', margin: '0.4rem 0 0' }}>
+            <div className="login-glass-card" style={{ maxWidth: '450px', width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.25)' }}>
+                {/* Official Brand Logo */}
+                <div className="login-header" style={{ textAlign: 'center', marginBottom: '1.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <BrandLogo size={68} href="/" style={{ marginBottom: '1rem' }} />
+                    <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                        Welcome to ProHealth
+                    </h2>
+                    <p style={{ color: '#475569', fontSize: '0.9rem', margin: '0.35rem 0 0', fontWeight: 500 }}>
                         Authorized Staff & Management Portal
                     </p>
                 </div>

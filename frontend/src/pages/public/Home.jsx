@@ -291,18 +291,18 @@ const Home = () => {
             {/* TRUST & SECURITY PILLARS */}
             <section className="container" style={{ marginTop: '4.5rem' }}>
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.88)',
-                    backdropFilter: 'blur(16px)',
+                    background: '#ffffff',
                     borderRadius: '24px',
                     padding: '3rem 2.5rem',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    color: '#ffffff'
+                    border: '1px solid #e2e8f0',
+                    color: '#0f172a',
+                    boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.1)'
                 }}>
                     <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 3rem' }}>
-                        <span style={{ color: '#34d399', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                        <span style={{ color: '#0284c7', fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             Advanced Infrastructure
                         </span>
-                        <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.4rem' }}>
+                        <h2 style={{ fontSize: '2.2rem', fontWeight: '800', marginTop: '0.4rem', color: '#0f172a' }}>
                             Engineered for Clinical Safety & Reliability
                         </h2>
                     </div>
@@ -313,36 +313,36 @@ const Home = () => {
                         gap: '2rem'
                     }}>
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ color: '#38bdf8', flexShrink: 0 }}>
+                            <div style={{ color: '#0284c7', flexShrink: 0 }}>
                                 <Shield size={28} />
                             </div>
                             <div>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.4rem' }}>Bank-Grade Security</h4>
-                                <p style={{ fontSize: '0.88rem', color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.4rem', color: '#0f172a' }}>Bank-Grade Security</h4>
+                                <p style={{ fontSize: '0.88rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
                                     Role-based access controls and encrypted electronic health records compliant with global healthcare guidelines.
                                 </p>
                             </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ color: '#34d399', flexShrink: 0 }}>
+                            <div style={{ color: '#059669', flexShrink: 0 }}>
                                 <Activity size={28} />
                             </div>
                             <div>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.4rem' }}>Live Queue Synchronization</h4>
-                                <p style={{ fontSize: '0.88rem', color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.4rem', color: '#0f172a' }}>Live Queue Synchronization</h4>
+                                <p style={{ fontSize: '0.88rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
                                     Real-time token and OPD queue updates across reception desk, doctor consultation rooms, and patient monitors.
                                 </p>
                             </div>
                         </div>
 
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ color: '#fbbf24', flexShrink: 0 }}>
+                            <div style={{ color: '#d97706', flexShrink: 0 }}>
                                 <Award size={28} />
                             </div>
                             <div>
-                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.4rem' }}>Instant Dispensing & Billing</h4>
-                                <p style={{ fontSize: '0.88rem', color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
+                                <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.4rem', color: '#0f172a' }}>Instant Dispensing & Billing</h4>
+                                <p style={{ fontSize: '0.88rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
                                     Automated pharmacy stock deduction, e-prescriptions, and paperless invoices in seconds.
                                 </p>
                             </div>

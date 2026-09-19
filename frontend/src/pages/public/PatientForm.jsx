@@ -169,16 +169,17 @@ const PatientForm = () => {
                 padding: '2rem'
             }}>
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.8)',
+                    background: '#ffffff',
                     borderRadius: '20px',
                     padding: '3rem 2rem',
                     textAlign: 'center',
                     maxWidth: '480px',
-                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)'
                 }}>
-                    <Stethoscope size={52} color="#38bdf8" style={{ margin: '0 auto 1rem' }} />
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.75rem' }}>No Doctor Selected</h2>
-                    <p style={{ color: '#94a3b8', fontSize: '0.92rem', marginBottom: '1.5rem' }}>
+                    <Stethoscope size={52} color="#0284c7" style={{ margin: '0 auto 1rem' }} />
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.75rem', color: '#0f172a' }}>No Doctor Selected</h2>
+                    <p style={{ color: '#64748b', fontSize: '0.92rem', marginBottom: '1.5rem' }}>
                         Please select a specialist from the 3D Doctor Selection rail to book your consultation.
                     </p>
                     <button
@@ -269,25 +270,26 @@ const PatientForm = () => {
 
                         {/* Token Pass Card */}
                         <div style={{
-                            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                            background: '#f8fafc',
+                            border: '1.5px solid #cbd5e1',
                             borderRadius: '18px',
                             padding: '1.75rem',
-                            color: '#ffffff',
+                            color: '#0f172a',
                             marginBottom: '2rem',
-                            boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)'
+                            boxShadow: '0 8px 24px -6px rgba(15, 23, 42, 0.08)'
                         }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.15)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
                                 <div>
-                                    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 700 }}>
+                                    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0284c7', fontWeight: 700 }}>
                                         OPD Queue Token Pass
                                     </span>
-                                    <h3 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#ffffff', margin: 0 }}>
+                                    <h3 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#0f172a', margin: 0 }}>
                                         {confirmedAppointment.queueToken}
                                     </h3>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Appointment Ref:</span>
-                                    <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#e2e8f0', margin: 0 }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Appointment Ref:</span>
+                                    <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
                                         {confirmedAppointment.appointmentNumber}
                                     </p>
                                 </div>
@@ -295,32 +297,32 @@ const PatientForm = () => {
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem' }}>
                                 <div>
-                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Consulting Doctor:</span>
-                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', margin: '0.15rem 0 0' }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Consulting Doctor:</span>
+                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', margin: '0.15rem 0 0' }}>
                                         {confirmedAppointment.doctorName}
                                     </p>
-                                    <span style={{ fontSize: '0.8rem', color: '#38bdf8' }}>{confirmedAppointment.department}</span>
+                                    <span style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 600 }}>{confirmedAppointment.department}</span>
                                 </div>
                                 <div>
-                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Hospital & Room:</span>
-                                    <p style={{ fontSize: '0.95rem', fontWeight: 600, color: '#ffffff', margin: '0.15rem 0 0' }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Hospital & Room:</span>
+                                    <p style={{ fontSize: '0.95rem', fontWeight: 600, color: '#0f172a', margin: '0.15rem 0 0' }}>
                                         {confirmedAppointment.hospitalName}
                                     </p>
-                                    <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>{confirmedAppointment.roomNumber}</span>
+                                    <span style={{ fontSize: '0.8rem', color: '#475569' }}>{confirmedAppointment.roomNumber}</span>
                                 </div>
                                 <div>
-                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Scheduled Time:</span>
-                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#38bdf8', margin: '0.15rem 0 0' }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Scheduled Time:</span>
+                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0284c7', margin: '0.15rem 0 0' }}>
                                         {confirmedAppointment.date}
                                     </p>
-                                    <span style={{ fontSize: '0.85rem', color: '#ffffff', fontWeight: 600 }}>{confirmedAppointment.timeSlot}</span>
+                                    <span style={{ fontSize: '0.85rem', color: '#0f172a', fontWeight: 600 }}>{confirmedAppointment.timeSlot}</span>
                                 </div>
                                 <div>
-                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Patient:</span>
-                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', margin: '0.15rem 0 0' }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Patient:</span>
+                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', margin: '0.15rem 0 0' }}>
                                         {confirmedAppointment.patientName}
                                     </p>
-                                    <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 700 }}>Fee: {confirmedAppointment.fee} (Paid)</span>
+                                    <span style={{ fontSize: '0.8rem', color: '#059669', fontWeight: 700 }}>Fee: {confirmedAppointment.fee} (Paid)</span>
                                 </div>
                             </div>
                         </div>

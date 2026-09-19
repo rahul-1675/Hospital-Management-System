@@ -221,12 +221,12 @@ const About = () => {
             {/* Accreditations Banner */}
             <div className="container">
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.9)',
-                    backdropFilter: 'blur(16px)',
+                    background: '#ffffff',
                     borderRadius: '20px',
                     padding: '2.5rem',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    color: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    color: '#0f172a',
+                    boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.1)',
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'center',
@@ -234,13 +234,13 @@ const About = () => {
                     gap: '2rem'
                 }}>
                     <div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.75rem' }}>
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.75rem', color: '#0f172a' }}>
                             Quality & Safety Accreditations
                         </h3>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.65rem' }}>
                             {ACCREDITATIONS.map((acc, index) => (
-                                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#cbd5e1' }}>
-                                    <ShieldCheck size={18} color="#34d399" />
+                                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#334155' }}>
+                                    <ShieldCheck size={18} color="#059669" />
                                     <span>{acc}</span>
                                 </div>
                             ))}

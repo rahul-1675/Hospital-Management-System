@@ -3,6 +3,8 @@ import { LayoutDashboard, Calendar, Users, FileText, User, LogOut, Menu, Chevron
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
+import BrandLogo from '../../common/BrandLogo';
+
 const DoctorSidebar = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) => {
     const { logout } = useAuth();
     const navigate = useNavigate();
@@ -22,10 +24,16 @@ const DoctorSidebar = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) 
 
     return (
         <nav className={`doctor-sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
-            <div className="doctor-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between' }}>
-                {!isCollapsed && <h2>Doctor Portal</h2>}
-                <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--reception-text-muted)' }}>
-                    {isCollapsed ? <Menu size={24} /> : <ChevronLeft size={24} />}
+            <div className="doctor-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', padding: isCollapsed ? '1rem 0.5rem' : '1rem 1.25rem' }}>
+                {!isCollapsed ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <BrandLogo size={38} href="/" />
+                    </div>
+                ) : (
+                    <BrandLogo size={28} href="/" />
+                )}
+                <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--reception-text-muted)', display: 'flex', alignItems: 'center' }}>
+                    {isCollapsed ? <Menu size={22} /> : <ChevronLeft size={22} />}
                 </button>
             </div>
 

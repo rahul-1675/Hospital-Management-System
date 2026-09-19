@@ -3,6 +3,8 @@ import { LayoutDashboard, Users, ScrollText, DollarSign, Settings, LogOut, Shiel
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
+import BrandLogo from '../../common/BrandLogo';
+
 const AdminSidebar = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) => {
     const { logout } = useAuth();
     const navigate = useNavigate();
@@ -22,20 +24,16 @@ const AdminSidebar = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) =
 
     return (
         <nav className={`doctor-sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
-            <div className="doctor-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between' }}>
-                {!isCollapsed && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ padding: '0.5rem', background: '#1e293b', borderRadius: '8px', color: 'white' }}>
-                            <ShieldCheck size={24} />
-                        </div>
-                        <div>
-                            <h2 style={{ fontSize: '1.25rem', color: '#1e293b', margin: 0 }}>Admin</h2>
-                            <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0, fontWeight: 600 }}>CONTROL CENTER</p>
-                        </div>
+            <div className="doctor-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', padding: isCollapsed ? '1rem 0.5rem' : '1rem 1.25rem' }}>
+                {!isCollapsed ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <BrandLogo size={38} href="/" />
                     </div>
+                ) : (
+                    <BrandLogo size={28} href="/" />
                 )}
-                <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--reception-text-muted)' }}>
-                    {isCollapsed ? <Menu size={24} /> : <ChevronLeft size={24} />}
+                <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--reception-text-muted)', display: 'flex', alignItems: 'center' }}>
+                    {isCollapsed ? <Menu size={22} /> : <ChevronLeft size={22} />}
                 </button>
             </div>
 

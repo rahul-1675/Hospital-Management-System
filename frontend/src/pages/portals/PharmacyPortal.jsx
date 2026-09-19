@@ -5,6 +5,8 @@ import { LayoutDashboard, Pill, Package, ClipboardList, FileText, User, LogOut, 
 import MedicineBg from '../../assets/Medicine.png';
 import { PharmacyProvider } from '../../context/PharmacyContext';
 
+import BrandLogo from '../../components/common/BrandLogo';
+
 // Pages
 import PharmacyDashboard from '../../components/pharmacy/pages/PharmacyDashboard';
 import PharmacyDispense from '../../components/pharmacy/pages/PharmacyDispense';
@@ -72,20 +74,16 @@ const PharmacyPortal = () => {
                 backgroundRepeat: 'no-repeat'
             }}>
                 <nav className={`pharmacy-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`} style={{ width: isSidebarCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
-                    <div className="pharmacy-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarCollapsed ? 'center' : 'space-between' }}>
-                        {!isSidebarCollapsed && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <div style={{ width: '40px', height: '40px', background: 'var(--pharmacy-primary)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                                    <Pill size={24} />
-                                </div>
-                                <div>
-                                    <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, lineHeight: 1 }}>MediCare</h2>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--pharmacy-text-muted)' }}>Pharmacy</span>
-                                </div>
+                    <div className="pharmacy-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarCollapsed ? 'center' : 'space-between', padding: isSidebarCollapsed ? '1rem 0.5rem' : '1rem 1.25rem' }}>
+                        {!isSidebarCollapsed ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <BrandLogo size={38} href="/" />
                             </div>
+                        ) : (
+                            <BrandLogo size={28} href="/" />
                         )}
-                        <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--pharmacy-text-muted)' }}>
-                            {isSidebarCollapsed ? <Menu size={24} /> : <ChevronLeft size={24} />}
+                        <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--pharmacy-text-muted)', display: 'flex', alignItems: 'center' }}>
+                            {isSidebarCollapsed ? <Menu size={22} /> : <ChevronLeft size={22} />}
                         </button>
                     </div>
 

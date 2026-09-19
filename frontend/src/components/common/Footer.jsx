@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Phone, Mail, MapPin, Clock, Award, ArrowUpRight, Activity } from 'lucide-react';
-import HmsLogo from '../../assets/hms-logo.png';
+import BrandLogo from './BrandLogo';
 
 const Footer = () => {
     return (
@@ -26,22 +26,8 @@ const Footer = () => {
                 }}>
                     {/* Column 1: Brand & Mission */}
                     <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.25rem' }}>
-                            <div style={{
-                                width: '42px',
-                                height: '42px',
-                                borderRadius: '10px',
-                                background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
-                            }}>
-                                <img src={HmsLogo} alt="HMS" style={{ height: '24px' }} />
-                            </div>
-                            <span style={{ fontSize: '1.35rem', fontWeight: '900', color: '#0f172a', letterSpacing: '-0.02em' }}>
-                                Pro<span style={{ color: '#0284c7' }}>Health</span> HMS
-                            </span>
+                        <div style={{ marginBottom: '1.25rem' }}>
+                            <BrandLogo size={50} href="/" />
                         </div>
 
                         <p style={{

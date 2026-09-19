@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Activity, Menu, X, PhoneCall, ShieldCheck, UserCheck, Stethoscope } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import HmsLogo from '../../assets/hms-logo.png';
+import BrandLogo from './BrandLogo';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +33,7 @@ const Navbar = () => {
             top: 0,
             zIndex: 999,
             transition: 'all 0.3s ease',
-            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.92)' : 'rgba(255, 255, 255, 0.98)',
+            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.94)' : 'rgba(255, 255, 255, 0.98)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             borderBottom: isScrolled ? '1px solid rgba(2, 132, 199, 0.15)' : '1px solid #e2e8f0',
@@ -68,31 +68,10 @@ const Navbar = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                height: '66px'
+                height: '70px'
             }}>
-                {/* Brand Logo */}
-                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{
-                        width: '42px',
-                        height: '42px',
-                        borderRadius: '10px',
-                        background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
-                    }}>
-                        <img src={HmsLogo} alt="ProHealth Logo" style={{ height: '26px', width: 'auto' }} />
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                            Pro<span style={{ color: '#0284c7' }}>Health</span>
-                        </div>
-                        <div style={{ fontSize: '0.7rem', fontWeight: '600', color: '#64748b', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                            Hospital System
-                        </div>
-                    </div>
-                </Link>
+                {/* Official Brand Logo */}
+                <BrandLogo size={52} href="/" />
 
                 {/* Desktop Navigation Links */}
                 <nav className="hidden md-flex" style={{ alignItems: 'center', gap: '0.5rem' }}>
