@@ -12,6 +12,7 @@ import {
     CheckCircle2,
     ArrowRight
 } from 'lucide-react';
+import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const INFRASTRUCTURE = [
     {
@@ -52,10 +53,10 @@ const About = () => {
         <div style={{
             position: 'relative',
             minHeight: '100vh',
-            background: 'linear-gradient(180deg, #090e1a 0%, #0d1527 50%, #080d19 100%)',
-            color: '#ffffff',
+            background: 'transparent',
             paddingBottom: '5rem'
         }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.88} />
             <div style={{ position: 'relative', zIndex: 10 }}>
             {/* Header */}
             <div style={{ padding: '4rem 1rem 3rem', textAlign: 'center', color: '#ffffff' }}>

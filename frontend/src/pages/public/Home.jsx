@@ -16,6 +16,7 @@ import {
     Sparkles,
     Building2
 } from 'lucide-react';
+import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
 
 const DEPARTMENTS = [
     { name: 'Cardiology', icon: HeartPulse, count: '14 Specialists', desc: 'Comprehensive cardiac care, ECG, angioplasty, and cardiac rehab.', color: '#ef4444', bg: '#fef2f2' },
@@ -38,24 +39,20 @@ const Home = () => {
         <div style={{
             position: 'relative',
             minHeight: '100vh',
-            background: 'linear-gradient(180deg, #090e1a 0%, #0d1527 50%, #080d19 100%)',
-            color: '#ffffff',
-            paddingBottom: '5rem',
-            overflow: 'hidden'
+            background: 'transparent',
+            paddingBottom: '5rem'
         }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.88} />
+
             {/* HERO SECTION */}
             <section style={{
                 position: 'relative',
                 zIndex: 10,
-                padding: '5.5rem 1rem 4rem',
+                padding: '5rem 1rem 4rem',
                 textAlign: 'center',
-                color: '#ffffff',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center'
+                color: '#ffffff'
             }}>
-                <div className="container" style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
+                <div className="container" style={{ maxWidth: '1000px' }}>
                     {/* Badge */}
                     <div style={{
                         display: 'inline-flex',
