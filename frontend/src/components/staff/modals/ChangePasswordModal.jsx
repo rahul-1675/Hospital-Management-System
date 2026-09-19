@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { X, Lock, ShieldCheck } from 'lucide-react';
+import { X, Lock, Check, AlertCircle, ShieldCheck } from 'lucide-react';
+import { InlineLoader } from '../../common/Loader';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -167,7 +168,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                             style={{ flex: 2, justifyContent: 'center', fontWeight: '700', gap: '0.75rem' }}
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Processing...' : <><Lock size={18} /> Update Password</>}
+                            {isLoading ? <InlineLoader size="18px" text="Processing..." /> : <><Lock size={18} /> Update Password</>}
                         </button>
                     </div>
                 </form>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { HourglassSvg } from './Loader';
 
 const Button = ({
     children,
@@ -28,47 +28,47 @@ const Button = ({
         opacity: disabled ? 0.6 : 1,
         fontSize: size === 'sm' ? '0.875rem' : size === 'lg' ? '1.125rem' : '1rem',
         padding: size === 'sm' ? '0.5rem 1rem' : size === 'lg' ? '1rem 2rem' : '0.75rem 1.5rem',
+        width: style.width || 'auto',
         ...style
     };
 
-    const variants = {
+    const variantStyles = {
         primary: {
-            background: 'var(--doctor-primary, #0ea5e9)',
-            color: 'white',
-            borderColor: 'transparent',
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+            background: 'var(--color-brand-primary, #0284c7)',
+            color: '#ffffff',
+            borderColor: 'var(--color-brand-primary, #0284c7)'
         },
         success: {
-            background: '#10b981',
-            color: 'white',
-            borderColor: 'transparent'
+            background: 'var(--color-success, #10b981)',
+            color: '#ffffff',
+            borderColor: 'var(--color-success, #10b981)'
         },
         warning: {
-            background: '#f59e0b',
-            color: 'white',
-            borderColor: 'transparent'
+            background: 'var(--color-warning, #f59e0b)',
+            color: '#ffffff',
+            borderColor: 'var(--color-warning, #f59e0b)'
         },
         danger: {
-            background: '#ef4444',
-            color: 'white',
-            borderColor: 'transparent'
+            background: 'var(--color-danger, #ef4444)',
+            color: '#ffffff',
+            borderColor: 'var(--color-danger, #ef4444)'
         },
         outline: {
-            background: 'white',
-            color: '#1e293b',
-            borderColor: '#e2e8f0'
+            background: 'transparent',
+            color: 'var(--color-slate-700, #334155)',
+            borderColor: 'var(--color-slate-300, #cbd5e1)'
         },
         ghost: {
             background: 'transparent',
-            color: '#64748b',
+            color: 'var(--color-slate-600, #475569)',
             borderColor: 'transparent'
         }
     };
 
     const combinedStyle = {
         ...baseStyle,
-        ...variants[variant],
-        ...(isLoading ? { opacity: 0.8 } : {})
+        ...variantStyles[variant],
+        ...(isLoading ? { opacity: 0.85 } : {})
     };
 
     // Hover effect logic handled via CSS classes usually, but styles are inline in request context mostly.
@@ -96,21 +96,10 @@ const Button = ({
         >
             {isLoading ? (
                 <>
-                    <Loader2 size={18} className="spin" />
+                    <HourglassSvg size={size === 'sm' ? '16px' : '20px'} />
                     <span>{loadingText}</span>
                 </>
             ) : children}
-            <style>
-                {`
-                    @keyframes spin {
-                        from { transform: rotate(0deg); }
-                        to { transform: rotate(360deg); }
-                    }
-                    .spin {
-                        animation: spin 1s linear infinite;
-                    }
-                `}
-            </style>
         </button>
     );
 };

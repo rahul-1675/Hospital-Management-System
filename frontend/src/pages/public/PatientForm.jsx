@@ -1,30 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Calendar, User, Phone, Stethoscope, Clock, ShieldCheck, Ticket, Download } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import {
+    ArrowLeft,
+    CheckCircle2,
+    Calendar,
+    User,
+    Phone,
+    Stethoscope,
+    Clock,
+    ShieldCheck,
+    Ticket,
+    Download,
+    Building2,
+    AlertCircle,
+    MapPin,
+    DollarSign,
+    Sparkles,
+    Check
+} from 'lucide-react';
 import hospitalVideo from '../../utils/hospital.mp4';
-import { receptionService } from '../../services/reception.service';
+import { doctorService } from '../../services/doctor.service';
+import { appointmentService } from '../../services/appointment.service';
+import { InlineLoader } from '../../components/common/Loader';
 
 const PatientForm = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const selectedDoctor = location.state?.doctor || null;
+    const { user, isAuthenticated } = useAuth();
 
+    // Doctor & Hospital data passed from DepthCarousel
+    const selectedDoctor = location.state?.doctor || location.state?.bookingPayload || null;
+    const doctorId = selectedDoctor?._id || selectedDoctor?.id || selectedDoctor?.doctorId || '';
+    const hospitalId = selectedDoctor?.hospitalId || selectedDoctor?.hospital?._id || selectedDoctor?.hospital?.id || selectedDoctor?.hospital || '';
+
+    // Form & Booking State
+    const todayStr = new Date().toISOString().split('T')[0];
+    const [selectedDate, setSelectedDate] = useState(todayStr);
+    const [selectedSlot, setSelectedSlot] = useState('');
+    
+    // Live availability slots from backend
+    const [availableSlots, setAvailableSlots] = useState([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
+    const [slotsError, setSlotsError] = useState(null);
+
+    // Patient Form Details (Pre-filled from auth state if logged in)
     const [formData, setFormData] = useState({
-        name: '',
+        name: user?.name || '',
+        email: user?.email || '',
+        contact: user?.phone || '',
         age: '',
         gender: 'Male',
-        contact: '',
         symptoms: '',
-        preferredDate: new Date().toISOString().split('T')[0],
-        preferredSlot: '10:00 AM',
-        department: selectedDoctor ? selectedDoctor.department : 'General Medicine',
-        doctorName: selectedDoctor ? selectedDoctor.name : 'Dr. Robert King'
+        notes: ''
     });
 
-    const [submitted, setSubmitted] = useState(false);
-    const [bookingDetails, setBookingDetails] = useState(null);
+    // Submission states
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+    const [submitted, setSubmitted] = useState(false);
+    const [confirmedAppointment, setConfirmedAppointment] = useState(null);
 
+    // Fetch live slots whenever selectedDate or doctorId changes
+    useEffect(() => {
+        if (!doctorId) return;
+
+        const fetchSlots = async () => {
+            setLoadingSlots(true);
+            setSlotsError(null);
+            try {
+                const res = await doctorService.getDoctorAvailability(doctorId, selectedDate);
+                const slotsData = res?.slots || [];
+                setAvailableSlots(slotsData);
+
+                // Auto-select first available slot if current selectedSlot is invalid
+                const firstAvail = slotsData.find(s => s.isAvailable);
+                if (firstAvail) {
+                    setSelectedSlot(firstAvail.slot || firstAvail.time12 || firstAvail.time24);
+                } else {
+                    setSelectedSlot('');
+                }
+            } catch (err) {
+                console.error('Failed to load slots:', err);
+                setSlotsError('Could not load slots for this date.');
+            } finally {
+                setLoadingSlots(false);
+            }
+        };
+
+        fetchSlots();
+    }, [doctorId, selectedDate]);
+
+    // Handle patient input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -33,34 +100,108 @@ const PatientForm = () => {
         }));
     };
 
+    // Handle Appointment Confirmation & Submission to MongoDB
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError('');
+
+        if (!selectedSlot) {
+            setSubmitError('Please select an available time slot.');
+            return;
+        }
+
         setSubmitting(true);
 
-        const token = `OPD-${Math.floor(100 + Math.random() * 900)}`;
-        const booking = {
-            ...formData,
-            id: Date.now(),
-            token,
-            status: 'scheduled',
+        const appointmentPayload = {
+            doctorId,
+            hospitalId: hospitalId || '6aaea47fabaa906ff397da51', // fallback to primary hospital if empty
+            specialtyId: selectedDoctor?.specialty?._id || selectedDoctor?.specialtyId,
+            department: selectedDoctor?.department || selectedDoctor?.specialization || 'General Medicine',
+            date: selectedDate,
+            timeSlot: selectedSlot,
             patientName: formData.name,
-            time: formData.preferredSlot,
-            date: formData.preferredDate
+            patientEmail: formData.email,
+            patientPhone: formData.contact,
+            patientAge: Number(formData.age) || 30,
+            patientGender: formData.gender,
+            symptoms: formData.symptoms,
+            notes: formData.notes
         };
 
         try {
-            await receptionService.createAppointment(booking);
-        } catch (err) {
-            console.warn('Booking submitted locally:', err);
-        }
+            const res = await appointmentService.createAppointment(appointmentPayload);
+            const savedData = res?.data || res?.appointment || res;
 
-        setBookingDetails(booking);
-        setSubmitted(true);
-        setSubmitting(false);
+            setConfirmedAppointment({
+                ...savedData,
+                appointmentNumber: savedData.appointmentNumber || `APT-${Date.now().toString().slice(-6)}`,
+                queueToken: savedData.queueToken || `OPD-${Math.floor(100 + Math.random() * 900)}`,
+                doctorName: selectedDoctor?.name || 'Dr. Specialist',
+                hospitalName: selectedDoctor?.hospitalName || selectedDoctor?.hospital?.name || 'ProHealth Hospital',
+                department: selectedDoctor?.department || selectedDoctor?.specialization || 'General Medicine',
+                roomNumber: selectedDoctor?.roomNumber || 'Room 102',
+                date: selectedDate,
+                timeSlot: selectedSlot,
+                fee: selectedDoctor?.fee || `$${selectedDoctor?.consultationFee || 50}`,
+                patientName: formData.name
+            });
+
+            setSubmitted(true);
+        } catch (err) {
+            console.error('Failed to confirm appointment:', err);
+            setSubmitError(err.response?.data?.message || err.message || 'Failed to book appointment. The slot might already be reserved.');
+        } finally {
+            setSubmitting(false);
+        }
     };
 
+    // Fallback if doctor is not selected
+    if (!selectedDoctor) {
+        return (
+            <div style={{
+                minHeight: '100vh',
+                background: '#0a0f1d',
+                color: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '2rem'
+            }}>
+                <div style={{
+                    background: 'rgba(15, 23, 42, 0.8)',
+                    borderRadius: '20px',
+                    padding: '3rem 2rem',
+                    textAlign: 'center',
+                    maxWidth: '480px',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}>
+                    <Stethoscope size={52} color="#38bdf8" style={{ margin: '0 auto 1rem' }} />
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.75rem' }}>No Doctor Selected</h2>
+                    <p style={{ color: '#94a3b8', fontSize: '0.92rem', marginBottom: '1.5rem' }}>
+                        Please select a specialist from the 3D Doctor Selection rail to book your consultation.
+                    </p>
+                    <button
+                        onClick={() => navigate('/patient')}
+                        style={{
+                            padding: '0.8rem 1.5rem',
+                            borderRadius: '10px',
+                            background: '#0284c7',
+                            color: '#ffffff',
+                            fontWeight: 700,
+                            border: 'none',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Browse Specialists
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
+        <div style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2.5rem 1rem' }}>
             {/* Background Video */}
             <video
                 src={hospitalVideo}
@@ -86,139 +227,154 @@ const PatientForm = () => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.88) 0%, rgba(2, 132, 199, 0.75) 100%)',
+                background: 'linear-gradient(135deg, rgba(10, 15, 29, 0.92) 0%, rgba(2, 132, 199, 0.82) 100%)',
                 zIndex: 1
             }} />
 
-            {/* Content Container */}
-            <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '640px' }}>
-                {submitted && bookingDetails ? (
+            {/* Main Booking Container */}
+            <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '820px' }}>
+                {submitted && confirmedAppointment ? (
                     /* DIGITAL OPD TOKEN CONFIRMATION PASS */
                     <div style={{
                         background: 'rgba(255, 255, 255, 0.98)',
-                        backdropFilter: 'blur(16px)',
+                        backdropFilter: 'blur(20px)',
                         borderRadius: '24px',
                         padding: '2.5rem',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                        border: '1px solid rgba(255, 255, 255, 0.8)',
-                        textAlign: 'center'
+                        boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.6)',
+                        border: '1px solid rgba(255, 255, 255, 0.9)'
                     }}>
-                        <div style={{
-                            width: '64px',
-                            height: '64px',
-                            borderRadius: '50%',
-                            background: '#ecfdf5',
-                            color: '#10b981',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            margin: '0 auto 1.25rem',
-                            border: '2px solid #a7f3d0'
-                        }}>
-                            <CheckCircle2 size={36} />
+                        {/* Success Header */}
+                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                            <div style={{
+                                width: '64px',
+                                height: '64px',
+                                borderRadius: '50%',
+                                background: '#ecfdf5',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1rem',
+                                color: '#059669',
+                                border: '2px solid #a7f3d0'
+                            }}>
+                                <CheckCircle2 size={36} />
+                            </div>
+                            <h2 style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0 0 0.35rem' }}>
+                                Appointment Confirmed!
+                            </h2>
+                            <p style={{ color: '#64748b', fontSize: '0.95rem', margin: 0 }}>
+                                Your OPD digital registration token has been verified and saved to the hospital queue.
+                            </p>
                         </div>
 
-                        <span style={{
-                            display: 'inline-block',
-                            padding: '0.25rem 0.85rem',
-                            borderRadius: '9999px',
-                            background: '#e0f2fe',
-                            color: '#0284c7',
-                            fontSize: '0.8rem',
-                            fontWeight: '700',
-                            marginBottom: '0.5rem'
-                        }}>
-                            CONFIRMED APPOINTMENT
-                        </span>
-
-                        <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0f172a', margin: '0.25rem 0 0.5rem' }}>
-                            Registration Complete
-                        </h2>
-                        <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '2rem' }}>
-                            Please present your digital token at the reception desk upon arrival.
-                        </p>
-
-                        {/* Token Card */}
+                        {/* Token Pass Card */}
                         <div style={{
                             background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                            color: '#ffffff',
-                            borderRadius: '16px',
+                            borderRadius: '18px',
                             padding: '1.75rem',
-                            textAlign: 'left',
+                            color: '#ffffff',
                             marginBottom: '2rem',
-                            boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+                            boxShadow: '0 12px 30px rgba(15, 23, 42, 0.25)'
                         }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.15)', paddingBottom: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.15)', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
                                 <div>
-                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Token Number</div>
-                                    <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#38bdf8' }}>{bookingDetails.token}</div>
+                                    <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#38bdf8', fontWeight: 700 }}>
+                                        OPD Queue Token Pass
+                                    </span>
+                                    <h3 style={{ fontSize: '1.8rem', fontWeight: 900, color: '#ffffff', margin: 0 }}>
+                                        {confirmedAppointment.queueToken}
+                                    </h3>
                                 </div>
-                                <Ticket size={32} color="#38bdf8" />
+                                <div style={{ textAlign: 'right' }}>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Appointment Ref:</span>
+                                    <p style={{ fontSize: '0.9rem', fontWeight: 700, color: '#e2e8f0', margin: 0 }}>
+                                        {confirmedAppointment.appointmentNumber}
+                                    </p>
+                                </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', fontSize: '0.88rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem' }}>
                                 <div>
-                                    <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.75rem' }}>Patient Name</span>
-                                    <strong style={{ color: '#ffffff' }}>{bookingDetails.name}</strong>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Consulting Doctor:</span>
+                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', margin: '0.15rem 0 0' }}>
+                                        {confirmedAppointment.doctorName}
+                                    </p>
+                                    <span style={{ fontSize: '0.8rem', color: '#38bdf8' }}>{confirmedAppointment.department}</span>
                                 </div>
                                 <div>
-                                    <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.75rem' }}>Consulting Doctor</span>
-                                    <strong style={{ color: '#38bdf8' }}>{bookingDetails.doctorName}</strong>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Hospital & Room:</span>
+                                    <p style={{ fontSize: '0.95rem', fontWeight: 600, color: '#ffffff', margin: '0.15rem 0 0' }}>
+                                        {confirmedAppointment.hospitalName}
+                                    </p>
+                                    <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>{confirmedAppointment.roomNumber}</span>
                                 </div>
                                 <div>
-                                    <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.75rem' }}>Department</span>
-                                    <span style={{ color: '#ffffff' }}>{bookingDetails.department}</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Scheduled Time:</span>
+                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#38bdf8', margin: '0.15rem 0 0' }}>
+                                        {confirmedAppointment.date}
+                                    </p>
+                                    <span style={{ fontSize: '0.85rem', color: '#ffffff', fontWeight: 600 }}>{confirmedAppointment.timeSlot}</span>
                                 </div>
                                 <div>
-                                    <span style={{ color: '#94a3b8', display: 'block', fontSize: '0.75rem' }}>Slot Time</span>
-                                    <span style={{ color: '#34d399', fontWeight: '600' }}>{bookingDetails.preferredDate} ({bookingDetails.preferredSlot})</span>
+                                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Patient:</span>
+                                    <p style={{ fontSize: '1.05rem', fontWeight: 700, color: '#ffffff', margin: '0.15rem 0 0' }}>
+                                        {confirmedAppointment.patientName}
+                                    </p>
+                                    <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 700 }}>Fee: {confirmedAppointment.fee} (Paid)</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', gap: '1rem' }}>
+                        {/* Action Buttons */}
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                             <button
                                 onClick={() => window.print()}
                                 style={{
                                     flex: 1,
-                                    padding: '0.8rem',
-                                    borderRadius: '10px',
+                                    padding: '0.85rem',
+                                    borderRadius: '12px',
                                     background: '#f1f5f9',
-                                    color: '#334155',
-                                    fontWeight: '600',
+                                    color: '#0f172a',
+                                    fontWeight: 700,
                                     border: '1px solid #cbd5e1',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
                                 }}
                             >
-                                Print Token
+                                <Download size={18} />
+                                <span>Print / Download Pass</span>
                             </button>
                             <button
                                 onClick={() => navigate('/patient')}
                                 style={{
                                     flex: 1,
-                                    padding: '0.8rem',
-                                    borderRadius: '10px',
+                                    padding: '0.85rem',
+                                    borderRadius: '12px',
                                     background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                                     color: '#ffffff',
-                                    fontWeight: '600',
+                                    fontWeight: 700,
                                     border: 'none',
                                     cursor: 'pointer'
                                 }}
                             >
-                                Back to Directory
+                                Back to Doctor Directory
                             </button>
                         </div>
                     </div>
                 ) : (
-                    /* BOOKING FORM */
+                    /* APPOINTMENT BOOKING FORM */
                     <div style={{
-                        background: 'rgba(255, 255, 255, 0.96)',
-                        backdropFilter: 'blur(16px)',
+                        background: 'rgba(255, 255, 255, 0.98)',
+                        backdropFilter: 'blur(20px)',
                         borderRadius: '24px',
                         padding: '2.5rem',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                        border: '1px solid rgba(255, 255, 255, 0.8)'
+                        boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.5)',
+                        border: '1px solid rgba(255, 255, 255, 0.9)'
                     }}>
+                        {/* Back Navigation */}
                         <button
                             onClick={() => navigate('/patient')}
                             style={{
@@ -227,62 +383,249 @@ const PatientForm = () => {
                                 gap: '0.4rem',
                                 color: '#64748b',
                                 fontSize: '0.88rem',
-                                fontWeight: '600',
+                                fontWeight: '700',
                                 marginBottom: '1.25rem',
                                 padding: 0,
-                                background: 'transparent'
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer'
                             }}
                         >
                             <ArrowLeft size={16} />
-                            <span>Back to Specialists</span>
+                            <span>Back to Doctor Selection</span>
                         </button>
 
-                        <div style={{ marginBottom: '1.75rem' }}>
-                            <h2 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#0f172a', margin: '0 0 0.4rem' }}>
-                                Book OPD Consultation
-                            </h2>
-                            <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>
-                                Fast-track registration with instant confirmation token.
-                            </p>
+                        {/* Booking Hierarchy Flow Indicators */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            flexWrap: 'wrap',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            color: '#0284c7',
+                            marginBottom: '1.5rem',
+                            padding: '0.6rem 1rem',
+                            background: '#f0f9ff',
+                            borderRadius: '12px',
+                            border: '1px solid #bae6fd'
+                        }}>
+                            <span>Doctor</span>
+                            <span>→</span>
+                            <span>Hospital</span>
+                            <span>→</span>
+                            <span>Specialization</span>
+                            <span>→</span>
+                            <span>Available Dates</span>
+                            <span>→</span>
+                            <span>Available Slots</span>
+                            <span>→</span>
+                            <span style={{ color: '#0f172a' }}>Confirm Appointment</span>
                         </div>
 
-                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                            <div>
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
-                                    Patient Full Name *
-                                </label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    required
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    placeholder="e.g. Alex Morgan"
-                                    style={{
-                                        width: '100%',
-                                        padding: '0.75rem 1rem',
-                                        borderRadius: '8px',
-                                        border: '1.5px solid #cbd5e1',
-                                        fontSize: '0.95rem',
-                                        boxSizing: 'border-box'
-                                    }}
-                                />
+                        {/* Selected Doctor Summary Card */}
+                        <div style={{
+                            background: '#f8fafc',
+                            border: '1.5px solid #e2e8f0',
+                            borderRadius: '16px',
+                            padding: '1.25rem',
+                            marginBottom: '2rem',
+                            display: 'flex',
+                            gap: '1.25rem',
+                            alignItems: 'center',
+                            flexWrap: 'wrap'
+                        }}>
+                            <div style={{
+                                width: '64px',
+                                height: '64px',
+                                borderRadius: '14px',
+                                overflow: 'hidden',
+                                background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                            }}>
+                                {selectedDoctor.image ? (
+                                    <img
+                                        src={selectedDoctor.image}
+                                        alt={selectedDoctor.name}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                ) : (
+                                    <User size={32} color="#ffffff" />
+                                )}
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                    <div>
+                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                                            {selectedDoctor.name}
+                                        </h3>
+                                        <p style={{ color: '#0284c7', fontWeight: 700, fontSize: '0.88rem', margin: '0.1rem 0' }}>
+                                            {selectedDoctor.specialization || selectedDoctor.department}
+                                        </p>
+                                    </div>
+                                    <span style={{
+                                        padding: '0.25rem 0.65rem',
+                                        borderRadius: '9999px',
+                                        background: '#ecfdf5',
+                                        color: '#059669',
+                                        fontSize: '0.8rem',
+                                        fontWeight: 800,
+                                        border: '1px solid #a7f3d0'
+                                    }}>
+                                        Fee: {selectedDoctor.fee || `$${selectedDoctor.consultationFee || 50}`}
+                                    </span>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.4rem', fontSize: '0.82rem', color: '#64748b', flexWrap: 'wrap' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                        <Building2 size={14} color="#0284c7" />
+                                        {selectedDoctor.hospitalName || 'ProHealth Hospital'}
+                                    </span>
+                                    <span>•</span>
+                                    <span>{selectedDoctor.roomNumber || 'OPD Room 102'}</span>
+                                    <span>•</span>
+                                    <span>{selectedDoctor.experience || `${selectedDoctor.experienceYears || 10}+ Years Exp`}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Error Notice */}
+                        {submitError && (
+                            <div style={{
+                                background: '#fef2f2',
+                                border: '1px solid #fecaca',
+                                color: '#b91c1c',
+                                padding: '0.85rem 1rem',
+                                borderRadius: '10px',
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                marginBottom: '1.5rem'
+                            }}>
+                                <AlertCircle size={18} />
+                                <span>{submitError}</span>
+                            </div>
+                        )}
+
+                        {/* Appointment Booking Form */}
+                        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+                            {/* Step 1: Select Date & Available Time Slot */}
+                            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+                                    <div>
+                                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.4rem' }}>
+                                            Consultation Date *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            min={todayStr}
+                                            value={selectedDate}
+                                            onChange={(e) => setSelectedDate(e.target.value)}
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem 1rem',
+                                                borderRadius: '10px',
+                                                border: '1.5px solid #cbd5e1',
+                                                fontSize: '0.95rem',
+                                                background: '#ffffff',
+                                                color: '#0f172a',
+                                                fontWeight: 600,
+                                                boxSizing: 'border-box'
+                                            }}
+                                            required
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Availability Summary:</span>
+                                        <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0284c7' }}>
+                                            {loadingSlots ? 'Checking doctor schedule...' : `${availableSlots.filter(s => s.isAvailable).length} Slots Available on ${selectedDate}`}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Available Time Slots Grid */}
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
-                                        Age *
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.5rem' }}>
+                                        Select Time Slot *
+                                    </label>
+                                    {loadingSlots ? (
+                                        <div style={{ padding: '1rem 0' }}>
+                                            <InlineLoader size="24px" text="Fetching real-time slots..." />
+                                        </div>
+                                    ) : availableSlots.length === 0 ? (
+                                        <p style={{ color: '#ef4444', fontSize: '0.88rem', margin: 0 }}>
+                                            No slots available for this doctor on {selectedDate}. Please choose another date.
+                                        </p>
+                                    ) : (
+                                        <div style={{
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))',
+                                            gap: '0.6rem'
+                                        }}>
+                                            {availableSlots.map((slotItem) => {
+                                                const slotLabel = slotItem.slot || slotItem.time12 || slotItem.time24;
+                                                const isAvailable = slotItem.isAvailable;
+                                                const isSelected = selectedSlot === slotLabel;
+
+                                                return (
+                                                    <button
+                                                        type="button"
+                                                        key={slotLabel}
+                                                        disabled={!isAvailable}
+                                                        onClick={() => setSelectedSlot(slotLabel)}
+                                                        style={{
+                                                            padding: '0.6rem 0.4rem',
+                                                            borderRadius: '8px',
+                                                            fontSize: '0.82rem',
+                                                            fontWeight: 700,
+                                                            textAlign: 'center',
+                                                            cursor: isAvailable ? 'pointer' : 'not-allowed',
+                                                            border: isSelected
+                                                                ? '2px solid #0284c7'
+                                                                : isAvailable
+                                                                    ? '1px solid #cbd5e1'
+                                                                    : '1px solid #e2e8f0',
+                                                            background: isSelected
+                                                                ? '#0284c7'
+                                                                : isAvailable
+                                                                    ? '#ffffff'
+                                                                    : '#f1f5f9',
+                                                            color: isSelected
+                                                                ? '#ffffff'
+                                                                : isAvailable
+                                                                    ? '#0f172a'
+                                                                    : '#94a3b8',
+                                                            textDecoration: !isAvailable ? 'line-through' : 'none',
+                                                            transition: 'all 0.15s ease'
+                                                        }}
+                                                    >
+                                                        {slotLabel}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Step 2: Patient Information */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                                        Patient Full Name *
                                     </label>
                                     <input
-                                        type="number"
-                                        name="age"
+                                        type="text"
+                                        name="name"
                                         required
-                                        min="1"
-                                        max="120"
-                                        value={formData.age}
+                                        value={formData.name}
                                         onChange={handleChange}
-                                        placeholder="e.g. 34"
+                                        placeholder="e.g. Alex Morgan"
                                         style={{
                                             width: '100%',
                                             padding: '0.75rem 1rem',
@@ -293,8 +636,79 @@ const PatientForm = () => {
                                         }}
                                     />
                                 </div>
+
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                                        Email Address *
+                                    </label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        required
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="alex@example.com"
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem 1rem',
+                                            borderRadius: '8px',
+                                            border: '1.5px solid #cbd5e1',
+                                            fontSize: '0.95rem',
+                                            boxSizing: 'border-box'
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                                        Phone Contact *
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        name="contact"
+                                        required
+                                        value={formData.contact}
+                                        onChange={handleChange}
+                                        placeholder="+1 555-0199"
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem 1rem',
+                                            borderRadius: '8px',
+                                            border: '1.5px solid #cbd5e1',
+                                            fontSize: '0.95rem',
+                                            boxSizing: 'border-box'
+                                        }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                                        Age *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="age"
+                                        min="1"
+                                        max="120"
+                                        required
+                                        value={formData.age}
+                                        onChange={handleChange}
+                                        placeholder="e.g. 32"
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem 1rem',
+                                            borderRadius: '8px',
+                                            border: '1.5px solid #cbd5e1',
+                                            fontSize: '0.95rem',
+                                            boxSizing: 'border-box'
+                                        }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
                                         Gender
                                     </label>
                                     <select
@@ -318,109 +732,16 @@ const PatientForm = () => {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
-                                        Phone Contact *
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        name="contact"
-                                        required
-                                        value={formData.contact}
-                                        onChange={handleChange}
-                                        placeholder="+1 555-0199"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem 1rem',
-                                            borderRadius: '8px',
-                                            border: '1.5px solid #cbd5e1',
-                                            fontSize: '0.95rem',
-                                            boxSizing: 'border-box'
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
-                                        Preferred Slot
-                                    </label>
-                                    <select
-                                        name="preferredSlot"
-                                        value={formData.preferredSlot}
-                                        onChange={handleChange}
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem 1rem',
-                                            borderRadius: '8px',
-                                            border: '1.5px solid #cbd5e1',
-                                            fontSize: '0.95rem',
-                                            background: '#ffffff',
-                                            boxSizing: 'border-box'
-                                        }}
-                                    >
-                                        <option value="09:00 AM">09:00 AM - Morning</option>
-                                        <option value="10:00 AM">10:00 AM - Morning</option>
-                                        <option value="11:30 AM">11:30 AM - Morning</option>
-                                        <option value="02:00 PM">02:00 PM - Afternoon</option>
-                                        <option value="04:30 PM">04:30 PM - Evening</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
-                                        Doctor Assigned
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="doctorName"
-                                        value={formData.doctorName}
-                                        readOnly
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem 1rem',
-                                            borderRadius: '8px',
-                                            border: '1.5px solid #e2e8f0',
-                                            background: '#f8fafc',
-                                            fontWeight: '600',
-                                            color: '#0284c7',
-                                            boxSizing: 'border-box'
-                                        }}
-                                    />
-                                </div>
-                                <div>
-                                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
-                                        Department
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="department"
-                                        value={formData.department}
-                                        readOnly
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem 1rem',
-                                            borderRadius: '8px',
-                                            border: '1.5px solid #e2e8f0',
-                                            background: '#f8fafc',
-                                            color: '#475569',
-                                            boxSizing: 'border-box'
-                                        }}
-                                    />
-                                </div>
-                            </div>
-
                             <div>
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '600', color: '#334155', marginBottom: '0.35rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
                                     Chief Complaints & Symptoms
                                 </label>
                                 <textarea
                                     name="symptoms"
-                                    rows={3}
+                                    rows={2}
                                     value={formData.symptoms}
                                     onChange={handleChange}
-                                    placeholder="Briefly describe what you're experiencing (e.g. fever, headache for 2 days)..."
+                                    placeholder="Briefly describe what you are experiencing (e.g. headache, chest discomfort)..."
                                     style={{
                                         width: '100%',
                                         padding: '0.75rem 1rem',
@@ -433,25 +754,37 @@ const PatientForm = () => {
                                 />
                             </div>
 
+                            {/* Submit Button */}
                             <button
                                 type="submit"
-                                disabled={submitting}
+                                disabled={submitting || !selectedSlot}
                                 style={{
                                     width: '100%',
-                                    padding: '0.9rem',
-                                    borderRadius: '10px',
+                                    padding: '0.95rem',
+                                    borderRadius: '12px',
                                     background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                                     color: '#ffffff',
-                                    fontWeight: '700',
-                                    fontSize: '1rem',
+                                    fontWeight: 800,
+                                    fontSize: '1.05rem',
                                     border: 'none',
-                                    cursor: submitting ? 'not-allowed' : 'pointer',
-                                    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
-                                    transition: 'all 0.2s',
-                                    marginTop: '0.5rem'
+                                    cursor: (submitting || !selectedSlot) ? 'not-allowed' : 'pointer',
+                                    boxShadow: '0 6px 18px rgba(2, 132, 199, 0.4)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem',
+                                    opacity: (!selectedSlot || submitting) ? 0.75 : 1,
+                                    transition: 'all 0.2s ease'
                                 }}
                             >
-                                {submitting ? 'Generating OPD Pass...' : 'Confirm Consultation Booking'}
+                                {submitting ? (
+                                    <InlineLoader size="20px" text="Confirming with Hospital Queue..." />
+                                ) : (
+                                    <>
+                                        <Calendar size={18} />
+                                        <span>Confirm Appointment ({selectedDate} @ {selectedSlot || 'Select Slot'})</span>
+                                    </>
+                                )}
                             </button>
                         </form>
                     </div>

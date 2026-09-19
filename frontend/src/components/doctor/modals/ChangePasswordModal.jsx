@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Lock, Check } from 'lucide-react';
+import { InlineLoader } from '../../common/Loader';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
@@ -62,65 +63,88 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     padding: '1.5rem', borderBottom: '1px solid var(--doctor-border)',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center'
                 }}>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--doctor-text-main)' }}>Change Password</h2>
-                    <button onClick={() => onClose(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--doctor-text-muted)' }}>
-                        <X size={24} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{
+                            padding: '0.5rem', backgroundColor: 'var(--doctor-bg)',
+                            borderRadius: '8px', color: 'var(--doctor-primary)'
+                        }}>
+                            <Lock size={20} />
+                        </div>
+                        <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--doctor-text-main)', margin: 0 }}>
+                            Change Password
+                        </h2>
+                    </div>
+                    <button
+                        onClick={() => onClose(false)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--doctor-text-muted)' }}
+                    >
+                        <X size={20} />
                     </button>
                 </div>
 
                 <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
                     {error && (
                         <div style={{
-                            padding: '0.75rem', marginBottom: '1rem', borderRadius: '6px',
-                            backgroundColor: '#fef2f2', color: '#ef4444', fontSize: '0.875rem'
+                            padding: '0.75rem', backgroundColor: '#fef2f2',
+                            border: '1px solid #fee2e2', borderRadius: '8px',
+                            color: 'var(--doctor-danger)', fontSize: '0.875rem',
+                            marginBottom: '1rem'
                         }}>
                             {error}
                         </div>
                     )}
 
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem', color: 'var(--doctor-text-main)' }}>
-                            Current Password
-                        </label>
-                        <input
-                            type="password"
-                            name="currentPassword"
-                            value={formData.currentPassword}
-                            onChange={handleChange}
-                            className="search-input"
-                            style={{ width: '100%' }}
-                        />
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div>
+                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+                                Current Password
+                            </label>
+                            <input
+                                type="password"
+                                name="currentPassword"
+                                value={formData.currentPassword}
+                                onChange={handleChange}
+                                className="form-input"
+                                style={{ width: '100%' }}
+                                placeholder="••••••••"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+                                New Password
+                            </label>
+                            <input
+                                type="password"
+                                name="newPassword"
+                                value={formData.newPassword}
+                                onChange={handleChange}
+                                className="form-input"
+                                style={{ width: '100%' }}
+                                placeholder="Min. 8 characters"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>
+                                Confirm New Password
+                            </label>
+                            <input
+                                type="password"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className="form-input"
+                                style={{ width: '100%' }}
+                                placeholder="••••••••"
+                            />
+                        </div>
                     </div>
 
-                    <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem', color: 'var(--doctor-text-main)' }}>
-                            New Password
-                        </label>
-                        <input
-                            type="password"
-                            name="newPassword"
-                            value={formData.newPassword}
-                            onChange={handleChange}
-                            className="search-input"
-                            style={{ width: '100%' }}
-                        />
-                    </div>
-
-                    <div style={{ marginBottom: '1.5rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem', color: 'var(--doctor-text-main)' }}>
-                            Confirm New Password
-                        </label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            className="search-input"
-                            style={{ width: '100%' }}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                    <div style={{
+                        marginTop: '1.5rem', display: 'flex',
+                        justifyContent: 'flex-end', gap: '0.75rem'
+                    }}>
                         <button
                             type="button"
                             onClick={() => onClose(false)}
@@ -135,7 +159,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Updating...' : <><Lock size={16} /> Update Password</>}
+                            {isLoading ? <InlineLoader size="18px" text="Updating..." /> : <><Lock size={16} /> Update Password</>}
                         </button>
                     </div>
                 </form>

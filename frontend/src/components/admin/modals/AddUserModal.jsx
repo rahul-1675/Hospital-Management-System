@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { UserPlus, AlertCircle, X, CheckCircle, Copy, RefreshCw } from 'lucide-react';
+import { UserPlus, AlertCircle, X, CheckCircle, Copy, Check, Lock } from 'lucide-react';
 import { useAdmin } from '../../../context/AdminContext';
+import { InlineLoader } from '../../common/Loader';
 
 const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
     const { addUser, checkEmailUnique } = useAdmin();
@@ -8,21 +9,22 @@ const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
         name: '',
         email: '',
         phone: '',
-        role: '',
-        department: '',
-        specialization: '', // Only for Doctor
+        role: 'Doctor',
+        department: 'Cardiology',
+        specialization: '',
+        password: '',
         status: 'Active'
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [newUserCreds, setNewUserCreds] = useState(null); // { userId, password }
+    const [copied, setCopied] = useState(false);
 
     if (!isOpen) return null;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user types
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
         }
@@ -41,12 +43,8 @@ const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
 
         if (!formData.role) newErrors.role = 'Role is required.';
 
-        if (formData.role !== 'Admin' && formData.role !== '' && !formData.department.trim()) {
+        if (formData.role !== 'Admin' && !formData.department.trim()) {
             newErrors.department = 'Department is required for this role.';
-        }
-
-        if (formData.role === 'Doctor' && !formData.specialization.trim()) {
-            newErrors.specialization = 'Specialization is required for Doctors.';
         }
 
         setErrors(newErrors);
@@ -58,18 +56,30 @@ const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
         if (!validate()) return;
 
         setIsSubmitting(true);
+        const result = await addUser(formData);
+        setIsSubmitting(false);
 
-        // Simulate API delay
-        setTimeout(() => {
-            const result = addUser(formData);
-            setIsSubmitting(false);
-            if (result.success) {
-                setNewUserCreds({ userId: result.user.id, password: result.tempPassword });
+        if (result && result.success) {
+            setNewUserCreds({
+                userId: result.user.id || result.user.staffId || result.user.email,
+                name: result.user.name,
+                role: result.user.role,
+                password: result.tempPassword || formData.password
+            });
+            if (onUserAdded) {
                 onUserAdded(result.user);
-            } else {
-                setErrors({ submit: 'Failed to create user. Please try again.' });
             }
-        }, 1000);
+        } else {
+            setErrors({ submit: result?.error || 'Failed to create user. Please try again.' });
+        }
+    };
+
+    const handleCopy = () => {
+        if (!newUserCreds) return;
+        const text = `Hospital System Credentials:\nName: ${newUserCreds.name}\nRole: ${newUserCreds.role}\nUser ID / Email: ${newUserCreds.userId}\nPassword: ${newUserCreds.password}`;
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
     };
 
     const handleClose = () => {
@@ -77,13 +87,15 @@ const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
             name: '',
             email: '',
             phone: '',
-            role: '',
-            department: '',
+            role: 'Doctor',
+            department: 'Cardiology',
             specialization: '',
+            password: '',
             status: 'Active'
         });
         setErrors({});
         setNewUserCreds(null);
+        setCopied(false);
         onClose();
     };
 
@@ -93,139 +105,190 @@ const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
             <div style={{
                 position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
                 backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000,
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backdropFilter: 'blur(4px)'
             }}>
-                <div className="detail-card" style={{ width: '450px', padding: '2.5rem', borderRadius: '16px', textAlign: 'center', animation: 'slideUp 0.3s ease' }}>
-                    <div style={{ width: '60px', height: '60px', background: '#f0fdf4', color: '#16a34a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                        <CheckCircle size={32} />
+                <div className="detail-card" style={{ width: '480px', padding: '2.5rem', borderRadius: '20px', textAlign: 'center', background: '#ffffff', boxShadow: '0 25px 50px rgba(0,0,0,0.25)' }}>
+                    <div style={{ width: '64px', height: '64px', background: '#ecfdf5', color: '#10b981', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', border: '2px solid #a7f3d0' }}>
+                        <CheckCircle size={36} />
                     </div>
-                    <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#1e293b', marginBottom: '0.5rem' }}>User Created!</h2>
-                    <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '2rem' }}>
-                        The user <strong>{formData.name}</strong> has been successfully added to the system.
+
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
+                        Member Added Successfully!
+                    </h2>
+                    <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.75rem' }}>
+                        The account has been created in the hospital database. Provide these credentials to the user:
                     </p>
 
-                    <div style={{ background: '#f8fafc', padding: '1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '2rem', textAlign: 'left' }}>
-                        <div style={{ marginBottom: '1rem' }}>
-                            <label className="text-label" style={{ fontSize: '0.75rem', display: 'block', marginBottom: '0.25rem' }}>User ID</label>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <code style={{ fontSize: '1.2rem', fontWeight: 600, color: '#1e293b' }}>{newUserCreds.userId}</code>
-                                <Copy size={16} color="#94a3b8" style={{ cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(newUserCreds.userId)} />
-                            </div>
+                    <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '1.25rem', textAlign: 'left', marginBottom: '1.5rem' }}>
+                        <div style={{ marginBottom: '0.75rem' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Full Name</span>
+                            <div style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>{newUserCreds.name} ({newUserCreds.role})</div>
+                        </div>
+                        <div style={{ marginBottom: '0.75rem' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Login ID / Email</span>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0284c7', fontFamily: 'var(--font-mono, monospace)' }}>{newUserCreds.userId}</div>
                         </div>
                         <div>
-                            <label className="text-label" style={{ fontSize: '0.75rem', display: 'block', marginBottom: '0.25rem' }}>Temporary Password</label>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <code style={{ fontSize: '1.2rem', fontWeight: 600, color: '#1e293b' }}>{newUserCreds.password}</code>
-                                <Copy size={16} color="#94a3b8" style={{ cursor: 'pointer' }} onClick={() => navigator.clipboard.writeText(newUserCreds.password)} />
+                            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Password</span>
+                            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: '#0f172a', fontFamily: 'var(--font-mono, monospace)', background: '#ffffff', padding: '0.4rem 0.75rem', borderRadius: '6px', border: '1px solid #cbd5e1', display: 'inline-block', marginTop: '0.25rem' }}>
+                                {newUserCreds.password}
                             </div>
                         </div>
                     </div>
 
-                    <button className="action-btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={handleClose}>
-                        Done
-                    </button>
-                    <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '1rem' }}>An email with these credentials has been sent.</p>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                        <button
+                            type="button"
+                            className="action-btn btn-outline"
+                            style={{ flex: 1, justifyContent: 'center', gap: '0.4rem' }}
+                            onClick={handleCopy}
+                        >
+                            {copied ? <Check size={18} color="#10b981" /> : <Copy size={18} />}
+                            <span>{copied ? 'Copied!' : 'Copy Credentials'}</span>
+                        </button>
+                        <button
+                            type="button"
+                            className="action-btn btn-primary"
+                            style={{ flex: 1, justifyContent: 'center' }}
+                            onClick={handleClose}
+                        >
+                            Done
+                        </button>
+                    </div>
                 </div>
             </div>
         );
     }
 
-    // Form View
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
             backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 10000,
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(4px)'
         }}>
-            <div className="detail-card" style={{ width: '600px', maxWidth: '95%', padding: '2rem', borderRadius: '16px', maxHeight: '90vh', overflowY: 'auto', animation: 'slideUp 0.3s ease' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <div style={{ padding: '0.75rem', background: '#eff6ff', borderRadius: '50%', color: '#2563eb' }}>
+            <div className="detail-card" style={{ width: '600px', maxWidth: '95%', maxHeight: '90vh', overflowY: 'auto', borderRadius: '20px', background: '#ffffff', padding: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <UserPlus size={24} />
                         </div>
                         <div>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, color: '#1e293b' }}>Add New User</h2>
-                            <p style={{ fontSize: '0.9rem', color: '#64748b', margin: 0 }}>Create a profile and assign permissions</p>
+                            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>Add Hospital Member</h2>
+                            <p style={{ color: '#64748b', fontSize: '0.85rem', margin: 0 }}>Create staff profile & generate portal access</p>
                         </div>
                     </div>
-                    <button className="btn-ghost" onClick={handleClose}><X size={24} /></button>
+                    <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
+                        <X size={22} />
+                    </button>
                 </div>
 
+                {errors.submit && (
+                    <div style={{ padding: '0.75rem 1rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '8px', color: '#b91c1c', fontSize: '0.88rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <AlertCircle size={18} />
+                        <span>{errors.submit}</span>
+                    </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '1.5rem' }}>
                         <div style={{ gridColumn: 'span 2' }}>
-                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Full Name <span style={{ color: 'red' }}>*</span></label>
+                            <label className="text-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                                Full Name <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
                             <input
-                                type="text" name="name" value={formData.name} onChange={handleInputChange}
-                                className="search-input" style={{ width: '100%', borderColor: errors.name ? '#ef4444' : undefined }}
-                                placeholder="e.g. Dr. John Doe"
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                placeholder="e.g. Dr. Jennifer Adams"
+                                className="form-input"
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: errors.name ? '1.5px solid #ef4444' : '1px solid #cbd5e1', boxSizing: 'border-box' }}
                             />
-                            {errors.name && <span style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>{errors.name}</span>}
+                            {errors.name && <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '0.25rem', display: 'block' }}>{errors.name}</span>}
                         </div>
 
                         <div>
-                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Email Address <span style={{ color: 'red' }}>*</span></label>
+                            <label className="text-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                                Email Address <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
                             <input
-                                type="email" name="email" value={formData.email} onChange={handleInputChange}
-                                className="search-input" style={{ width: '100%', borderColor: errors.email ? '#ef4444' : undefined }}
-                                placeholder="john.doe@hms.com"
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                placeholder="jennifer@hms.com"
+                                className="form-input"
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: errors.email ? '1.5px solid #ef4444' : '1px solid #cbd5e1', boxSizing: 'border-box' }}
                             />
-                            {errors.email && <span style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>{errors.email}</span>}
+                            {errors.email && <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '0.25rem', display: 'block' }}>{errors.email}</span>}
                         </div>
+
                         <div>
-                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Phone Number</label>
+                            <label className="text-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                                Phone Number
+                            </label>
                             <input
-                                type="text" name="phone" value={formData.phone} onChange={handleInputChange}
-                                className="search-input" style={{ width: '100%' }}
-                                placeholder="+1 (555) 000-0000"
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                placeholder="+1 (555) 012-3456"
+                                className="form-input"
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                             />
                         </div>
 
                         <div>
-                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Role <span style={{ color: 'red' }}>*</span></label>
+                            <label className="text-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                                Hospital Role <span style={{ color: '#ef4444' }}>*</span>
+                            </label>
                             <select
-                                name="role" value={formData.role} onChange={handleInputChange}
-                                className="search-input" style={{ width: '100%', borderColor: errors.role ? '#ef4444' : undefined }}
+                                name="role"
+                                value={formData.role}
+                                onChange={handleInputChange}
+                                className="form-select"
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
                             >
-                                <option value="">Select Role...</option>
-                                <option value="Admin">Admin</option>
-                                <option value="Doctor">Doctor</option>
-                                <option value="Nurse">Nurse</option>
-                                <option value="Receptionist">Receptionist</option>
+                                <option value="Doctor">Doctor / Physician</option>
+                                <option value="Receptionist">Receptionist / Front Desk</option>
                                 <option value="Pharmacist">Pharmacist</option>
-                                <option value="Staff">Staff</option>
+                                <option value="Staff">Clinical / Nursing Staff</option>
+                                <option value="Admin">Administrator</option>
                             </select>
-                            {errors.role && <span style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>{errors.role}</span>}
                         </div>
 
                         <div>
-                            <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Department <span style={formData.role === 'Admin' ? { display: 'none' } : { color: 'red' }}>*</span></label>
+                            <label className="text-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                                Department <span style={formData.role === 'Admin' ? { display: 'none' } : { color: '#ef4444' }}>*</span>
+                            </label>
                             <input
-                                type="text" name="department" value={formData.department} onChange={handleInputChange}
-                                className="search-input" style={{ width: '100%', borderColor: errors.department ? '#ef4444' : undefined, opacity: formData.role === 'Admin' ? 0.5 : 1 }}
+                                type="text"
+                                name="department"
+                                value={formData.department}
+                                onChange={handleInputChange}
                                 disabled={formData.role === 'Admin'}
-                                placeholder={formData.role === 'Admin' ? 'N/A' : 'e.g. Cardiology'}
+                                placeholder={formData.role === 'Admin' ? 'Management' : 'e.g. Cardiology'}
+                                className="form-input"
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: errors.department ? '1.5px solid #ef4444' : '1px solid #cbd5e1', boxSizing: 'border-box' }}
                             />
-                            {errors.department && <span style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>{errors.department}</span>}
+                            {errors.department && <span style={{ color: '#ef4444', fontSize: '0.78rem', marginTop: '0.25rem', display: 'block' }}>{errors.department}</span>}
                         </div>
 
-                        {formData.role === 'Doctor' && (
-                            <div style={{ gridColumn: 'span 2' }}>
-                                <label className="text-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Specialization <span style={{ color: 'red' }}>*</span></label>
-                                <input
-                                    type="text" name="specialization" value={formData.specialization} onChange={handleInputChange}
-                                    className="search-input" style={{ width: '100%', borderColor: errors.specialization ? '#ef4444' : undefined }}
-                                    placeholder="e.g. Heart Surgeon"
-                                />
-                                {errors.specialization && <span style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>{errors.specialization}</span>}
-                            </div>
-                        )}
-
-                        <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
-                            <AlertCircle size={18} color="#64748b" />
-                            <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
-                                A temporary password will be generated and sent to the email provided. The user status will be set to <strong>Active</strong> by default.
-                            </p>
+                        <div style={{ gridColumn: 'span 2' }}>
+                            <label className="text-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
+                                Initial Password (Optional — Auto-generated if blank)
+                            </label>
+                            <input
+                                type="text"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                placeholder="Leave blank to auto-generate a secure password"
+                                className="form-input"
+                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                            />
                         </div>
                     </div>
 
@@ -236,25 +299,14 @@ const AddUserModal = ({ isOpen, onClose, onUserAdded }) => {
                         <button
                             type="submit"
                             className="action-btn btn-primary"
-                            style={{ flex: 1, justifyContent: 'center', opacity: isSubmitting ? 0.7 : 1 }}
+                            style={{ flex: 2, justifyContent: 'center', fontWeight: 700 }}
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? <><RefreshCw className="spin" size={18} /> Creating...</> : 'Create User'}
+                            {isSubmitting ? <InlineLoader size="18px" text="Creating Member..." /> : 'Add Member to Hospital'}
                         </button>
                     </div>
                 </form>
             </div>
-            <style>
-                {`
-                   @keyframes spin {
-                       from { transform: rotate(0deg); }
-                       to { transform: rotate(360deg); }
-                   }
-                   .spin {
-                       animation: spin 1s linear infinite;
-                   }
-               `}
-            </style>
         </div>
     );
 };

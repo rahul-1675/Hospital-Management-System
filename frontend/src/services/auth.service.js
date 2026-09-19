@@ -1,75 +1,69 @@
 import { apiClient } from './api';
 
-export const CREDENTIALS = {
-    doctor: {
-        id: "DOC001",
-        password: "doc@123",
-        name: "Dr. Smith",
-        role: "doctor"
-    },
-    receptionist: {
-        id: "REC001",
-        password: "rec@123",
-        name: "Receptionist Jane",
-        role: "receptionist"
-    },
-    pharmacy: {
-        id: "PHA001",
-        password: "pha@123",
-        name: "Pharmacist Bob",
-        role: "pharmacy"
-    },
-    staff: {
-        id: "STF001",
-        password: "stf@123",
-        name: "Staff Member Mike",
-        role: "staff"
-    },
-    admin: {
-        id: "ADM001",
-        password: "admin@123",
-        name: "Admin Alice",
-        role: "admin"
-    }
-};
-
 export const authService = {
     login: async (role, id, password) => {
+        const payload = {
+            role,
+            id: id ? id.trim() : '',
+            email: id && id.includes('@') ? id.trim() : undefined,
+            password
+        };
+
+        const res = await apiClient.post('/auth/login', payload);
+
+        if (res.success && res.user) {
+            if (res.token) {
+                localStorage.setItem('hms_auth_token', res.token);
+                localStorage.setItem('hms_token', res.token);
+            }
+            return {
+                ...res.user,
+                token: res.token
+            };
+        }
+
+        throw new Error(res.message || 'Login failed. Please check your credentials.');
+    },
+
+    register: async (userData) => {
+        const res = await apiClient.post('/auth/register', userData);
+        if (res.success && res.user) {
+            if (res.token) {
+                localStorage.setItem('hms_auth_token', res.token);
+                localStorage.setItem('hms_token', res.token);
+            }
+            return res;
+        }
+        throw new Error(res.message || 'Registration failed.');
+    },
+
+    getCurrentUser: async () => {
+        const token = localStorage.getItem('hms_auth_token') || localStorage.getItem('hms_token');
+        if (!token) return null;
+
         try {
-            const res = await apiClient.post('/auth/login', { role, id, password });
+            const res = await apiClient.get('/auth/me');
             if (res.success && res.user) {
-                if (res.token) {
-                    localStorage.setItem('hms_auth_token', res.token);
-                }
                 return res.user;
             }
-        } catch (apiError) {
-            console.warn('Backend login unavailable or failed, checking local credentials fallback...', apiError.message);
+        } catch (err) {
+            console.warn('Failed to verify session token:', err.message);
+            localStorage.removeItem('hms_auth_token');
+            localStorage.removeItem('hms_token');
         }
-
-        // Fallback for offline/standalone execution
-        await new Promise(resolve => setTimeout(resolve, 300));
-        const user = CREDENTIALS[role];
-
-        if (!user) {
-            throw new Error("Invalid role selected");
-        }
-
-        if (user.id === id && user.password === password) {
-            const { password: _, ...safeUser } = user;
-            return safeUser;
-        }
-
-        throw new Error("Invalid ID or Password");
+        return null;
     },
 
     logout: async () => {
         try {
             await apiClient.post('/auth/logout', {});
         } catch (err) {
-            console.warn('Backend logout failed:', err.message);
+            console.warn('Logout API error:', err.message);
         } finally {
             localStorage.removeItem('hms_auth_token');
+            localStorage.removeItem('hms_token');
+            localStorage.removeItem('hms_user');
+            localStorage.removeItem('hms_role');
         }
         return true;
     }

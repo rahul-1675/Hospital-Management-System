@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, HeartHandshake, CheckCircle2, User, Building } from 'lucide-react';
 import { feedbackService } from '../../services/feedback.service';
+import { InlineLoader, Loader } from '../../components/common/Loader';
 import HomeBg from '../../assets/Home.png';
 
 const Feedback = () => {
     const [feedbacks, setFeedbacks] = useState([]);
+    const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
     const [name, setName] = useState('');
     const [department, setDepartment] = useState('General');
     const [rating, setRating] = useState(5);
@@ -15,8 +17,15 @@ const Feedback = () => {
 
     useEffect(() => {
         const load = async () => {
-            const data = await feedbackService.getFeedbacks();
-            setFeedbacks(data);
+            setLoadingFeedbacks(true);
+            try {
+                const data = await feedbackService.getFeedbacks();
+                setFeedbacks(data || []);
+            } catch (err) {
+                console.warn('Failed to load feedbacks:', err);
+            } finally {
+                setLoadingFeedbacks(false);
+            }
         };
         load();
     }, []);
@@ -229,10 +238,14 @@ const Feedback = () => {
                                     cursor: submitting ? 'not-allowed' : 'pointer',
                                     opacity: submitting ? 0.7 : 1,
                                     boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '0.5rem'
                                 }}
                             >
-                                {submitting ? 'Submitting...' : 'Submit Feedback'}
+                                {submitting ? <InlineLoader size="20px" text="Submitting Feedback..." /> : 'Submit Feedback'}
                             </button>
                         </form>
                     </div>
@@ -260,46 +273,56 @@ const Feedback = () => {
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '550px', overflowY: 'auto', paddingRight: '0.25rem' }}>
-                            {feedbacks.map((item) => (
-                                <div
-                                    key={item.id}
-                                    style={{
-                                        background: 'rgba(255, 255, 255, 0.95)',
-                                        backdropFilter: 'blur(10px)',
-                                        borderRadius: '14px',
-                                        padding: '1.25rem 1.5rem',
-                                        boxShadow: '0 4px 15px rgba(0,0,0,0.06)',
-                                        border: '1px solid rgba(255, 255, 255, 0.8)'
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569' }}>
-                                                <User size={18} />
-                                            </div>
-                                            <div>
-                                                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>{item.name}</h4>
-                                                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                                                    {item.department ? `Visited ${item.department}` : 'Patient'} • {item.date || 'Recent'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '2px' }}>
-                                            {[1, 2, 3, 4, 5].map((s) => (
-                                                <Star
-                                                    key={s}
-                                                    size={14}
-                                                    fill={s <= item.rating ? '#f59e0b' : 'none'}
-                                                    color={s <= item.rating ? '#f59e0b' : '#cbd5e1'}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: '1.5' }}>
-                                        "{item.comment}"
-                                    </p>
+                            {loadingFeedbacks ? (
+                                <div style={{ background: 'rgba(255, 255, 255, 0.95)', borderRadius: '14px', padding: '3rem 1rem', textAlign: 'center' }}>
+                                    <Loader size="48px" text="Loading patient reviews..." />
                                 </div>
-                            ))}
+                            ) : feedbacks.length === 0 ? (
+                                <div style={{ background: 'rgba(255, 255, 255, 0.95)', borderRadius: '14px', padding: '2.5rem', textAlign: 'center', color: '#64748b' }}>
+                                    <p style={{ margin: 0 }}>No reviews submitted yet. Be the first to share your experience!</p>
+                                </div>
+                            ) : (
+                                feedbacks.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        style={{
+                                            background: 'rgba(255, 255, 255, 0.95)',
+                                            backdropFilter: 'blur(10px)',
+                                            borderRadius: '14px',
+                                            padding: '1.25rem 1.5rem',
+                                            boxShadow: '0 4px 15px rgba(0,0,0,0.06)',
+                                            border: '1px solid rgba(255, 255, 255, 0.8)'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#475569' }}>
+                                                    <User size={18} />
+                                                </div>
+                                                <div>
+                                                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: '700', color: '#1e293b' }}>{item.name}</h4>
+                                                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                                                        {item.department ? `Visited ${item.department}` : 'Patient'} • {item.date || 'Recent'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: '2px' }}>
+                                                {[1, 2, 3, 4, 5].map((s) => (
+                                                    <Star
+                                                        key={s}
+                                                        size={14}
+                                                        fill={s <= item.rating ? '#f59e0b' : 'none'}
+                                                        color={s <= item.rating ? '#f59e0b' : '#cbd5e1'}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: '1.5' }}>
+                                            "{item.comment}"
+                                        </p>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

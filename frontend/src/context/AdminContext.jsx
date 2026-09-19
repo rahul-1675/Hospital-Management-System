@@ -5,38 +5,30 @@ const AdminContext = createContext();
 
 export const useAdmin = () => useContext(AdminContext);
 
-const initialUsers = [
-    { id: 'USR001', name: 'Dr. Sarah Smith', role: 'Doctor', department: 'Cardiology', status: 'Active', email: 'sarah.smith@hms.com' },
-    { id: 'USR002', name: 'James Wilson', role: 'Receptionist', department: 'Front Desk', status: 'Active', email: 'j.wilson@hms.com' },
-    { id: 'USR003', name: 'Emily Davis', role: 'Nurse', department: 'Pediatrics', status: 'Active', email: 'e.davis@hms.com' },
-    { id: 'USR004', name: 'Michael Chen', role: 'Admin', department: 'IT', status: 'Active', email: 'm.chen@hms.com' },
-    { id: 'USR005', name: 'Robert Brown', role: 'Pharmacist', department: 'Pharmacy', status: 'Suspended', email: 'r.brown@hms.com' },
-];
-
-const initialLogs = [
-    { id: 1, timestamp: '2026-02-02 10:30:15', actor: 'Dr. Sarah Smith', action: 'UPDATE_RECORD', entity: 'Patient #4022', status: 'Success' },
-    { id: 2, timestamp: '2026-02-02 10:15:00', actor: 'James Wilson', action: 'LOGIN', entity: 'System', status: 'Success' },
-    { id: 3, timestamp: '2026-02-02 09:45:22', actor: 'System', action: 'BACKUP', entity: 'Database', status: 'Success' },
-    { id: 4, timestamp: '2026-02-02 09:00:00', actor: 'Robert Brown', action: 'LOGIN_ATTEMPT', entity: 'System', status: 'Failed' },
-    { id: 5, timestamp: '2026-02-01 18:30:00', actor: 'Admin', action: 'CONFIG_CHANGE', entity: 'Settings', status: 'Warning' },
-];
-
-const initialInvoices = [
-    { id: 'INV-2024-001', patient: 'Alice Cooper', amount: 150.00, status: 'Paid', date: '2026-02-01' },
-    { id: 'INV-2024-002', patient: 'Bob Marley', amount: 450.50, status: 'Pending', date: '2026-02-02' },
-    { id: 'INV-2024-003', patient: 'Charlie Puth', amount: 1200.00, status: 'Overdue', date: '2026-01-25' },
-];
-
 export const AdminProvider = ({ children }) => {
-    const [users, setUsers] = useState(initialUsers);
-    const [logs, setLogs] = useState(initialLogs);
-    const [invoices, setInvoices] = useState(initialInvoices);
+    const [users, setUsers] = useState([]);
+    const [logs, setLogs] = useState([]);
+    const [invoices, setInvoices] = useState([]);
+    const [loadingUsers, setLoadingUsers] = useState(true);
 
     // Initial load from backend API
+    const fetchUsers = async () => {
+        setLoadingUsers(true);
+        try {
+            const fetchedUsers = await adminService.getUsers();
+            if (fetchedUsers) {
+                setUsers(fetchedUsers);
+            }
+        } catch (err) {
+            console.warn('Failed to load users from backend:', err);
+        } finally {
+            setLoadingUsers(false);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
-            const fetchedUsers = await adminService.getUsers();
-            if (fetchedUsers && fetchedUsers.length > 0) setUsers(fetchedUsers);
+            await fetchUsers();
 
             const fetchedLogs = await adminService.getLogs();
             if (fetchedLogs && fetchedLogs.length > 0) setLogs(fetchedLogs);
@@ -49,48 +41,76 @@ export const AdminProvider = ({ children }) => {
 
     // User Actions
     const checkEmailUnique = (email) => {
-        return !users.some(u => u.email.toLowerCase() === email.toLowerCase());
+        return !users.some(u => u.email?.toLowerCase() === email.toLowerCase());
     };
 
     const addUser = async (userData) => {
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const newUser = {
-            ...userData,
-            id: `USR00${users.length + 1}`,
-            status: 'Active'
-        };
-
-        setUsers(prev => [...prev, newUser]);
-        logAction('Admin', 'CREATE_USER', newUser.name, 'Success');
-
-        // Async sync with backend
-        adminService.addUser(newUser);
-
-        return { success: true, user: newUser, tempPassword };
-    };
-
-    const updateUser = (id, updates) => {
-        setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updates } : u));
-        logAction('Admin', 'UPDATE_USER', `ID: ${id}`, 'Success');
-        adminService.updateUser(id, updates);
-    };
-
-    const deleteUser = (id) => {
-        setUsers(prev => prev.filter(u => u.id !== id));
-        logAction('Admin', 'DELETE_USER', `ID: ${id}`, 'Success');
-        adminService.deleteUser(id);
-    };
-
-    const toggleUserStatus = (id) => {
-        setUsers(prev => prev.map(u => {
-            if (u.id === id) {
-                const newStatus = u.status === 'Active' ? 'Suspended' : 'Active';
-                logAction('Admin', 'STATUS_CHANGE', `${u.name} -> ${newStatus}`, 'Success');
-                return { ...u, status: newStatus };
+        try {
+            const res = await adminService.addUser(userData);
+            if (res && res.success && res.user) {
+                const newUser = res.user;
+                setUsers(prev => [newUser, ...prev.filter(u => u.id !== newUser.id && u._id !== newUser._id)]);
+                logAction('Admin', 'CREATE_USER', `${newUser.name} (${newUser.role})`, 'Success');
+                return { success: true, user: newUser, tempPassword: res.tempPassword };
             }
-            return u;
-        }));
-        adminService.toggleUserStatus(id);
+            throw new Error(res?.message || 'Failed to create user on backend');
+        } catch (err) {
+            console.error('Error adding user:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const updateUser = async (id, updates) => {
+        try {
+            const res = await adminService.updateUser(id, updates);
+            if (res && res.success && res.user) {
+                setUsers(prev => prev.map(u => (u.id === id || u._id === id) ? { ...u, ...res.user } : u));
+                logAction('Admin', 'UPDATE_USER', `ID: ${id}`, 'Success');
+                return { success: true, user: res.user };
+            }
+            // Fallback local update
+            setUsers(prev => prev.map(u => (u.id === id || u._id === id) ? { ...u, ...updates } : u));
+            logAction('Admin', 'UPDATE_USER', `ID: ${id}`, 'Success');
+            return { success: true };
+        } catch (err) {
+            console.error('Error updating user:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const deleteUser = async (id) => {
+        try {
+            await adminService.deleteUser(id);
+            setUsers(prev => prev.filter(u => u.id !== id && u._id !== id));
+            logAction('Admin', 'DELETE_USER', `ID: ${id}`, 'Success');
+            return { success: true };
+        } catch (err) {
+            console.error('Error deleting user:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const toggleUserStatus = async (id) => {
+        try {
+            const res = await adminService.toggleUserStatus(id);
+            if (res && res.success && res.user) {
+                setUsers(prev => prev.map(u => (u.id === id || u._id === id) ? { ...u, status: res.user.status } : u));
+                logAction('Admin', 'STATUS_CHANGE', `${res.user.name || id} -> ${res.user.status}`, 'Success');
+                return { success: true, status: res.user.status };
+            }
+            setUsers(prev => prev.map(u => {
+                if (u.id === id || u._id === id) {
+                    const newStatus = u.status === 'Active' ? 'Suspended' : 'Active';
+                    logAction('Admin', 'STATUS_CHANGE', `${u.name} -> ${newStatus}`, 'Success');
+                    return { ...u, status: newStatus };
+                }
+                return u;
+            }));
+            return { success: true };
+        } catch (err) {
+            console.error('Error toggling status:', err);
+            return { success: false, error: err.message };
+        }
     };
 
     const resetPassword = (id) => {
@@ -126,8 +146,10 @@ export const AdminProvider = ({ children }) => {
     return (
         <AdminContext.Provider value={{
             users,
+            loadingUsers,
             logs,
             invoices,
+            fetchUsers,
             checkEmailUnique,
             addUser,
             updateUser,

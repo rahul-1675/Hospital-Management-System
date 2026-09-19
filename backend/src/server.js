@@ -6,7 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { connectDB } from './config/db.js';
-import { seedDemoData } from './seeds/seedDemoData.js';
+import { seedDemoData, ensureMasterAdmin } from './seeds/seedDemoData.js';
 
 import authRoutes from './routes/auth.routes.js';
 import hospitalRoutes from './routes/hospital.routes.js';
@@ -37,8 +37,9 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Connect to MongoDB and seed demo data
-connectDB().then(() => {
-    seedDemoData();
+connectDB().then(async () => {
+    await seedDemoData();
+    await ensureMasterAdmin();
 });
 
 // Health check

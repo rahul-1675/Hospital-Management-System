@@ -9,48 +9,54 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        const token = localStorage.getItem("hms_token");
-        const role = localStorage.getItem("hms_role");
-        const storedUser = localStorage.getItem("hms_user");
+        const initAuth = async () => {
+            const token = localStorage.getItem("hms_auth_token") || localStorage.getItem("hms_token");
+            const storedUser = localStorage.getItem("hms_user");
 
-        if (token && role && storedUser) {
-            try {
-                setUser({ ...JSON.parse(storedUser), role }); // Ensure role is synced
-                setIsAuthenticated(true);
-            } catch (error) {
-                console.error("Failed to parse stored user", error);
-                localStorage.removeItem("hms_user");
-                localStorage.removeItem("hms_role");
-                localStorage.removeItem("hms_token");
+            if (token && storedUser) {
+                try {
+                    const parsedUser = JSON.parse(storedUser);
+                    setUser(parsedUser);
+                    setIsAuthenticated(true);
+
+                    // Background session verification
+                    const verifiedUser = await authService.getCurrentUser();
+                    if (verifiedUser) {
+                        const role = (verifiedUser.role || 'patient').toUpperCase();
+                        const syncedUser = { ...verifiedUser, role };
+                        setUser(syncedUser);
+                        localStorage.setItem("hms_user", JSON.stringify(syncedUser));
+                        localStorage.setItem("hms_role", role);
+                    }
+                } catch (error) {
+                    console.error("Failed to parse stored user", error);
+                    localStorage.removeItem("hms_user");
+                    localStorage.removeItem("hms_role");
+                    localStorage.removeItem("hms_token");
+                    localStorage.removeItem("hms_auth_token");
+                }
             }
-        }
-        setAuthReady(true);
+            setAuthReady(true);
+        };
+
+        initAuth();
     }, []);
 
-    const login = async (role, id, password) => {
+    const login = async (role, identifier, password) => {
         try {
-            const userData = await authService.login(role, id, password);
+            const userData = await authService.login(role, identifier, password);
 
-            // FIX 1: ROLE NORMALIZATION
-            const normalizedRole = userData.role.toUpperCase(); // Assuming authService returns role in userData
-
-            // Ensure authService returned a role, if not use the requested one
-            const finalRole = normalizedRole || role.toUpperCase();
-
-            // Mock Token (since authService might not return one)
-            const token = "mock-jwt-token-12345";
-
-            const safeUser = { ...userData, role: finalRole };
+            // Normalized uppercase role for client routing
+            const normalizedRole = (userData.role || role || 'PATIENT').toUpperCase();
+            const safeUser = { ...userData, role: normalizedRole };
 
             setUser(safeUser);
             setIsAuthenticated(true);
 
-            // Store separate items as requested
             localStorage.setItem("hms_user", JSON.stringify(safeUser));
-            localStorage.setItem("hms_role", finalRole);
-            localStorage.setItem("hms_token", token);
+            localStorage.setItem("hms_role", normalizedRole);
 
-            return { success: true, role: finalRole };
+            return { success: true, role: normalizedRole, user: safeUser };
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -63,6 +69,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem("hms_user");
         localStorage.removeItem("hms_role");
         localStorage.removeItem("hms_token");
+        localStorage.removeItem("hms_auth_token");
     };
 
     return (

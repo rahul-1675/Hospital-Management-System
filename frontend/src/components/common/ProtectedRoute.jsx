@@ -1,13 +1,14 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { PageLoader } from './Loader';
 
 const ProtectedRoute = ({ allowedRoles, children }) => {
     const { user, isAuthenticated, authReady } = useAuth();
     const location = useLocation();
 
     // Fix 3: Harden Route Guard
-    if (!authReady) return null; // Or a loading spinner
+    if (!authReady) return <PageLoader text="Authenticating session..." minHeight="100vh" />;
 
     if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} replace />;

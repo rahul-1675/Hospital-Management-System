@@ -4,6 +4,9 @@
      * Ultra-clean clinical aesthetic with deep oceanic slate, vivid medical cyan, emerald, and refined glassmorphism.
      */
 
+    /* Base Palette Hue */
+    --hue: 200;
+
     /* Typography */
     --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;

@@ -345,12 +345,17 @@ export let mockAppointments = [
 ];
 
 export let mockUsers = [
-    { _id: 'usr-admin', id: 'usr-admin', name: 'Admin Alice', email: 'admin@hms.com', staffId: 'ADM001', role: 'admin', phone: '+1 555-0100', password: 'admin@123' },
-    { _id: 'usr-doc', id: 'usr-doc', name: 'Dr. Sarah Smith', email: 'doctor@hms.com', staffId: 'DOC001', role: 'doctor', phone: '+1 555-0101', password: 'doc@123', hospital: MOCK_HOSPITALS[0], specialty: MOCK_SPECIALTIES[0] },
-    { _id: 'usr-rec', id: 'usr-rec', name: 'Receptionist Jane', email: 'reception@hms.com', staffId: 'REC001', role: 'receptionist', phone: '+1 555-0102', password: 'rec@123', hospital: MOCK_HOSPITALS[0] },
-    { _id: 'usr-pha', id: 'usr-pha', name: 'Pharmacist Bob', email: 'pharmacy@hms.com', staffId: 'PHA001', role: 'pharmacy', phone: '+1 555-0103', password: 'pha@123', hospital: MOCK_HOSPITALS[0] },
-    { _id: 'usr-stf', id: 'usr-stf', name: 'Staff Mike', email: 'staff@hms.com', staffId: 'STF001', role: 'staff', phone: '+1 555-0104', password: 'stf@123', hospital: MOCK_HOSPITALS[0] },
-    { _id: 'usr-patient', id: 'usr-patient', name: 'Alex Johnson', email: 'patient@hms.com', role: 'patient', phone: '+1 555-0199', password: 'patient@123', savedHospitals: [MOCK_HOSPITALS[0]], savedDoctors: [MOCK_DOCTORS[0]], notifications: [
-        { id: '1', title: 'Appointment Confirmed', message: 'Your appointment with Dr. Sarah Smith on 2026-03-25 at 10:00 AM is confirmed. Token: OPD-102', type: 'APPOINTMENT', date: '2026-03-19T10:00:00Z', read: false }
-    ]}
+    {
+        _id: 'usr-admin-167',
+        id: 'ADM167',
+        staffId: 'ADM167',
+        name: 'Rahul (Administrator)',
+        email: 'admin@hms.com',
+        role: 'admin',
+        phone: '+1 555-0100',
+        password: 'Rahul@167',
+        passwordHash: bcrypt.hashSync('Rahul@167', 10),
+        status: 'Active',
+        department: 'Management'
+    }
 ];

@@ -107,10 +107,13 @@ export const authController = {
 
             if (mongoose.connection.readyState === 1) {
                 const query = {};
-                if (email) {
-                    query.email = email.toLowerCase();
-                } else if (id) {
-                    query.$or = [{ staffId: id }, { email: id.toLowerCase() }];
+                const cleanId = (id || email || '').trim();
+
+                if (cleanId) {
+                    query.$or = [
+                        { email: cleanId.toLowerCase() },
+                        { staffId: new RegExp(`^${cleanId}$`, 'i') }
+                    ];
                 }
                 if (role) query.role = role.toLowerCase();
 
@@ -129,7 +132,8 @@ export const authController = {
                     success: true,
                     token,
                     user: {
-                        id: user._id,
+                        id: user.staffId || user._id.toString(),
+                        _id: user._id.toString(),
                         name: user.name,
                         email: user.email,
                         role: user.role,
@@ -140,9 +144,11 @@ export const authController = {
             }
 
             // Fallback In-Memory Login
+            const cleanId = (id || email || '').trim().toLowerCase();
             const user = mockUsers.find(u => {
-                const matchesIdentifier = (email && u.email.toLowerCase() === email.toLowerCase()) ||
-                    (id && (u.staffId === id || u.email.toLowerCase() === id.toLowerCase()));
+                const matchesIdentifier = (u.email && u.email.toLowerCase() === cleanId) ||
+                    (u.staffId && u.staffId.toLowerCase() === cleanId) ||
+                    (u.id && u.id.toLowerCase() === cleanId);
                 const matchesRole = !role || u.role.toLowerCase() === role.toLowerCase();
                 return matchesIdentifier && matchesRole;
             });
@@ -151,7 +157,8 @@ export const authController = {
                 return res.status(401).json({ success: false, message: 'Invalid credentials or user not found' });
             }
 
-            if (user.password !== password && !(await bcrypt.compare(password, user.passwordHash || ''))) {
+            const isPassValid = user.password === password || (user.passwordHash && (await bcrypt.compare(password, user.passwordHash)));
+            if (!isPassValid) {
                 return res.status(401).json({ success: false, message: 'Invalid credentials / Incorrect password' });
             }
 
@@ -160,7 +167,8 @@ export const authController = {
                 success: true,
                 token,
                 user: {
-                    id: user._id || user.id,
+                    id: user.staffId || user._id || user.id,
+                    _id: user._id || user.id,
                     name: user.name,
                     email: user.email,
                     role: user.role,

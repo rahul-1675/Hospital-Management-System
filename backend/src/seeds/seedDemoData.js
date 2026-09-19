@@ -287,24 +287,22 @@ export const seedDemoData = async () => {
 
         const doctors = await Doctor.insertMany(doctorsData);
 
-        // 4. Seed Standard Staff & Demo Users with bcrypt hashed passwords
-        const passDoctor = await bcrypt.hash('doc@123', 10);
-        const passReceptionist = await bcrypt.hash('rec@123', 10);
-        const passPharmacy = await bcrypt.hash('pha@123', 10);
-        const passStaff = await bcrypt.hash('stf@123', 10);
-        const passAdmin = await bcrypt.hash('admin@123', 10);
-        const passPatient = await bcrypt.hash('patient@123', 10);
-
-        const usersData = [
-            { name: 'Admin Alice', email: 'admin@hms.com', staffId: 'ADM001', passwordHash: passAdmin, role: 'admin', phone: '+1 555-0100', isDemoData: true },
-            { name: 'Dr. Sarah Smith', email: 'doctor@hms.com', staffId: 'DOC001', passwordHash: passDoctor, role: 'doctor', phone: '+1 555-0101', hospital: hospitalMap['ProHealth Central Super Specialty Hospital'], specialty: specialtyMap['Cardiology'], isDemoData: true },
-            { name: 'Receptionist Jane', email: 'reception@hms.com', staffId: 'REC001', passwordHash: passReceptionist, role: 'receptionist', phone: '+1 555-0102', hospital: hospitalMap['ProHealth Central Super Specialty Hospital'], isDemoData: true },
-            { name: 'Pharmacist Bob', email: 'pharmacy@hms.com', staffId: 'PHA001', passwordHash: passPharmacy, role: 'pharmacy', phone: '+1 555-0103', hospital: hospitalMap['ProHealth Central Super Specialty Hospital'], isDemoData: true },
-            { name: 'Staff Mike', email: 'staff@hms.com', staffId: 'STF001', passwordHash: passStaff, role: 'staff', phone: '+1 555-0104', hospital: hospitalMap['ProHealth Central Super Specialty Hospital'], isDemoData: true },
-            { name: 'Alex Johnson', email: 'patient@hms.com', passwordHash: passPatient, role: 'patient', phone: '+1 555-0199', isDemoData: true, savedHospitals: [hospitalMap['ProHealth Central Super Specialty Hospital']], savedDoctors: [doctors[0]._id] }
-        ];
-
-        await User.insertMany(usersData);
+        // 4. Seed Master Admin
+        const passAdmin = await bcrypt.hash('Rahul@167', 10);
+        await User.findOneAndUpdate(
+            { $or: [{ staffId: 'ADM167' }, { email: 'admin@hms.com' }] },
+            {
+                name: 'Rahul (Administrator)',
+                email: 'admin@hms.com',
+                staffId: 'ADM167',
+                passwordHash: passAdmin,
+                role: 'admin',
+                phone: '+1 555-0100',
+                status: 'Active',
+                department: 'Management'
+            },
+            { upsert: true, new: true }
+        );
 
         // 5. Seed Initial Reviews / Feedback
         const feedbackData = [
@@ -318,5 +316,28 @@ export const seedDemoData = async () => {
         console.log('✅ DEMO DATA seeded successfully into MongoDB with explicit isDemoData flags.');
     } catch (err) {
         console.error('❌ Error during demo data seeding:', err.message);
+    }
+};
+
+export const ensureMasterAdmin = async () => {
+    try {
+        const passAdmin = await bcrypt.hash('Rahul@167', 10);
+        await User.findOneAndUpdate(
+            { $or: [{ staffId: 'ADM167' }, { email: 'admin@hms.com' }] },
+            {
+                name: 'Rahul (Administrator)',
+                email: 'admin@hms.com',
+                staffId: 'ADM167',
+                passwordHash: passAdmin,
+                role: 'admin',
+                phone: '+1 555-0100',
+                status: 'Active',
+                department: 'Management'
+            },
+            { upsert: true, new: true }
+        );
+        console.log('🔒 Master Admin ADM167 verified and active.');
+    } catch (err) {
+        console.error('⚠️ Could not verify master admin:', err.message);
     }
 };
