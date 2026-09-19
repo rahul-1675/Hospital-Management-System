@@ -1,52 +1,205 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Activity, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Activity, Menu, X, PhoneCall, ShieldCheck, UserCheck, Stethoscope } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import Button from '../ui/Button';
 import HmsLogo from '../../assets/hms-logo.png';
 
 const Navbar = () => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { user } = useAuth();
+    const location = useLocation();
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const navLinks = [
+        { path: '/', label: 'Home' },
+        { path: '/patient', label: 'Find Doctors' },
+        { path: '/about', label: 'About HMS' },
+        { path: '/feedback', label: 'Patient Reviews' }
+    ];
+
+    const isActive = (path) => location.pathname === path;
 
     return (
-        <nav style={{
-            backgroundColor: 'white',
-            borderBottom: '1px solid var(--border-color)',
-            // position: 'sticky', // Removed to make it scroll with page
-            // top: 0,
-            // zIndex: 50
+        <header style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 999,
+            transition: 'all 0.3s ease',
+            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.92)' : 'rgba(255, 255, 255, 0.98)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            borderBottom: isScrolled ? '1px solid rgba(2, 132, 199, 0.15)' : '1px solid #e2e8f0',
+            boxShadow: isScrolled ? '0 10px 25px -5px rgba(15, 23, 42, 0.08)' : '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-            <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 'var(--header-height)' }}>
+            {/* Top Micro-Bar for Emergency Status */}
+            <div style={{
+                background: 'linear-gradient(90deg, #0f172a 0%, #0369a1 50%, #0f172a 100%)',
+                color: '#ffffff',
+                padding: '0.35rem 1rem',
+                fontSize: '0.78rem',
+                fontWeight: '500'
+            }}>
+                <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span className="pulse-indicator" style={{ backgroundColor: '#10b981' }}></span>
+                        <span>24/7 Emergency Admissions Open</span>
+                        <span style={{ opacity: 0.4 }}>•</span>
+                        <span style={{ color: '#38bdf8' }}>Average ER Wait: &lt; 8 mins</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <a href="tel:8001234567" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#ffffff', fontWeight: '600' }}>
+                            <PhoneCall size={13} color="#38bdf8" />
+                            <span>Emergency: (800) 123-4567</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Navigation Bar */}
+            <div className="container" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height: '66px'
+            }}>
+                {/* Brand Logo */}
                 <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <img src={HmsLogo} alt="HMS Logo" style={{ height: '40px', width: 'auto' }} />
-                    <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-color)' }}>HMS</span>
+                    <div style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
+                    }}>
+                        <img src={HmsLogo} alt="ProHealth Logo" style={{ height: '26px', width: 'auto' }} />
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                            Pro<span style={{ color: '#0284c7' }}>Health</span>
+                        </div>
+                        <div style={{ fontSize: '0.7rem', fontWeight: '600', color: '#64748b', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                            Hospital System
+                        </div>
+                    </div>
                 </Link>
 
-                {/* Desktop Menu */}
-                <div className="flex gap-lg hidden md-flex">
-                    {/* Navigation items can go here if needed later */}
-                </div>
+                {/* Desktop Navigation Links */}
+                <nav className="hidden md-flex" style={{ alignItems: 'center', gap: '0.5rem' }}>
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.path}
+                            to={link.path}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                borderRadius: '8px',
+                                fontSize: '0.92rem',
+                                fontWeight: isActive(link.path) ? '700' : '600',
+                                color: isActive(link.path) ? '#0284c7' : '#475569',
+                                background: isActive(link.path) ? 'rgba(2, 132, 199, 0.08)' : 'transparent',
+                                transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!isActive(link.path)) e.currentTarget.style.color = '#0284c7';
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!isActive(link.path)) e.currentTarget.style.color = '#475569';
+                            }}
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
+                </nav>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <Link to="/" style={{ fontWeight: 500 }}>Home</Link>
-                    <Link to="/about" style={{ fontWeight: 500 }}>About</Link>
-                    <Link to="/patient" style={{ fontWeight: 500 }}>Find Doctors</Link>
-                    <Link to="/feedback" style={{ fontWeight: 500 }}>Feedback</Link>
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Link to="/patient">
+                        <button className="btn btn-outline" style={{
+                            padding: '0.5rem 1rem',
+                            fontSize: '0.88rem',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.4rem',
+                            borderColor: '#0284c7',
+                            color: '#0284c7',
+                            fontWeight: '600'
+                        }}>
+                            <Stethoscope size={15} />
+                            <span>Book Visit</span>
+                        </button>
+                    </Link>
 
                     {user ? (
                         <Link to="/portal">
-                            <Button>Dashboard</Button>
+                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.1rem', fontSize: '0.88rem', borderRadius: '8px' }}>
+                                <UserCheck size={16} />
+                                <span>Portal ({user.role})</span>
+                            </button>
                         </Link>
                     ) : (
-                        <div className="flex gap-sm" style={{ gap: '0.5rem' }}>
-                            <Link to="/login" style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--primary-color)' }}>Staff Login</Link>
-                        </div>
+                        <Link to="/login">
+                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.1rem', fontSize: '0.88rem', borderRadius: '8px' }}>
+                                <ShieldCheck size={16} />
+                                <span>Staff Login</span>
+                            </button>
+                        </Link>
                     )}
+
+                    {/* Mobile Hamburger Button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        style={{
+                            display: 'none',
+                            padding: '0.4rem',
+                            color: '#0f172a'
+                        }}
+                        className="mobile-toggle"
+                    >
+                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
                 </div>
             </div>
-        </nav>
+
+            {/* Mobile Drawer Menu */}
+            {mobileMenuOpen && (
+                <div style={{
+                    backgroundColor: '#ffffff',
+                    borderTop: '1px solid #e2e8f0',
+                    padding: '1rem 1.5rem 1.5rem',
+                    boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+                }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.path}
+                                to={link.path}
+                                onClick={() => setMobileMenuOpen(false)}
+                                style={{
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '8px',
+                                    fontWeight: '600',
+                                    color: isActive(link.path) ? '#0284c7' : '#334155',
+                                    background: isActive(link.path) ? '#f0f9ff' : 'transparent'
+                                }}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </header>
     );
 };
 
