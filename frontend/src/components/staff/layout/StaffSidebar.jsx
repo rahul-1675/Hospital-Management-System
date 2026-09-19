@@ -55,11 +55,9 @@ const StaffSidebar = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) =
         <nav className={`doctor-sidebar ${isCollapsed ? 'collapsed' : ''}`} style={{ width: isCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
             <div className="doctor-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', padding: isCollapsed ? '1rem 0.5rem' : '1rem 1.25rem' }}>
                 {!isCollapsed ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <BrandLogo size={38} href="/" />
-                    </div>
+                    <BrandLogo size={36} showTitle={true} subtitle={`Staff #${staff?.id || ''}`} href="/" />
                 ) : (
-                    <BrandLogo size={28} href="/" />
+                    <BrandLogo size={30} showTitle={false} href="/" />
                 )}
                 <button onClick={toggleSidebar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--reception-text-muted)', display: 'flex', alignItems: 'center' }}>
                     {isCollapsed ? <Menu size={22} /> : <ChevronLeft size={22} />}
