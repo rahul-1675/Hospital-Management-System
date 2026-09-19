@@ -67,11 +67,33 @@ const Feedback = () => {
             {/* Hero Header */}
             <div className="landing-hero" style={{ padding: '3.5rem 1rem 2rem' }}>
                 <div className="hero-content" style={{ textAlign: 'center' }}>
-                    <span className="hero-badge">Patient Voice</span>
-                    <h1 className="hero-title" style={{ fontSize: '2.8rem', marginTop: '0.5rem', color: '#ffffff' }}>
-                        Patient Feedback & <span className="highlight">Reviews</span>
+                    <span className="hero-badge" style={{
+                        background: 'rgba(2, 132, 199, 0.25)',
+                        border: '1px solid rgba(56, 189, 248, 0.45)',
+                        color: '#38bdf8',
+                        backdropFilter: 'blur(10px)'
+                    }}>Patient Voice</span>
+                    <h1 className="hero-title" style={{
+                        fontSize: '2.8rem',
+                        marginTop: '0.5rem',
+                        color: '#ffffff',
+                        fontWeight: '900',
+                        textShadow: '0 3px 15px rgba(0,0,0,0.6)'
+                    }}>
+                        Patient Feedback & <span className="highlight" style={{
+                            background: 'linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 2px 8px rgba(56,189,248,0.4))'
+                        }}>Reviews</span>
                     </h1>
-                    <p className="hero-subtitle" style={{ color: '#f1f5f9', maxWidth: '650px', margin: '1rem auto 0' }}>
+                    <p className="hero-subtitle" style={{
+                        color: '#f8fafc',
+                        maxWidth: '650px',
+                        margin: '1rem auto 0',
+                        fontWeight: 500,
+                        textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+                    }}>
                         We value your health journey. Share your experience with our doctors, staff, and facilities to help us continually elevate patient care.
                     </p>
                 </div>

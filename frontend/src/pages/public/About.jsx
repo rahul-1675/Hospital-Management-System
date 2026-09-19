@@ -59,7 +59,7 @@ const About = () => {
             <AnimatedGlassBackground isFixed={true} opacity={0.88} />
             <div style={{ position: 'relative', zIndex: 10 }}>
             {/* Header */}
-            <div style={{ padding: '4rem 1rem 3rem', textAlign: 'center', color: '#ffffff' }}>
+            <div style={{ padding: '3.5rem 1rem 2.5rem', textAlign: 'center', color: '#ffffff' }}>
                 <div className="container" style={{ maxWidth: '850px' }}>
                     <span style={{
                         display: 'inline-flex',
@@ -67,12 +67,13 @@ const About = () => {
                         gap: '0.4rem',
                         padding: '0.35rem 1rem',
                         borderRadius: '9999px',
-                        background: 'rgba(56, 189, 248, 0.15)',
-                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        background: 'rgba(2, 132, 199, 0.25)',
+                        border: '1px solid rgba(56, 189, 248, 0.45)',
                         color: '#38bdf8',
                         fontSize: '0.85rem',
                         fontWeight: '700',
-                        marginBottom: '1rem'
+                        marginBottom: '1rem',
+                        backdropFilter: 'blur(10px)'
                     }}>
                         <Award size={14} />
                         <span>Excellence in Healthcare Since 2012</span>
@@ -80,16 +81,29 @@ const About = () => {
 
                     <h1 style={{
                         fontSize: 'clamp(2.2rem, 4vw, 3.4rem)',
-                        fontWeight: '800',
+                        fontWeight: '900',
                         color: '#ffffff',
                         marginBottom: '1.25rem',
-                        letterSpacing: '-0.02em'
+                        letterSpacing: '-0.02em',
+                        textShadow: '0 3px 15px rgba(0,0,0,0.6)'
                     }}>
                         Pioneering Compassionate Care & <br />
-                        <span style={{ color: '#38bdf8' }}>Clinical Excellence</span>
+                        <span style={{
+                            background: 'linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 2px 8px rgba(56,189,248,0.4))'
+                        }}>Clinical Excellence</span>
                     </h1>
 
-                    <p style={{ color: '#e2e8f0', fontSize: '1.1rem', lineHeight: '1.6', margin: '0 auto' }}>
+                    <p style={{
+                        color: '#f8fafc',
+                        fontSize: '1.1rem',
+                        lineHeight: '1.6',
+                        margin: '0 auto',
+                        fontWeight: 500,
+                        textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+                    }}>
                         ProHealth Hospital is a multi-specialty healthcare institution dedicated to delivering world-class medical treatments through innovative technology and empathetic patient care.
                     </p>
                 </div>

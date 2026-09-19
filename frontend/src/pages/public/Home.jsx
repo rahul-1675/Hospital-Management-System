@@ -48,7 +48,7 @@ const Home = () => {
             <section style={{
                 position: 'relative',
                 zIndex: 10,
-                padding: '5rem 1rem 4rem',
+                padding: '4.5rem 1rem 3.5rem',
                 textAlign: 'center',
                 color: '#ffffff'
             }}>
@@ -60,12 +60,12 @@ const Home = () => {
                         gap: '0.5rem',
                         padding: '0.45rem 1.1rem',
                         borderRadius: '9999px',
-                        background: 'rgba(56, 189, 248, 0.15)',
-                        border: '1px solid rgba(56, 189, 248, 0.35)',
+                        background: 'rgba(2, 132, 199, 0.25)',
+                        border: '1px solid rgba(56, 189, 248, 0.45)',
                         color: '#38bdf8',
                         fontSize: '0.85rem',
                         fontWeight: '700',
-                        marginBottom: '1.75rem',
+                        marginBottom: '1.5rem',
                         backdropFilter: 'blur(10px)'
                     }}>
                         <Sparkles size={15} />
@@ -74,19 +74,20 @@ const Home = () => {
 
                     {/* Main Headline */}
                     <h1 style={{
-                        fontSize: 'clamp(2.4rem, 5vw, 4rem)',
-                        fontWeight: '800',
+                        fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
+                        fontWeight: '900',
                         lineHeight: 1.15,
                         color: '#ffffff',
-                        marginBottom: '1.5rem',
+                        marginBottom: '1.25rem',
                         letterSpacing: '-0.03em',
-                        textShadow: '0 4px 20px rgba(0,0,0,0.5)'
+                        textShadow: '0 3px 15px rgba(0,0,0,0.6)'
                     }}>
                         Precision Medicine Meets <br />
                         <span style={{
                             background: 'linear-gradient(135deg, #38bdf8 0%, #34d399 100%)',
                             WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 2px 8px rgba(56,189,248,0.4))'
                         }}>
                             Seamless Clinical Care
                         </span>
@@ -95,11 +96,12 @@ const Home = () => {
                     {/* Subtitle */}
                     <p style={{
                         fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
-                        color: '#e2e8f0',
+                        color: '#f8fafc',
                         maxWidth: '750px',
                         margin: '0 auto 2.5rem',
                         lineHeight: 1.6,
-                        textShadow: '0 2px 8px rgba(0,0,0,0.6)'
+                        fontWeight: 500,
+                        textShadow: '0 2px 8px rgba(0,0,0,0.8)'
                     }}>
                         Connecting patients, doctors, pharmacy, and administration in one unified, real-time healthcare ecosystem.
                     </p>
@@ -110,39 +112,39 @@ const Home = () => {
                         flexWrap: 'wrap',
                         justifyContent: 'center',
                         gap: '1rem',
-                        marginBottom: '3.5rem'
+                        marginBottom: '3rem'
                     }}>
                         <Link to="/patient">
                             <button style={{
-                                padding: '0.9rem 2rem',
+                                padding: '0.85rem 1.85rem',
                                 borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+                                background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                                 color: '#ffffff',
                                 fontWeight: '700',
-                                fontSize: '1.05rem',
+                                fontSize: '1rem',
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.6rem',
-                                boxShadow: '0 10px 25px rgba(2, 132, 199, 0.4)',
+                                boxShadow: '0 8px 20px rgba(2, 132, 199, 0.35)',
                                 border: 'none',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s'
                             }}>
-                                <Calendar size={20} />
+                                <Calendar size={18} />
                                 <span>Book an Appointment</span>
-                                <ArrowRight size={18} />
+                                <ArrowRight size={17} />
                             </button>
                         </Link>
                         <Link to="/about">
                             <button style={{
-                                padding: '0.9rem 1.75rem',
+                                padding: '0.85rem 1.65rem',
                                 borderRadius: '12px',
-                                background: 'rgba(255, 255, 255, 0.12)',
-                                backdropFilter: 'blur(12px)',
-                                color: '#ffffff',
-                                fontWeight: '600',
-                                fontSize: '1.05rem',
-                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                background: '#ffffff',
+                                color: '#0f172a',
+                                fontWeight: '700',
+                                fontSize: '1rem',
+                                border: '1.5px solid #cbd5e1',
+                                boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s'
                             }}>
@@ -156,28 +158,28 @@ const Home = () => {
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
                         gap: '1.25rem',
-                        background: 'rgba(15, 23, 42, 0.75)',
+                        background: 'rgba(255, 255, 255, 0.92)',
                         backdropFilter: 'blur(16px)',
-                        padding: '1.75rem',
-                        borderRadius: '20px',
-                        border: '1px solid rgba(255, 255, 255, 0.15)',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+                        padding: '1.5rem',
+                        borderRadius: '18px',
+                        border: '1px solid rgba(226, 232, 240, 0.95)',
+                        boxShadow: '0 12px 30px -10px rgba(15, 23, 42, 0.08)'
                     }}>
                         {STATS.map((stat, i) => (
                             <div key={i} style={{ textAlign: 'center' }}>
                                 <div style={{
-                                    fontSize: '2.1rem',
+                                    fontSize: '2rem',
                                     fontWeight: '800',
-                                    color: '#38bdf8',
+                                    color: '#0284c7',
                                     lineHeight: 1.1,
-                                    marginBottom: '0.35rem'
+                                    marginBottom: '0.25rem'
                                 }}>
                                     {stat.value}
                                 </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: '700', color: '#ffffff' }}>
+                                <div style={{ fontSize: '0.92rem', fontWeight: '700', color: '#0f172a' }}>
                                     {stat.label}
                                 </div>
-                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.15rem' }}>
                                     {stat.change}
                                 </div>
                             </div>
@@ -190,7 +192,7 @@ const Home = () => {
             <section className="container" style={{ marginTop: '2rem' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     <span style={{
-                        color: '#38bdf8',
+                        color: '#0284c7',
                         fontWeight: '700',
                         fontSize: '0.85rem',
                         textTransform: 'uppercase',
@@ -199,11 +201,10 @@ const Home = () => {
                         Centers of Clinical Excellence
                     </span>
                     <h2 style={{
-                        fontSize: '2.3rem',
+                        fontSize: '2.2rem',
                         fontWeight: '800',
-                        color: '#ffffff',
-                        marginTop: '0.4rem',
-                        textShadow: '0 2px 10px rgba(0,0,0,0.5)'
+                        color: '#0f172a',
+                        marginTop: '0.4rem'
                     }}>
                         World-Class Specialized Care
                     </h2>

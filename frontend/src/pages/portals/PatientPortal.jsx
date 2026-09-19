@@ -190,54 +190,67 @@ const PatientPortal = () => {
     };
 
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: 'transparent', color: '#f8fafc' }}>
-            <AnimatedGlassBackground isFixed={true} opacity={0.9} />
+        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '4rem', background: 'transparent', color: '#ffffff' }}>
+            <AnimatedGlassBackground isFixed={true} opacity={0.92} />
 
-            <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '2.5rem' }}>
+            <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '1.5rem' }}>
                 {/* Hero Header */}
-                <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 2.5rem' }}>
+                <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 1.5rem' }}>
                     <div style={{
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.5rem',
                         padding: '0.4rem 1rem',
                         borderRadius: '9999px',
-                        background: 'rgba(2, 132, 199, 0.15)',
-                        border: '1px solid rgba(56, 189, 248, 0.3)',
+                        background: 'rgba(2, 132, 199, 0.25)',
+                        border: '1px solid rgba(56, 189, 248, 0.45)',
                         color: '#38bdf8',
                         fontSize: '0.85rem',
                         fontWeight: '700',
-                        marginBottom: '1rem',
-                        backdropFilter: 'blur(8px)'
+                        marginBottom: '0.85rem',
+                        backdropFilter: 'blur(10px)'
                     }}>
                         <Sparkles size={16} />
                         <span>Verified Medical Specialists & OPD Booking</span>
                     </div>
 
                     <h1 style={{
-                        fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+                        fontSize: 'clamp(1.9rem, 3.8vw, 2.65rem)',
                         fontWeight: '900',
                         color: '#ffffff',
                         lineHeight: 1.2,
-                        marginBottom: '1rem',
-                        letterSpacing: '-0.02em'
+                        marginBottom: '0.75rem',
+                        letterSpacing: '-0.02em',
+                        textShadow: '0 3px 15px rgba(0,0,0,0.6)'
                     }}>
-                        Find Top Specialists & Book <span style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Instant Consultations</span>
+                        Find Top Specialists & Book <span style={{
+                            background: 'linear-gradient(135deg, #38bdf8 0%, #7dd3fc 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            filter: 'drop-shadow(0 2px 8px rgba(56,189,248,0.4))'
+                        }}>Instant Consultations</span>
                     </h1>
-                    <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.6, margin: '0 auto' }}>
+                    <p style={{
+                        color: '#f8fafc',
+                        fontSize: '1.05rem',
+                        lineHeight: 1.6,
+                        margin: '0 auto',
+                        maxWidth: '720px',
+                        fontWeight: 500,
+                        textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+                    }}>
                         Browse leading physicians across multi-specialty hospitals. Select a doctor on the 3D rail, review availability, and secure your OPD token in seconds.
                     </p>
                 </div>
 
-                {/* Filter Toolbar Section */}
+                {/* Filter Toolbar Section - Crisp White Card */}
                 <div style={{
-                    background: 'rgba(15, 23, 42, 0.75)',
-                    backdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '20px',
-                    padding: '1.5rem',
-                    boxShadow: '0 20px 40px -15px rgba(0, 0, 0, 0.5)',
-                    marginBottom: '2rem'
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '18px',
+                    padding: '1.25rem',
+                    boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.35)',
+                    marginBottom: '1.25rem'
                 }}>
                     <div style={{
                         display: 'grid',
@@ -249,7 +262,7 @@ const PatientPortal = () => {
                         <div style={{ position: 'relative' }}>
                             <Search
                                 size={18}
-                                color="#38bdf8"
+                                color="#0284c7"
                                 style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }}
                             />
                             <input
@@ -259,12 +272,12 @@ const PatientPortal = () => {
                                 placeholder="Search by doctor name, specialty..."
                                 style={{
                                     width: '100%',
-                                    padding: '0.8rem 1rem 0.8rem 2.6rem',
-                                    borderRadius: '12px',
-                                    background: 'rgba(10, 15, 29, 0.85)',
-                                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                                    color: '#ffffff',
-                                    fontSize: '0.92rem',
+                                    padding: '0.75rem 1rem 0.75rem 2.6rem',
+                                    borderRadius: '10px',
+                                    background: '#f8fafc',
+                                    border: '1.5px solid #cbd5e1',
+                                    color: '#0f172a',
+                                    fontSize: '0.9rem',
                                     outline: 'none',
                                     boxSizing: 'border-box'
                                 }}
@@ -275,7 +288,7 @@ const PatientPortal = () => {
                         <div style={{ position: 'relative' }}>
                             <Building2
                                 size={18}
-                                color="#38bdf8"
+                                color="#0284c7"
                                 style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                             />
                             <select
@@ -283,12 +296,12 @@ const PatientPortal = () => {
                                 onChange={(e) => setSelectedHospital(e.target.value)}
                                 style={{
                                     width: '100%',
-                                    padding: '0.8rem 1rem 0.8rem 2.6rem',
-                                    borderRadius: '12px',
-                                    background: 'rgba(10, 15, 29, 0.85)',
-                                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                                    color: '#ffffff',
-                                    fontSize: '0.92rem',
+                                    padding: '0.75rem 1rem 0.75rem 2.6rem',
+                                    borderRadius: '10px',
+                                    background: '#f8fafc',
+                                    border: '1.5px solid #cbd5e1',
+                                    color: '#0f172a',
+                                    fontSize: '0.9rem',
                                     outline: 'none',
                                     cursor: 'pointer',
                                     boxSizing: 'border-box'
@@ -305,8 +318,8 @@ const PatientPortal = () => {
 
                         {/* Reset / Count Stats */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
-                            <span style={{ fontSize: '0.88rem', color: '#94a3b8', fontWeight: 600 }}>
-                                Showing <strong style={{ color: '#38bdf8' }}>{filteredDoctors.length}</strong> available {filteredDoctors.length === 1 ? 'doctor' : 'doctors'}
+                            <span style={{ fontSize: '0.88rem', color: '#475569', fontWeight: 600 }}>
+                                Showing <strong style={{ color: '#0284c7' }}>{filteredDoctors.length}</strong> available {filteredDoctors.length === 1 ? 'doctor' : 'doctors'}
                             </span>
                             {(searchQuery || selectedHospital !== 'All' || selectedDept !== 'All') && (
                                 <button
@@ -319,11 +332,11 @@ const PatientPortal = () => {
                                         display: 'inline-flex',
                                         alignItems: 'center',
                                         gap: '0.35rem',
-                                        padding: '0.45rem 0.85rem',
+                                        padding: '0.4rem 0.75rem',
                                         borderRadius: '8px',
-                                        background: 'rgba(239, 68, 68, 0.15)',
-                                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                                        color: '#f87171',
+                                        background: 'rgba(239, 68, 68, 0.1)',
+                                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                                        color: '#ef4444',
                                         fontSize: '0.8rem',
                                         fontWeight: 600,
                                         cursor: 'pointer'
@@ -337,7 +350,7 @@ const PatientPortal = () => {
                     </div>
 
                     {/* Department Filter Pills */}
-                    <div style={{ marginTop: '1.25rem', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
                         {departmentOptions.map((dept) => {
                             const isSelected = selectedDept.toLowerCase() === dept.toLowerCase();
                             return (
@@ -345,17 +358,16 @@ const PatientPortal = () => {
                                     key={dept}
                                     onClick={() => setSelectedDept(dept)}
                                     style={{
-                                        padding: '0.45rem 1rem',
+                                        padding: '0.4rem 0.9rem',
                                         borderRadius: '9999px',
-                                        fontSize: '0.82rem',
+                                        fontSize: '0.8rem',
                                         fontWeight: 600,
-                                        border: isSelected ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
-                                        background: isSelected ? '#0284c7' : 'rgba(10, 15, 29, 0.6)',
-                                        color: isSelected ? '#ffffff' : '#cbd5e1',
-                                        backdropFilter: 'blur(8px)',
+                                        border: isSelected ? '1px solid #0284c7' : '1px solid #cbd5e1',
+                                        background: isSelected ? '#0284c7' : '#f1f5f9',
+                                        color: isSelected ? '#ffffff' : '#334155',
                                         cursor: 'pointer',
                                         transition: 'all 0.2s ease',
-                                        boxShadow: isSelected ? '0 4px 14px rgba(2, 132, 199, 0.35)' : 'none'
+                                        boxShadow: isSelected ? '0 4px 12px rgba(2, 132, 199, 0.25)' : 'none'
                                     }}
                                 >
                                     {dept}
@@ -366,22 +378,23 @@ const PatientPortal = () => {
                 </div>
 
                 {/* DOCTOR SELECTION SECTION: DEPTH CAROUSEL */}
-                <div style={{ margin: '2rem 0', minHeight: '500px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ margin: '0.5rem 0 1.5rem', minHeight: '430px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
                             <InlineLoader size="42px" text="Loading hospital specialists and real-time availability..." />
                         </div>
                     ) : error ? (
                         <div style={{
-                            background: 'rgba(239, 68, 68, 0.1)',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            background: '#ffffff',
+                            border: '1px solid #fecaca',
                             borderRadius: '16px',
-                            padding: '3rem 2rem',
+                            padding: '2.5rem 1.5rem',
                             textAlign: 'center',
                             maxWidth: '520px',
-                            margin: '2rem auto'
+                            margin: '1.5rem auto',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
                         }}>
-                            <p style={{ color: '#f87171', fontWeight: 600, marginBottom: '1.25rem' }}>{error}</p>
+                            <p style={{ color: '#ef4444', fontWeight: 600, marginBottom: '1.25rem' }}>{error}</p>
                             <button
                                 onClick={loadDirectoryData}
                                 style={{
@@ -399,19 +412,20 @@ const PatientPortal = () => {
                         </div>
                     ) : carouselItems.length === 0 ? (
                         <div style={{
-                            background: 'rgba(15, 23, 42, 0.6)',
-                            border: '1px solid rgba(255, 255, 255, 0.08)',
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
                             borderRadius: '20px',
-                            padding: '4rem 2rem',
+                            padding: '3rem 2rem',
                             textAlign: 'center',
                             maxWidth: '560px',
-                            margin: '2rem auto'
+                            margin: '1.5rem auto',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
                         }}>
-                            <Stethoscope size={52} color="#64748b" style={{ margin: '0 auto 1rem' }} />
-                            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>
+                            <Stethoscope size={48} color="#64748b" style={{ margin: '0 auto 1rem' }} />
+                            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', marginBottom: '0.5rem' }}>
                                 No Specialists Found
                             </h3>
-                            <p style={{ color: '#94a3b8', fontSize: '0.92rem', marginBottom: '1.5rem' }}>
+                            <p style={{ color: '#64748b', fontSize: '0.92rem', marginBottom: '1.5rem' }}>
                                 No doctors matched your current hospital or specialization filter. Try resetting filters to explore all available clinicians.
                             </p>
                             <button
@@ -438,14 +452,16 @@ const PatientPortal = () => {
                             {/* React Bits DepthCarousel Component */}
                             <DepthCarousel
                                 items={carouselItems}
-                                depth={220}
-                                spread={90}
-                                tilt={22}
+                                cardWidth={290}
+                                cardHeight={390}
+                                depth={180}
+                                spread={75}
+                                tilt={16}
                                 tiltDirection="right"
-                                perspective={1400}
+                                perspective={1200}
                                 visibleCards={4}
                                 falloff={0.2}
-                                blur={6}
+                                blur={5}
                                 autoplay={false}
                                 loop={carouselItems.length > 1}
                                 onBook={handleBookAppointment}
@@ -454,89 +470,92 @@ const PatientPortal = () => {
                     )}
                 </div>
 
-                {/* Features & Safe Healthcare Guarantee */}
+                {/* Features & Safe Healthcare Guarantee - Solid White Cards */}
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                    gap: '1.5rem',
-                    marginTop: '4rem'
+                    gap: '1.25rem',
+                    marginTop: '2.5rem'
                 }}>
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
                         borderRadius: '16px',
-                        padding: '1.5rem',
+                        padding: '1.25rem',
                         display: 'flex',
                         gap: '1rem',
-                        alignItems: 'flex-start'
+                        alignItems: 'flex-start',
+                        boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.25)'
                     }}>
                         <div style={{
-                            padding: '0.75rem',
-                            borderRadius: '12px',
-                            background: 'rgba(2, 132, 199, 0.15)',
-                            color: '#38bdf8'
+                            padding: '0.65rem',
+                            borderRadius: '10px',
+                            background: 'rgba(2, 132, 199, 0.1)',
+                            color: '#0284c7'
                         }}>
-                            <CheckCircle2 size={24} />
+                            <CheckCircle2 size={22} />
                         </div>
                         <div>
-                            <h4 style={{ color: '#ffffff', fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.35rem' }}>
+                            <h4 style={{ color: '#0f172a', fontWeight: 700, fontSize: '1rem', margin: '0 0 0.25rem' }}>
                                 Board-Certified Specialists
                             </h4>
-                            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+                            <p style={{ color: '#475569', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
                                 Every clinician profile is authenticated with medical council registration and verified clinical credentials.
                             </p>
                         </div>
                     </div>
 
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
                         borderRadius: '16px',
-                        padding: '1.5rem',
+                        padding: '1.25rem',
                         display: 'flex',
                         gap: '1rem',
-                        alignItems: 'flex-start'
+                        alignItems: 'flex-start',
+                        boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.25)'
                     }}>
                         <div style={{
-                            padding: '0.75rem',
-                            borderRadius: '12px',
-                            background: 'rgba(2, 132, 199, 0.15)',
-                            color: '#38bdf8'
+                            padding: '0.65rem',
+                            borderRadius: '10px',
+                            background: 'rgba(2, 132, 199, 0.1)',
+                            color: '#0284c7'
                         }}>
-                            <Clock size={24} />
+                            <Clock size={22} />
                         </div>
                         <div>
-                            <h4 style={{ color: '#ffffff', fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.35rem' }}>
+                            <h4 style={{ color: '#0f172a', fontWeight: 700, fontSize: '1rem', margin: '0 0 0.25rem' }}>
                                 Real-Time Slot Guarantee
                             </h4>
-                            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+                            <p style={{ color: '#475569', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
                                 Direct connection to the hospital OPD queuing system prevents double bookings and minimizes waiting room delays.
                             </p>
                         </div>
                     </div>
 
                     <div style={{
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: '#ffffff',
+                        border: '1px solid #e2e8f0',
                         borderRadius: '16px',
-                        padding: '1.5rem',
+                        padding: '1.25rem',
                         display: 'flex',
                         gap: '1rem',
-                        alignItems: 'flex-start'
+                        alignItems: 'flex-start',
+                        boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.25)'
                     }}>
                         <div style={{
-                            padding: '0.75rem',
-                            borderRadius: '12px',
-                            background: 'rgba(2, 132, 199, 0.15)',
-                            color: '#38bdf8'
+                            padding: '0.65rem',
+                            borderRadius: '10px',
+                            background: 'rgba(2, 132, 199, 0.1)',
+                            color: '#0284c7'
                         }}>
-                            <Shield size={24} />
+                            <Shield size={22} />
                         </div>
                         <div>
-                            <h4 style={{ color: '#ffffff', fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.35rem' }}>
+                            <h4 style={{ color: '#0f172a', fontWeight: 700, fontSize: '1rem', margin: '0 0 0.25rem' }}>
                                 Digital OPD Pass & Queue Token
                             </h4>
-                            <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
+                            <p style={{ color: '#475569', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
                                 Receive an instant printable OPD confirmation pass with verified QR identification upon booking.
                             </p>
                         </div>
