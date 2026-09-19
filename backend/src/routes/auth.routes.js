@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { authController } from '../controllers/auth.controller.js';
+import { verifyToken } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
+router.post('/register', authController.register);
 router.post('/login', authController.login);
-router.post('/logout', authController.logout);
-router.get('/profile/:role', authController.getProfile);
+router.get('/me', verifyToken, authController.getMe);
 
 export default router;
