@@ -160,6 +160,7 @@ const Home = () => {
                         gap: '1.25rem',
                         background: '#ffffff',
                         backgroundColor: '#ffffff',
+                        color: '#0f172a',
                         padding: '1.75rem 1.5rem',
                         borderRadius: '18px',
                         border: '1.5px solid #e2e8f0',
@@ -176,10 +177,10 @@ const Home = () => {
                                 }}>
                                     {stat.value}
                                 </div>
-                                <div style={{ fontSize: '0.92rem', fontWeight: '700', color: '#0f172a' }}>
+                                <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a' }}>
                                     {stat.label}
                                 </div>
-                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.15rem' }}>
+                                <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.2rem', fontWeight: 600 }}>
                                     {stat.change}
                                 </div>
                             </div>
@@ -193,7 +194,7 @@ const Home = () => {
                 <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                     <span style={{
                         color: '#0284c7',
-                        fontWeight: '700',
+                        fontWeight: '800',
                         fontSize: '0.85rem',
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em'
@@ -202,7 +203,7 @@ const Home = () => {
                     </span>
                     <h2 style={{
                         fontSize: '2.2rem',
-                        fontWeight: '800',
+                        fontWeight: '900',
                         color: '#0f172a',
                         marginTop: '0.4rem'
                     }}>
@@ -223,6 +224,7 @@ const Home = () => {
                                 style={{
                                     background: '#ffffff',
                                     backgroundColor: '#ffffff',
+                                    color: '#0f172a',
                                     borderRadius: '16px',
                                     padding: '1.75rem',
                                     boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
@@ -248,20 +250,20 @@ const Home = () => {
                                             <IconComponent size={28} />
                                         </div>
                                         <span style={{
-                                            padding: '0.25rem 0.65rem',
+                                            padding: '0.3rem 0.75rem',
                                             borderRadius: '9999px',
                                             background: '#f1f5f9',
-                                            color: '#475569',
-                                            fontSize: '0.78rem',
-                                            fontWeight: '600'
+                                            color: '#1e293b',
+                                            fontSize: '0.8rem',
+                                            fontWeight: '700'
                                         }}>
                                             {dept.count}
                                         </span>
                                     </div>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0f172a', marginBottom: '0.5rem' }}>
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>
                                         {dept.name}
                                     </h3>
-                                    <p style={{ fontSize: '0.9rem', color: '#64748b', lineHeight: '1.5', margin: 0 }}>
+                                    <p style={{ fontSize: '0.92rem', color: '#334155', lineHeight: '1.6', margin: 0, fontWeight: 500 }}>
                                         {dept.desc}
                                     </p>
                                 </div>
@@ -273,9 +275,10 @@ const Home = () => {
                                             display: 'inline-flex',
                                             alignItems: 'center',
                                             gap: '0.4rem',
-                                            fontSize: '0.88rem',
-                                            fontWeight: '700',
-                                            color: '#0284c7'
+                                            fontSize: '0.9rem',
+                                            fontWeight: '800',
+                                            color: '#0284c7',
+                                            textDecoration: 'none'
                                         }}
                                     >
                                         <span>Consult Specialists</span>
