@@ -17,10 +17,8 @@ services:
         value: "*"
 
   # Frontend Static Site
-  - type: web
+  - type: static
     name: hms-frontend
-    runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: dist
