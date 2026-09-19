@@ -44,388 +44,401 @@ const Home = () => {
         }}>
             <AnimatedGlassBackground isFixed={true} opacity={0.88} />
 
-            {/* HERO SECTION */}
-            <section style={{
-                position: 'relative',
-                zIndex: 10,
-                padding: '4.5rem 1rem 3.5rem',
-                textAlign: 'center',
-                color: '#ffffff'
-            }}>
-                <div className="container" style={{ maxWidth: '1000px' }}>
-                    {/* Badge */}
-                    <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.45rem 1.1rem',
-                        borderRadius: '9999px',
-                        background: 'rgba(2, 132, 199, 0.25)',
-                        border: '1px solid rgba(56, 189, 248, 0.45)',
-                        color: '#38bdf8',
-                        fontSize: '0.85rem',
-                        fontWeight: '700',
-                        marginBottom: '1.5rem',
-                        backdropFilter: 'blur(10px)'
-                    }}>
-                        <Sparkles size={15} />
-                        <span>Next-Generation Intelligent Healthcare Management</span>
-                    </div>
-
-                    {/* Main Headline */}
-                    <h1 style={{
-                        fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
-                        fontWeight: '900',
-                        lineHeight: 1.15,
-                        color: '#ffffff',
-                        marginBottom: '1.25rem',
-                        letterSpacing: '-0.03em',
-                        textShadow: '0 3px 15px rgba(0,0,0,0.6)'
-                    }}>
-                        Precision Medicine Meets <br />
-                        <span style={{
-                            background: 'linear-gradient(135deg, #38bdf8 0%, #34d399 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            filter: 'drop-shadow(0 2px 8px rgba(56,189,248,0.4))'
-                        }}>
-                            Seamless Clinical Care
-                        </span>
-                    </h1>
-
-                    {/* Subtitle */}
-                    <p style={{
-                        fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
-                        color: '#f8fafc',
-                        maxWidth: '750px',
-                        margin: '0 auto 2.5rem',
-                        lineHeight: 1.6,
-                        fontWeight: 500,
-                        textShadow: '0 2px 8px rgba(0,0,0,0.8)'
-                    }}>
-                        Connecting patients, doctors, pharmacy, and administration in one unified, real-time healthcare ecosystem.
-                    </p>
-
-                    {/* Action Triggers */}
-                    <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        gap: '1rem',
-                        marginBottom: '3rem'
-                    }}>
-                        <Link to="/patient">
-                            <button style={{
-                                padding: '0.85rem 1.85rem',
-                                borderRadius: '12px',
-                                background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-                                color: '#ffffff',
-                                fontWeight: '700',
-                                fontSize: '1rem',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.6rem',
-                                boxShadow: '0 8px 20px rgba(2, 132, 199, 0.35)',
-                                border: 'none',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s'
-                            }}>
-                                <Calendar size={18} />
-                                <span>Book an Appointment</span>
-                                <ArrowRight size={17} />
-                            </button>
-                        </Link>
-                        <Link to="/about">
-                            <button style={{
-                                padding: '0.85rem 1.65rem',
-                                borderRadius: '12px',
-                                background: '#ffffff',
-                                color: '#0f172a',
-                                fontWeight: '700',
-                                fontSize: '1rem',
-                                border: '1.5px solid #cbd5e1',
-                                boxShadow: '0 4px 14px rgba(15, 23, 42, 0.05)',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s'
-                            }}>
-                                Hospital Facilities
-                            </button>
-                        </Link>
-                    </div>
-
-                    {/* LIVE STATS BAR */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-                        gap: '1.25rem',
-                        background: '#ffffff',
-                        backgroundColor: '#ffffff',
-                        color: '#0f172a',
-                        padding: '1.75rem 1.5rem',
-                        borderRadius: '18px',
-                        border: '1.5px solid #e2e8f0',
-                        boxShadow: '0 15px 35px -10px rgba(0, 0, 0, 0.1)'
-                    }}>
-                        {STATS.map((stat, i) => (
-                            <div key={i} style={{ textAlign: 'center' }}>
-                                <div style={{
-                                    fontSize: '2rem',
-                                    fontWeight: '800',
-                                    color: '#0284c7',
-                                    lineHeight: 1.1,
-                                    marginBottom: '0.25rem'
-                                }}>
-                                    {stat.value}
-                                </div>
-                                <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a' }}>
-                                    {stat.label}
-                                </div>
-                                <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.2rem', fontWeight: 600 }}>
-                                    {stat.change}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* DEPARTMENTS SHOWCASE */}
-            <section className="container" style={{ marginTop: '2rem' }}>
-                <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                    <span style={{
-                        color: '#0284c7',
-                        fontWeight: '800',
-                        fontSize: '0.85rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em'
-                    }}>
-                        Centers of Clinical Excellence
-                    </span>
-                    <h2 style={{
-                        fontSize: '2.2rem',
-                        fontWeight: '900',
-                        color: '#0f172a',
-                        marginTop: '0.4rem'
-                    }}>
-                        World-Class Specialized Care
-                    </h2>
-                </div>
-
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-                    gap: '1.5rem'
+            <div style={{ position: 'relative', zIndex: 10 }}>
+                {/* HERO SECTION */}
+                <section style={{
+                    padding: '4.5rem 1rem 3.5rem',
+                    textAlign: 'center',
+                    color: '#ffffff'
                 }}>
-                    {DEPARTMENTS.map((dept, index) => {
-                        const IconComponent = dept.icon;
-                        return (
-                            <div
-                                key={index}
-                                style={{
+                    <div className="container" style={{ maxWidth: '1000px' }}>
+                        {/* Badge */}
+                        <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.55rem 1.25rem',
+                            borderRadius: '9999px',
+                            background: '#ffffff',
+                            backgroundColor: '#ffffff',
+                            border: '1.5px solid #e2e8f0',
+                            color: '#0284c7',
+                            fontSize: '0.88rem',
+                            fontWeight: '800',
+                            marginBottom: '1.75rem',
+                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)'
+                        }}>
+                            <Sparkles size={16} color="#0284c7" />
+                            <span style={{ color: '#0f172a' }}>Next-Generation <strong style={{ color: '#0284c7' }}>Intelligent Healthcare Management</strong></span>
+                        </div>
+
+                        {/* Main Headline */}
+                        <h1 style={{
+                            fontSize: 'clamp(2.4rem, 5vw, 3.8rem)',
+                            fontWeight: '900',
+                            lineHeight: 1.15,
+                            color: '#ffffff',
+                            marginBottom: '1.25rem',
+                            letterSpacing: '-0.03em',
+                            textShadow: '0 3px 15px rgba(0,0,0,0.6)'
+                        }}>
+                            Precision Medicine Meets <br />
+                            <span style={{
+                                background: 'linear-gradient(135deg, #38bdf8 0%, #34d399 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                filter: 'drop-shadow(0 2px 8px rgba(56,189,248,0.4))'
+                            }}>
+                                Seamless Clinical Care
+                            </span>
+                        </h1>
+
+                        {/* Subtitle */}
+                        <p style={{
+                            fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
+                            color: '#f8fafc',
+                            maxWidth: '750px',
+                            margin: '0 auto 2.5rem',
+                            lineHeight: 1.6,
+                            fontWeight: 500,
+                            textShadow: '0 2px 8px rgba(0,0,0,0.8)'
+                        }}>
+                            Connecting patients, doctors, pharmacy, and administration in one unified, real-time healthcare ecosystem.
+                        </p>
+
+                        {/* Action Triggers */}
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            justifyContent: 'center',
+                            gap: '1rem',
+                            marginBottom: '3rem'
+                        }}>
+                            <Link to="/patient">
+                                <button style={{
+                                    padding: '0.85rem 1.85rem',
+                                    borderRadius: '12px',
+                                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                                    color: '#ffffff',
+                                    fontWeight: '700',
+                                    fontSize: '1rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.6rem',
+                                    boxShadow: '0 8px 20px rgba(2, 132, 199, 0.35)',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}>
+                                    <Calendar size={18} />
+                                    <span>Book an Appointment</span>
+                                    <ArrowRight size={17} />
+                                </button>
+                            </Link>
+                            <Link to="/about">
+                                <button style={{
+                                    padding: '0.85rem 1.65rem',
+                                    borderRadius: '12px',
                                     background: '#ffffff',
                                     backgroundColor: '#ffffff',
                                     color: '#0f172a',
-                                    borderRadius: '16px',
-                                    padding: '1.75rem',
-                                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
-                                    border: '1.5px solid #e2e8f0',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'space-between',
-                                    transition: 'transform 0.25s, box-shadow 0.25s'
-                                }}
-                            >
-                                <div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
-                                        <div style={{
-                                            width: '52px',
-                                            height: '52px',
-                                            borderRadius: '14px',
-                                            background: dept.bg,
-                                            color: dept.color,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            <IconComponent size={28} />
-                                        </div>
-                                        <span style={{
-                                            padding: '0.3rem 0.75rem',
-                                            borderRadius: '9999px',
-                                            background: '#f1f5f9',
-                                            color: '#1e293b',
-                                            fontSize: '0.8rem',
-                                            fontWeight: '700'
-                                        }}>
-                                            {dept.count}
-                                        </span>
+                                    fontWeight: '700',
+                                    fontSize: '1rem',
+                                    border: '1.5px solid #cbd5e1',
+                                    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.08)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}>
+                                    Hospital Facilities
+                                </button>
+                            </Link>
+                        </div>
+
+                        {/* LIVE STATS BAR */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+                            gap: '1.25rem',
+                            background: '#ffffff',
+                            backgroundColor: '#ffffff',
+                            color: '#0f172a',
+                            padding: '1.75rem 1.5rem',
+                            borderRadius: '18px',
+                            border: '1.5px solid #e2e8f0',
+                            boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.2)'
+                        }}>
+                            {STATS.map((stat, i) => (
+                                <div key={i} style={{ textAlign: 'center' }}>
+                                    <div style={{
+                                        fontSize: '2rem',
+                                        fontWeight: '800',
+                                        color: '#0284c7',
+                                        lineHeight: 1.1,
+                                        marginBottom: '0.25rem'
+                                    }}>
+                                        {stat.value}
                                     </div>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>
-                                        {dept.name}
-                                    </h3>
-                                    <p style={{ fontSize: '0.92rem', color: '#334155', lineHeight: '1.6', margin: 0, fontWeight: 500 }}>
-                                        {dept.desc}
-                                    </p>
+                                    <div style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a' }}>
+                                        {stat.label}
+                                    </div>
+                                    <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.2rem', fontWeight: 600 }}>
+                                        {stat.change}
+                                    </div>
                                 </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
 
-                                <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
-                                    <Link
-                                        to="/patient"
-                                        style={{
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '0.4rem',
-                                            fontSize: '0.9rem',
-                                            fontWeight: '800',
-                                            color: '#0284c7',
-                                            textDecoration: 'none'
-                                        }}
-                                    >
-                                        <span>Consult Specialists</span>
-                                        <ArrowRight size={15} />
-                                    </Link>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </section>
-
-            {/* TRUST & SECURITY PILLARS */}
-            <section className="container" style={{ marginTop: '4.5rem' }}>
-                <div style={{
-                    background: '#ffffff',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '24px',
-                    padding: '3.5rem 2.5rem',
-                    border: '1.5px solid #e2e8f0',
-                    color: '#0f172a',
-                    boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.12)'
-                }}>
-                    <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 3rem' }}>
+                {/* DEPARTMENTS SHOWCASE */}
+                <section className="container" style={{ marginTop: '2rem' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
                         <span style={{
                             display: 'inline-block',
+                            background: '#ffffff',
+                            backgroundColor: '#ffffff',
+                            border: '1.5px solid #e2e8f0',
                             color: '#0284c7',
+                            padding: '0.4rem 1.1rem',
+                            borderRadius: '9999px',
                             fontWeight: '800',
                             fontSize: '0.85rem',
                             textTransform: 'uppercase',
                             letterSpacing: '0.08em',
-                            background: '#f0f9ff',
-                            border: '1px solid #bae6fd',
-                            padding: '0.35rem 0.85rem',
-                            borderRadius: '9999px',
-                            marginBottom: '0.75rem'
+                            marginBottom: '0.75rem',
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
                         }}>
-                            Advanced Infrastructure
+                            Centers of Clinical Excellence
                         </span>
-                        <h2 style={{ fontSize: '2.3rem', fontWeight: '900', marginTop: '0.4rem', color: '#0f172a', letterSpacing: '-0.02em' }}>
-                            Engineered for Clinical Safety & Reliability
+                        <h2 style={{
+                            fontSize: '2.3rem',
+                            fontWeight: '900',
+                            color: '#ffffff',
+                            marginTop: '0.2rem',
+                            textShadow: '0 3px 12px rgba(0,0,0,0.6)'
+                        }}>
+                            World-Class Specialized Care
                         </h2>
                     </div>
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                        gap: '1.75rem'
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
+                        gap: '1.5rem'
                     }}>
-                        {/* Pillar 1 */}
-                        <div style={{
-                            background: '#ffffff',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '16px',
-                            padding: '1.75rem',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
-                        }}>
-                            <div style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '12px',
-                                background: '#f0f9ff',
+                        {DEPARTMENTS.map((dept, index) => {
+                            const IconComponent = dept.icon;
+                            return (
+                                <div
+                                    key={index}
+                                    style={{
+                                        background: '#ffffff',
+                                        backgroundColor: '#ffffff',
+                                        color: '#0f172a',
+                                        borderRadius: '18px',
+                                        padding: '1.85rem',
+                                        boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.2)',
+                                        border: '1.5px solid #e2e8f0',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'space-between',
+                                        transition: 'transform 0.25s, box-shadow 0.25s'
+                                    }}
+                                >
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+                                            <div style={{
+                                                width: '52px',
+                                                height: '52px',
+                                                borderRadius: '14px',
+                                                background: dept.bg,
+                                                color: dept.color,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <IconComponent size={28} />
+                                            </div>
+                                            <span style={{
+                                                padding: '0.35rem 0.85rem',
+                                                borderRadius: '9999px',
+                                                background: '#f1f5f9',
+                                                color: '#1e293b',
+                                                fontSize: '0.82rem',
+                                                fontWeight: '700'
+                                            }}>
+                                                {dept.count}
+                                            </span>
+                                        </div>
+                                        <h3 style={{ fontSize: '1.28rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.5rem' }}>
+                                            {dept.name}
+                                        </h3>
+                                        <p style={{ fontSize: '0.92rem', color: '#334155', lineHeight: '1.6', margin: 0, fontWeight: 500 }}>
+                                            {dept.desc}
+                                        </p>
+                                    </div>
+
+                                    <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                                        <Link
+                                            to="/patient"
+                                            style={{
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '0.4rem',
+                                                fontSize: '0.92rem',
+                                                fontWeight: '800',
+                                                color: '#0284c7',
+                                                textDecoration: 'none'
+                                            }}
+                                        >
+                                            <span>Consult Specialists</span>
+                                            <ArrowRight size={15} />
+                                        </Link>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                {/* TRUST & SECURITY PILLARS */}
+                <section className="container" style={{ marginTop: '4.5rem' }}>
+                    <div style={{
+                        background: '#ffffff',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '24px',
+                        padding: '3.5rem 2.5rem',
+                        border: '1.5px solid #e2e8f0',
+                        color: '#0f172a',
+                        boxShadow: '0 20px 45px -10px rgba(0, 0, 0, 0.25)'
+                    }}>
+                        <div style={{ textAlign: 'center', maxWidth: '700px', margin: '0 auto 3rem' }}>
+                            <span style={{
+                                display: 'inline-block',
                                 color: '#0284c7',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0
+                                fontWeight: '800',
+                                fontSize: '0.85rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.08em',
+                                background: '#f0f9ff',
+                                backgroundColor: '#f0f9ff',
+                                border: '1.5px solid #bae6fd',
+                                padding: '0.4rem 1rem',
+                                borderRadius: '9999px',
+                                marginBottom: '0.75rem',
+                                boxShadow: '0 4px 12px rgba(15, 23, 42, 0.05)'
                             }}>
-                                <Shield size={26} />
-                            </div>
-                            <div>
-                                <h4 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.45rem', color: '#0f172a' }}>Bank-Grade Security</h4>
-                                <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0, lineHeight: 1.6 }}>
-                                    Role-based access controls and encrypted electronic health records compliant with global healthcare guidelines.
-                                </p>
-                            </div>
+                                Advanced Infrastructure
+                            </span>
+                            <h2 style={{ fontSize: '2.3rem', fontWeight: '900', marginTop: '0.4rem', color: '#0f172a', letterSpacing: '-0.02em' }}>
+                                Engineered for Clinical Safety & Reliability
+                            </h2>
                         </div>
 
-                        {/* Pillar 2 */}
                         <div style={{
-                            background: '#ffffff',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '16px',
-                            padding: '1.75rem',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                            gap: '1.75rem'
                         }}>
+                            {/* Pillar 1 */}
                             <div style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '12px',
-                                background: '#ecfdf5',
-                                color: '#059669',
+                                background: '#ffffff',
+                                backgroundColor: '#ffffff',
+                                border: '1.5px solid #e2e8f0',
+                                borderRadius: '16px',
+                                padding: '1.75rem',
                                 display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0
+                                gap: '1.25rem',
+                                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)'
                             }}>
-                                <Activity size={26} />
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '12px',
+                                    background: '#f0f9ff',
+                                    color: '#0284c7',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                }}>
+                                    <Shield size={26} />
+                                </div>
+                                <div>
+                                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.45rem', color: '#0f172a' }}>Bank-Grade Security</h4>
+                                    <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0, lineHeight: 1.6 }}>
+                                        Role-based access controls and encrypted electronic health records compliant with global healthcare guidelines.
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.45rem', color: '#0f172a' }}>Live Queue Synchronization</h4>
-                                <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0, lineHeight: 1.6 }}>
-                                    Real-time token and OPD queue updates across reception desk, doctor consultation rooms, and patient monitors.
-                                </p>
-                            </div>
-                        </div>
 
-                        {/* Pillar 3 */}
-                        <div style={{
-                            background: '#ffffff',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid #e2e8f0',
-                            borderRadius: '16px',
-                            padding: '1.75rem',
-                            display: 'flex',
-                            gap: '1.25rem',
-                            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)'
-                        }}>
+                            {/* Pillar 2 */}
                             <div style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '12px',
-                                background: '#fffbeb',
-                                color: '#d97706',
+                                background: '#ffffff',
+                                backgroundColor: '#ffffff',
+                                border: '1.5px solid #e2e8f0',
+                                borderRadius: '16px',
+                                padding: '1.75rem',
                                 display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0
+                                gap: '1.25rem',
+                                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)'
                             }}>
-                                <Award size={26} />
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '12px',
+                                    background: '#ecfdf5',
+                                    color: '#059669',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                }}>
+                                    <Activity size={26} />
+                                </div>
+                                <div>
+                                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.45rem', color: '#0f172a' }}>Live Queue Synchronization</h4>
+                                    <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0, lineHeight: 1.6 }}>
+                                        Real-time token and OPD queue updates across reception desk, doctor consultation rooms, and patient monitors.
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.45rem', color: '#0f172a' }}>Instant Dispensing & Billing</h4>
-                                <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0, lineHeight: 1.6 }}>
-                                    Automated pharmacy stock deduction, e-prescriptions, and paperless invoices in seconds.
-                                </p>
+
+                            {/* Pillar 3 */}
+                            <div style={{
+                                background: '#ffffff',
+                                backgroundColor: '#ffffff',
+                                border: '1.5px solid #e2e8f0',
+                                borderRadius: '16px',
+                                padding: '1.75rem',
+                                display: 'flex',
+                                gap: '1.25rem',
+                                boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)'
+                            }}>
+                                <div style={{
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: '12px',
+                                    background: '#fffbeb',
+                                    color: '#d97706',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    flexShrink: 0
+                                }}>
+                                    <Award size={26} />
+                                </div>
+                                <div>
+                                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '0.45rem', color: '#0f172a' }}>Instant Dispensing & Billing</h4>
+                                    <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0, lineHeight: 1.6 }}>
+                                        Automated pharmacy stock deduction, e-prescriptions, and paperless invoices in seconds.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
     );
 };

@@ -46,11 +46,13 @@ const Footer = () => {
                             gap: '0.5rem',
                             padding: '0.4rem 0.85rem',
                             borderRadius: '8px',
-                            background: '#f0f9ff',
-                            border: '1px solid #bae6fd',
+                            background: '#ffffff',
+                            backgroundColor: '#ffffff',
+                            border: '1.5px solid #e2e8f0',
                             color: '#0284c7',
                             fontSize: '0.82rem',
-                            fontWeight: '700'
+                            fontWeight: '700',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                         }}>
                             <Award size={15} />
                             <span>NABH & JCI Accredited Hospital</span>
@@ -304,11 +306,13 @@ const Footer = () => {
                                 gap: '0.5rem',
                                 padding: '0.45rem 0.85rem',
                                 borderRadius: '8px',
-                                background: '#ecfdf5',
-                                border: '1px solid #a7f3d0',
+                                background: '#ffffff',
+                                backgroundColor: '#ffffff',
+                                border: '1.5px solid #e2e8f0',
                                 color: '#059669',
                                 fontSize: '0.85rem',
-                                fontWeight: '700'
+                                fontWeight: '700',
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
                             }}>
                                 <Clock size={15} />
                                 <span>24/7 Trauma & Emergency Center Open</span>

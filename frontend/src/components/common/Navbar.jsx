@@ -41,22 +41,23 @@ const Navbar = () => {
         }}>
             {/* Top Micro-Bar for Emergency Status */}
             <div style={{
-                background: 'linear-gradient(90deg, #0f172a 0%, #0369a1 50%, #0f172a 100%)',
-                color: '#ffffff',
-                padding: '0.35rem 1rem',
-                fontSize: '0.78rem',
-                fontWeight: '500'
+                background: '#ffffff',
+                color: '#0f172a',
+                borderBottom: '1px solid #e2e8f0',
+                padding: '0.4rem 1rem',
+                fontSize: '0.8rem',
+                fontWeight: '600'
             }}>
                 <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                         <span className="pulse-indicator" style={{ backgroundColor: '#10b981' }}></span>
-                        <span>24/7 Emergency Admissions Open</span>
+                        <span style={{ color: '#0f172a' }}>24/7 Emergency Admissions Open</span>
                         <span style={{ opacity: 0.4 }}>•</span>
-                        <span style={{ color: '#38bdf8' }}>Average ER Wait: &lt; 8 mins</span>
+                        <span style={{ color: '#0284c7' }}>Average ER Wait: &lt; 8 mins</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                        <a href="tel:8001234567" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#ffffff', fontWeight: '600' }}>
-                            <PhoneCall size={13} color="#38bdf8" />
+                        <a href="tel:8001234567" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#0284c7', fontWeight: '700', textDecoration: 'none' }}>
+                            <PhoneCall size={13} color="#0284c7" />
                             <span>Emergency: (800) 123-4567</span>
                         </a>
                     </div>
