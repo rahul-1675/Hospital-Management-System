@@ -1,0 +1,298 @@
+/* Receptionist Portal Theme */
+:root {
+    --reception-primary: #0891b2;
+    /* Cyan/Blue */
+    --reception-primary-hover: #0e7490;
+    --reception-secondary: #ecfeff;
+    /* Soft Cyan */
+    --reception-success: #10b981;
+    /* Soft Green */
+    --reception-warning: #f59e0b;
+    /* Muted Amber */
+    --reception-danger: #ef4444;
+    /* Soft Red */
+    --reception-bg: #f8fafc;
+    /* Off-white / light grey */
+    --reception-text-main: #0f172a;
+    --reception-text-muted: #64748b;
+    --reception-border: #e2e8f0;
+    --reception-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --reception-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.reception-portal-container {
+    display: flex;
+    height: 100vh;
+    background-color: transparent;
+    /* Removed solid color for bg image */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--reception-text-main);
+    overflow: hidden;
+}
+
+/* Sidebar */
+.reception-sidebar {
+    width: 260px;
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Semi-transparent sidebar too */
+    border-right: 1px solid var(--reception-border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    flex-shrink: 0;
+}
+
+.reception-sidebar-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--reception-secondary);
+}
+
+.reception-sidebar-header h2 {
+    color: var(--reception-primary);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.reception-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 8px;
+    color: var(--reception-text-muted);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.reception-nav-item:hover {
+    background-color: var(--reception-secondary);
+    color: var(--reception-primary);
+}
+
+.reception-nav-item.active {
+    background-color: var(--reception-primary);
+    color: white;
+    box-shadow: var(--reception-shadow);
+}
+
+.reception-sidebar-footer {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--reception-border);
+}
+
+/* Main Content Area */
+.reception-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Split View Layouts */
+.split-view-container {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+}
+
+.list-panel {
+    width: 400px;
+    border-right: 1px solid var(--reception-border);
+    background-color: rgba(255, 255, 255, 0.85);
+    /* Semi-transparent */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.detail-panel {
+    flex: 1;
+    background-color: transparent;
+    /* Transparent for bg image */
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Cards */
+.reception-card {
+    background: rgba(255, 255, 255, 0.9);
+    /* Semi-transparent */
+    border: 1px solid var(--reception-border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.reception-card:hover {
+    border-color: var(--reception-primary);
+    box-shadow: var(--reception-shadow);
+}
+
+.reception-card.active {
+    border-color: var(--reception-primary);
+    background-color: var(--reception-secondary);
+}
+
+.reception-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-scheduled {
+    background-color: var(--reception-secondary);
+    color: var(--reception-primary);
+}
+
+.status-checked-in {
+    background-color: #f0fdf4;
+    color: var(--reception-success);
+}
+
+.status-completed {
+    background-color: #f1f5f9;
+    color: var(--reception-text-muted);
+}
+
+.status-cancelled {
+    background-color: #fef2f2;
+    color: var(--reception-danger);
+}
+
+.status-waiting {
+    background-color: #fff7ed;
+    color: var(--reception-warning);
+}
+
+/* Detail View */
+.detail-card {
+    background: rgba(255, 255, 255, 0.9);
+    /* Semi-transparent */
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: var(--reception-shadow);
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--reception-text-main);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Forms */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--reception-text-main);
+}
+
+.form-input,
+.form-select {
+    padding: 0.75rem;
+    border: 1px solid var(--reception-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--reception-primary);
+    box-shadow: 0 0 0 3px var(--reception-secondary);
+}
+
+/* Common Text Utilities */
+.text-label {
+    font-size: 0.875rem;
+    color: var(--reception-text-muted);
+}
+
+.text-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--reception-text-main);
+}
+
+.text-lg {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.action-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--reception-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--reception-primary-hover);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--reception-border);
+    color: var(--reception-text-main);
+}
+
+.btn-outline:hover {
+    border-color: var(--reception-primary);
+    color: var(--reception-primary);
+}
+
+.btn-danger {
+    background: #fef2f2;
+    color: var(--reception-danger);
+}
+
+.btn-danger:hover {
+    background: #fee2e2;
+}

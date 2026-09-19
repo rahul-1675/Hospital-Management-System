@@ -1,0 +1,650 @@
+/* =========================================
+   Auth & Login Styles (Simplified & Premium)
+   ========================================= */
+
+/* =========================================
+   Auth & Login Styles (Premium Healthcare UI)
+   ========================================= */
+
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-md);
+    position: relative;
+    overflow: hidden;
+    /* Clean Login Background */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* Background Image will be set inline in Login.jsx or assume it's set there */
+}
+
+/* Floating Blob 1 - Teal/Cyan (Top Left) */
+.login-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    width: 70vw;
+    height: 70vw;
+    background: radial-gradient(circle, rgba(45, 212, 191, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+    /* Teal-400 */
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    animation: floatBlobOne 25s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* Floating Blob 2 - Blue/Indigo (Bottom Right) */
+.login-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -10%;
+    right: -10%;
+    width: 65vw;
+    height: 65vw;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+    /* Sky-500 */
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    animation: floatBlobTwo 20s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+/* Glassmorphism Card for Login */
+.login-glass-card {
+    position: relative;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.85);
+    /* Frosted Glass */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    width: 100%;
+    max-width: 420px;
+    padding: 3rem 2.5rem;
+    border-radius: 24px;
+    /* Rounded corners */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    /* Subtle white border */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05),
+        0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    text-align: center;
+    color: white;
+    /* Card Animations */
+    animation: cardFloat 6s ease-in-out infinite,
+        gentlePulseShadow 8s ease-in-out infinite;
+}
+
+/* --- Animations --- */
+
+@keyframes fadeInPage {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes floatBlobOne {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(10%, 10%) scale(1.1);
+    }
+}
+
+@keyframes floatBlobTwo {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(-10%, -10%) scale(1.05);
+    }
+}
+
+@keyframes cardFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+
+    /* Very subtle float */
+}
+
+@keyframes gentlePulseShadow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 20px 25px -5px rgba(0, 0, 0, 0.05),
+            0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    50% {
+        box-shadow:
+            0 25px 50px -12px rgba(14, 165, 233, 0.15),
+            /* Subtle blue glow */
+            0 10px 15px -3px rgba(14, 165, 233, 0.05);
+        border-color: rgba(14, 165, 233, 0.2);
+        /* Subtle brand border tint */
+    }
+}
+
+/* Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+
+    .login-wrapper,
+    .login-wrapper::before,
+    .login-wrapper::after,
+    .login-card {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* Header simplified */
+.login-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.login-brand {
+    font-size: 1.5rem;
+    font-weight: 600;
+    /* Regular weight for calm feel */
+    color: var(--color-text-main);
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+/* Form Layout */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+/* Clean Inputs for Glass Card */
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.75rem 0.875rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.9);
+    /* Slightly opaque for readability */
+    font-size: 0.9375rem;
+    color: #1e293b;
+    /* Dark text for typing */
+    transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+    background-color: white;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    /* White label text */
+    margin-bottom: 0.5rem;
+    display: block;
+    text-align: left;
+}
+
+/* Button - Flat and Clean */
+.login-btn {
+    width: 100%;
+    padding: 0.875rem;
+    background-color: var(--color-brand-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 0.5rem;
+}
+
+.login-btn:hover:not(:disabled) {
+    background-color: var(--color-brand-hover);
+}
+
+.login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--color-text-light);
+}
+
+/* Footer - Minimalist */
+.login-footer {
+    margin-top: 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.security-notice {
+    font-size: 0.75rem;
+    color: #000080;
+    /* Lighter text for almost invisible feel */
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.btn-ghost {
+    background: transparent;
+    border: none;
+    color: #000080;
+    font-size: 0.8125rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    opacity: 0.8;
+}
+
+.btn-ghost:hover {
+    color: var(--color-text-main);
+    opacity: 1;
+}
+
+.error-message {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #b91c1c;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* =========================================
+   Premium Landing Page Styles (About.jsx)
+   ========================================= */
+
+.about-wrapper {
+    background-color: var(--color-surface-bg);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Hero Section --- */
+.landing-hero {
+    position: relative;
+    background: transparent;
+    padding: 6rem var(--spacing-md) 8rem;
+    /* Extra padding at bottom for overlap */
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Subtle background accent */
+.landing-hero::before {
+    display: none;
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(2, 132, 199, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-badge {
+    display: inline-block;
+    background-color: var(--color-brand-subtle);
+    color: var(--color-brand-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-lg);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #38bdf8;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+.hero-title .highlight {
+    background: none;
+    -webkit-text-fill-color: initial;
+    color: #38bdf8;
+    /* Bright Sky Blue */
+    text-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #f1f5f9;
+    /* Slate-100 */
+    max-width: 650px;
+    margin: 0 auto;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    line-height: 1.6;
+}
+
+/* --- Floating Stats Strip --- */
+.stats-strip-container {
+    margin-top: -4rem;
+    /* Negative margin to overlap hero */
+    position: relative;
+    z-index: 10;
+    margin-bottom: var(--spacing-2xl);
+    padding: 0 var(--spacing-md);
+}
+
+.stats-strip {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    padding: var(--spacing-xl);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-xl);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    animation: fadeInUp 1s ease-out 0.2s backwards;
+}
+
+.stat-block {
+    text-align: center;
+    position: relative;
+}
+
+/* Separator lines between stats */
+.stat-block:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -1rem;
+    /* Adjust based on gap */
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background-color: var(--color-border);
+    opacity: 0.5;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--color-text-main), var(--color-text-muted));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* --- Features Grid (Premium Cards) --- */
+.section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-2xl);
+}
+
+.section-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #38bdf8;
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.modern-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    padding-bottom: 4rem;
+}
+
+.premium-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    border: 1px solid var(--color-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-brand-subtle);
+}
+
+.card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: 1rem;
+}
+
+.card-desc {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .stats-strip {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .stat-block:not(:last-child)::after {
+        display: none;
+    }
+
+    .modern-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .modern-grid,
+    .stats-strip {
+        grid-template-columns: 1fr;
+    }
+
+
+    .stats-strip-container {
+        margin-top: -2rem;
+    }
+}
+
+/* =========================================
+   Patient Booking Page Styles
+   ========================================= */
+
+.booking-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.booking-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.booking-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.booking-content {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* Default desktop alignment */
+    padding: 2rem;
+}
+
+.booking-card {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(10px);
+    max-width: 450px;
+    width: 100%;
+    margin-right: 8vw;
+    transition: all 0.3s ease;
+}
+
+/* Success State Override */
+.booking-card.success {
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.booking-card h2 {
+    color: var(--color-brand-primary);
+    /* Was #1e3a8a - using variable now */
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.booking-card p {
+    color: var(--color-text-muted);
+    margin-top: 0.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+    .booking-card {
+        margin-right: 4vw;
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .booking-content {
+        justify-content: center;
+        /* Center on mobile/tablet */
+        align-items: center;
+        /* Center vertically if possible, or start with padding */
+        padding: 1.5rem;
+    }
+
+    .booking-card {
+        margin-right: 0;
+        /* Remove right margin */
+        max-width: 100%;
+        padding: 1.5rem;
+    }
+
+    .booking-card h2 {
+        font-size: 1.5rem;
+    }
+}

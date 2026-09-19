@@ -1,0 +1,80 @@
+export const initialData = {
+    credentials: {
+        doctor: { id: "DOC001", password: "doc@123", name: "Dr. Smith", role: "doctor", department: "General Med", email: "dr.smith@hms.com" },
+        receptionist: { id: "REC001", password: "rec@123", name: "Receptionist Jane", role: "receptionist", department: "Front Desk", email: "jane@hms.com" },
+        pharmacy: { id: "PHA001", password: "pha@123", name: "Pharmacist Bob", role: "pharmacy", department: "Pharmacy", email: "bob@hms.com" },
+        staff: { id: "STF001", password: "stf@123", name: "Staff Member Mike", role: "staff", department: "General Ops", email: "mike@hms.com" },
+        admin: { id: "ADM001", password: "admin@123", name: "Admin Alice", role: "admin", department: "Administration", email: "alice@hms.com" }
+    },
+    users: [
+        { id: 'USR001', name: 'Dr. Sarah Smith', role: 'Doctor', department: 'Cardiology', status: 'Active', email: 'sarah.smith@hms.com' },
+        { id: 'USR002', name: 'James Wilson', role: 'Receptionist', department: 'Front Desk', status: 'Active', email: 'j.wilson@hms.com' },
+        { id: 'USR003', name: 'Emily Davis', role: 'Nurse', department: 'Pediatrics', status: 'Active', email: 'e.davis@hms.com' },
+        { id: 'USR004', name: 'Michael Chen', role: 'Admin', department: 'IT', status: 'Active', email: 'm.chen@hms.com' },
+        { id: 'USR005', name: 'Robert Brown', role: 'Pharmacist', department: 'Pharmacy', status: 'Suspended', email: 'r.brown@hms.com' }
+    ],
+    logs: [
+        { id: 1, timestamp: '2026-02-02 10:30:15', actor: 'Dr. Sarah Smith', action: 'UPDATE_RECORD', entity: 'Patient #4022', status: 'Success' },
+        { id: 2, timestamp: '2026-02-02 10:15:00', actor: 'James Wilson', action: 'LOGIN', entity: 'System', status: 'Success' },
+        { id: 3, timestamp: '2026-02-02 09:45:22', actor: 'System', action: 'BACKUP', entity: 'Database', status: 'Success' },
+        { id: 4, timestamp: '2026-02-02 09:00:00', actor: 'Robert Brown', action: 'LOGIN_ATTEMPT', entity: 'System', status: 'Failed' },
+        { id: 5, timestamp: '2026-02-01 18:30:00', actor: 'Admin', action: 'CONFIG_CHANGE', entity: 'Settings', status: 'Warning' }
+    ],
+    invoices: [
+        { id: 'INV-2024-001', patient: 'Alice Cooper', amount: 150.00, status: 'Paid', date: '2026-02-01', items: [{ description: 'Consultation - Dr. Smith', amount: 150 }] },
+        { id: 'INV-2024-002', patient: 'Bob Marley', amount: 450.50, status: 'Pending', date: '2026-02-02', items: [{ description: 'Cardiology Assessment', amount: 450.50 }] },
+        { id: 'INV-2024-003', patient: 'Charlie Puth', amount: 1200.00, status: 'Overdue', date: '2026-01-25', items: [{ description: 'Emergency Ward Services', amount: 1200 }] }
+    ],
+    appointments: [
+        { id: 1, time: '09:00 AM', patientName: 'Alice Springs', doctorName: 'Dr. Smith', type: 'New Visit', status: 'scheduled', details: 'Initial consultation for persistent headaches.', contact: '+1 555-0101', department: 'General Med' },
+        { id: 2, time: '09:15 AM', patientName: 'Bob Martin', doctorName: 'Dr. Jones', type: 'Follow-up', status: 'checked-in', details: 'Post-surgery checkup.', contact: '+1 555-0102', department: 'Cardiology' },
+        { id: 3, time: '09:30 AM', patientName: 'Charlie Davis', doctorName: 'Dr. Smith', type: 'New Visit', status: 'cancelled', details: 'Cancelled by patient.', contact: '+1 555-0103', department: 'General Med' },
+        { id: 4, time: '10:00 AM', patientName: 'Diana Prince', doctorName: 'Dr. Williams', type: 'New Visit', status: 'scheduled', details: 'Annual physical.', contact: '+1 555-0104', department: 'General Med' }
+    ],
+    queueState: {
+        doctors: {
+            'Dr. Smith': {
+                status: 'BUSY',
+                department: 'General Med',
+                current: { token: 'A-101', name: 'Liam Wilson', time: '10:00 AM' },
+                waiting: []
+            },
+            'Dr. Jones': {
+                status: 'AVAILABLE',
+                department: 'Cardiology',
+                current: null,
+                waiting: [{ token: 'A-102', name: 'Bob Martin', time: '09:15 AM' }]
+            },
+            'Dr. Williams': {
+                status: 'AVAILABLE',
+                department: 'General Med',
+                current: null,
+                waiting: []
+            }
+        }
+    },
+    inventory: [
+        { id: 1, name: 'Paracetamol 500mg', category: 'Analgesics', stock: 1200, unit: 'Tablets', price: 5.50, minThreshold: 200, expiryDate: '2027-12-31' },
+        { id: 2, name: 'Amoxicillin 250mg', category: 'Antibiotics', stock: 85, unit: 'Capsules', price: 12.00, minThreshold: 100, expiryDate: '2026-08-15' },
+        { id: 3, name: 'Cetirizine 10mg', category: 'Antihistamines', stock: 450, unit: 'Tablets', price: 3.20, minThreshold: 150, expiryDate: '2028-01-20' },
+        { id: 4, name: 'Metformin 500mg', category: 'Antidiabetic', stock: 320, unit: 'Tablets', price: 8.00, minThreshold: 100, expiryDate: '2027-05-10' }
+    ],
+    prescriptions: [
+        { id: 'RX-1001', patientName: 'Liam Wilson', doctorName: 'Dr. Smith', date: '2026-02-02', items: [{ medicine: 'Paracetamol 500mg', dosage: '1 tablet 3x daily', quantity: 15 }], status: 'Dispensed' },
+        { id: 'RX-1002', patientName: 'Bob Martin', doctorName: 'Dr. Jones', date: '2026-02-02', items: [{ medicine: 'Amoxicillin 250mg', dosage: '1 capsule 2x daily', quantity: 10 }], status: 'Pending' }
+    ],
+    staffMembers: [
+        { id: 'STF001', name: 'Mike Johnson', role: 'Ward Attendant', department: 'General Ward', shift: 'Morning (08:00 - 16:00)', status: 'On Duty' },
+        { id: 'STF002', name: 'Sarah Conner', role: 'Staff Nurse', department: 'ICU', shift: 'Evening (16:00 - 00:00)', status: 'On Duty' },
+        { id: 'STF003', name: 'David Miller', role: 'Orderly', department: 'Emergency', shift: 'Night (00:00 - 08:00)', status: 'Off Duty' }
+    ],
+    tasks: [
+        { id: 1, title: 'Sanitize Ward 3B', assignee: 'Mike Johnson', priority: 'High', status: 'In Progress', dueTime: '11:00 AM' },
+        { id: 2, title: 'Restock Medical Supplies in ICU', assignee: 'Sarah Conner', priority: 'Medium', status: 'Pending', dueTime: '02:00 PM' },
+        { id: 3, title: 'Patient Escort to Radiology #402', assignee: 'David Miller', priority: 'High', status: 'Completed', dueTime: '09:30 AM' }
+    ],
+    feedback: [
+        { id: 1, patientName: 'Alice Springs', rating: 5, comment: 'Excellent doctor care and clean environment.', date: '2026-02-01' },
+        { id: 2, patientName: 'Bob Martin', rating: 4, comment: 'Fast check-in process at reception.', date: '2026-02-02' }
+    ]
+};

@@ -1,0 +1,305 @@
+/* Doctor Portal Theme */
+:root {
+  --doctor-primary: #0284c7;
+  /* Medical Blue */
+  --doctor-primary-hover: #0369a1;
+  --doctor-secondary: #e0f2fe;
+  /* Soft Blue */
+  --doctor-success: #10b981;
+  /* Soft Green */
+  --doctor-warning: #f59e0b;
+  /* Muted Amber */
+  --doctor-bg: #f8fafc;
+  /* Off-white / light grey */
+  --doctor-text-main: #0f172a;
+  --doctor-text-muted: #64748b;
+  --doctor-border: #e2e8f0;
+  --doctor-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --doctor-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Glassmorphism Variables */
+  --doctor-glass-bg: rgba(255, 255, 255, 0.75);
+  --doctor-glass-border: 1px solid rgba(255, 255, 255, 0.5);
+  --doctor-glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --doctor-blur: blur(12px);
+}
+
+
+.doctor-portal-container {
+  display: flex;
+  height: 100vh;
+  background-color: transparent;
+  /* Transparent for bg image */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--doctor-text-main);
+  overflow: hidden;
+}
+
+/* Sidebar */
+.doctor-sidebar {
+  width: 260px;
+  background-color: var(--doctor-glass-bg);
+  backdrop-filter: var(--doctor-blur);
+  -webkit-backdrop-filter: var(--doctor-blur);
+  border-right: var(--doctor-glass-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  flex-shrink: 0;
+}
+
+.doctor-sidebar-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--doctor-secondary);
+}
+
+.doctor-sidebar-header h2 {
+  color: var(--doctor-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.doctor-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  color: var(--doctor-text-muted);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.doctor-nav-item:hover {
+  background-color: var(--doctor-secondary);
+  color: var(--doctor-primary);
+}
+
+.doctor-nav-item.active {
+  background-color: var(--doctor-primary);
+  color: white;
+  box-shadow: var(--doctor-shadow);
+}
+
+.doctor-sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--doctor-border);
+}
+
+/* Main Content Area */
+.doctor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Split View Layouts */
+.split-view-container {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.list-panel {
+  width: 400px;
+  /* Fixed width for list */
+  border-right: var(--doctor-glass-border);
+  background-color: var(--doctor-glass-bg);
+  backdrop-filter: var(--doctor-blur);
+  -webkit-backdrop-filter: var(--doctor-blur);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.detail-panel {
+  flex: 1;
+  background-color: transparent;
+  /* Transparent for bg image */
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Cards */
+.doctor-card {
+  background: var(--doctor-glass-bg);
+  backdrop-filter: var(--doctor-blur);
+  -webkit-backdrop-filter: var(--doctor-blur);
+  border: var(--doctor-glass-border);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.doctor-card:hover {
+  border-color: var(--doctor-primary);
+  box-shadow: var(--doctor-shadow);
+}
+
+.doctor-card.active {
+  border-color: var(--doctor-primary);
+  background-color: var(--doctor-secondary);
+}
+
+.doctor-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.time-slot {
+  font-weight: 600;
+  color: var(--doctor-text-main);
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background-color: #f1f5f9;
+  color: var(--doctor-text-muted);
+}
+
+.status-checked-in {
+  background-color: var(--doctor-secondary);
+  color: var(--doctor-primary);
+}
+
+.status-in-consultation {
+  background-color: #fff7ed;
+  color: var(--doctor-warning);
+  border: 1px solid var(--doctor-warning);
+}
+
+.status-completed {
+  background-color: #f0fdf4;
+  color: var(--doctor-success);
+}
+
+/* Detail View */
+.detail-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.detail-card {
+  background: var(--doctor-glass-bg);
+  backdrop-filter: var(--doctor-blur);
+  -webkit-backdrop-filter: var(--doctor-blur);
+  border: var(--doctor-glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--doctor-glass-shadow);
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--doctor-text-main);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Patient Grid */
+.patient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+/* Search Bar */
+.search-bar-container {
+  padding: 1.5rem;
+  background: var(--doctor-glass-bg);
+  backdrop-filter: var(--doctor-blur);
+  -webkit-backdrop-filter: var(--doctor-blur);
+  border-bottom: var(--doctor-glass-border);
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--doctor-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: var(--doctor-bg);
+}
+
+/* Common Text Utilities */
+.text-label {
+  font-size: 0.875rem;
+  color: var(--doctor-text-muted);
+}
+
+.text-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--doctor-text-main);
+}
+
+.text-lg {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.action-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--doctor-primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--doctor-primary-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--doctor-border);
+  color: var(--doctor-text-main);
+}
+
+.btn-outline:hover {
+  border-color: var(--doctor-primary);
+  color: var(--doctor-primary);
+}
+
+/* Glass Header Utility */
+.glass-header {
+  background: var(--doctor-glass-bg) !important;
+  backdrop-filter: var(--doctor-blur);
+  -webkit-backdrop-filter: var(--doctor-blur);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--doctor-glass-shadow);
+  border: var(--doctor-glass-border);
+  margin-bottom: 2rem;
+}

@@ -1,0 +1,103 @@
+src/
+│
+├── app/                     # App bootstrap & routing
+│   ├── App.jsx
+│   ├── main.jsx
+│   ├── routes.jsx           # All routes + role guards
+│   └── providers/           # Context providers
+│       ├── AuthProvider.jsx
+│       ├── ToastProvider.jsx
+│
+├── components/              # GLOBAL reusable components
+│   ├── ui/
+│   │   ├── Button.jsx       # ✅ SINGLE shared button
+│   │   ├── Input.jsx
+│   │   ├── Select.jsx
+│   │   ├── Modal.jsx
+│   │   ├── Badge.jsx
+│   │   ├── Card.jsx
+│   │   ├── Skeleton.jsx
+│   │   └── Loader.jsx
+│   │
+│   ├── layout/
+│   │   ├── Sidebar.jsx
+│   │   ├── Header.jsx
+│   │   └── PageWrapper.jsx
+│   │
+│   └── common/
+│       ├── EmptyState.jsx
+│       ├── ConfirmDialog.jsx
+│       └── Unauthorized.jsx
+│
+├── features/                # DOMAIN-BASED modules (✔ best practice)
+│
+│   ├── auth/
+│   │   ├── Login.jsx
+│   │   ├── Unauthorized.jsx
+│   │   ├── auth.service.js
+│   │   └── auth.guard.jsx
+│
+│   ├── doctor/
+│   │   ├── Dashboard.jsx
+│   │   ├── Appointments.jsx
+│   │   ├── MyPatients.jsx
+│   │   ├── MedicalRecords.jsx
+│   │   ├── Profile.jsx
+│   │   └── doctor.service.js
+│
+│   ├── receptionist/
+│   │   ├── Dashboard.jsx
+│   │   ├── Appointments.jsx
+│   │   ├── PatientRegistration.jsx
+│   │   ├── QueueManagement.jsx
+│   │   ├── Billing.jsx
+│   │   ├── Profile.jsx
+│   │   └── receptionist.service.js
+│
+│   ├── pharmacy/
+│   │   ├── Dashboard.jsx
+│   │   ├── Dispense.jsx
+│   │   ├── Inventory.jsx
+│   │   ├── Orders.jsx
+│   │   ├── Reports.jsx
+│   │   └── pharmacy.service.js
+│
+│   ├── staff/
+│   │   ├── Dashboard.jsx
+│   │   ├── MyTasks.jsx
+│   │   ├── Schedule.jsx
+│   │   ├── Profile.jsx
+│   │   └── staff.service.js
+│
+│   ├── admin/
+│   │   ├── Overview.jsx
+│   │   ├── UserManagement.jsx
+│   │   ├── SystemLogs.jsx
+│   │   ├── Finance.jsx
+│   │   ├── Settings.jsx
+│   │   └── admin.service.js
+│
+├── services/                # API + mock logic
+│   ├── api.js               # axios/fetch wrapper
+│   ├── mockAuth.js
+│   ├── queue.engine.js      # queue simulation logic
+│   └── storage.js           # localStorage helpers
+│
+├── constants/               # SINGLE SOURCE OF TRUTH
+│   ├── roles.js
+│   ├── routes.js
+│   ├── status.js
+│   └── colors.js
+│
+├── utils/
+│   ├── date.js
+│   ├── formatters.js
+│   └── validators.js
+│
+├── styles/
+│   ├── globals.css
+│   └── tailwind.css
+│
+└── assets/
+    ├── icons/
+    └── images/
