@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Lock, AlertCircle, LogOut } from 'lucide-react';
+import { Lock, AlertCircle, LogOut, KeyRound } from 'lucide-react';
 import Button from '../../components/common/Button';
-
+import { CREDENTIALS } from '../../services/auth.service';
 import LoginBg from '../../assets/LoginBg.png';
+
+const DEMO_ROLES = [
+    { key: 'doctor', label: 'Doctor', id: 'DOC001', pass: 'doc@123', color: '#0284c7' },
+    { key: 'receptionist', label: 'Receptionist', id: 'REC001', pass: 'rec@123', color: '#0d9488' },
+    { key: 'pharmacy', label: 'Pharmacy', id: 'PHA001', pass: 'pha@123', color: '#16a34a' },
+    { key: 'staff', label: 'Staff', id: 'STF001', pass: 'stf@123', color: '#d97706' },
+    { key: 'admin', label: 'Admin', id: 'ADM001', pass: 'admin@123', color: '#9333ea' }
+];
 
 const Login = () => {
     const navigate = useNavigate();
@@ -12,10 +20,17 @@ const Login = () => {
 
     // Form State
     const [role, setRole] = useState('doctor');
-    const [id, setId] = useState('');
-    const [password, setPassword] = useState('');
+    const [id, setId] = useState('DOC001');
+    const [password, setPassword] = useState('doc@123');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    const selectDemoRole = (demo) => {
+        setRole(demo.key);
+        setId(demo.id);
+        setPassword(demo.pass);
+        setError('');
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -25,37 +40,14 @@ const Login = () => {
         const result = await login(role, id, password);
 
         if (result.success) {
-            // FIX: FINAL LOGIN REDIRECT with Normalized Roles
-            const normalizedRole = result.role; // This comes from Context which returns uppercase
+            const normalizedRole = result.role;
 
             switch (normalizedRole) {
                 case "DOCTOR":
                     navigate("/portal/doctor");
                     break;
-                case "RECEPTION": // Note: Service returns 'receptionist', context normalizes it. 
-                    // Wait, service returns 'receptionist'. context normalizes to 'RECEPTIONIST'. 
-                    // Requirement says 'RECEPTION'. I need to map it.
-                    navigate("/portal/receptionist");
-                    break;
-                    // Wait, let's look at FIX 1 again. 
-                    // "Allowed values ONLY: DOCTOR, RECEPTION, PHARMACY, STAFF, ADMIN"
-                    // My service returns 'receptionist'. 
-                    // If I normalize 'receptionist'.toUpperCase() => 'RECEPTIONIST'. 
-                    // But valid value is 'RECEPTION'. I need to fix the service or the mapping in Login/Context.
-
-                    // Let's rely on the switch case to handle what comes back, but better yet, fix the mapping here or in Context.
-                    // Since I cannot change auth.service easily (or I can), I will map it here or rely on loose matching.
-                    // Actually, let's check what auth.service returns. 
-                    // It returns role: "doctor", "receptionist", "pharmacy", "staff", "admin".
-
-                    // So Uppercase: DOCTOR, RECEPTIONIST, PHARMACY, STAFF, ADMIN.
-                    // The requirement strict list has "RECEPTION". 
-                    // If I strictly follow "Allowed values ONLY: ... RECEPTION ...", then "RECEPTIONIST" is invalid.
-
-                    // I will map standard roles to these Strict Roles.
-                    navigate("/portal/receptionist");
-                    break;
-                case "RECEPTIONIST": // Covering base
+                case "RECEPTION":
+                case "RECEPTIONIST":
                     navigate("/portal/receptionist");
                     break;
                 case "PHARMACY":
@@ -78,10 +70,41 @@ const Login = () => {
 
     return (
         <div className="login-wrapper" style={{ backgroundImage: `url(${LoginBg})` }}>
-            <div className="login-glass-card">
+            <div className="login-glass-card" style={{ maxWidth: '440px', width: '100%' }}>
                 {/* Header Section */}
                 <div className="login-header">
                     <h1 className="login-brand">ProHealth HMS</h1>
+                    <p style={{ color: 'var(--text-muted, #64748b)', fontSize: '0.85rem', margin: '0.3rem 0 0' }}>Hospital Management Portal</p>
+                </div>
+
+                {/* Quick Demo Credentials Pill Selector */}
+                <div style={{ marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.5rem', color: '#475569', fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        <KeyRound size={13} />
+                        <span>Quick Demo Logins</span>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                        {DEMO_ROLES.map((d) => (
+                            <button
+                                key={d.key}
+                                type="button"
+                                onClick={() => selectDemoRole(d)}
+                                style={{
+                                    padding: '0.3rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600',
+                                    border: role === d.key ? `1.5px solid ${d.color}` : '1px solid #e2e8f0',
+                                    background: role === d.key ? `${d.color}15` : '#ffffff',
+                                    color: role === d.key ? d.color : '#64748b',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s'
+                                }}
+                            >
+                                {d.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Error Message */}
@@ -98,7 +121,15 @@ const Login = () => {
                         <label className="form-label">Select Role</label>
                         <select
                             value={role}
-                            onChange={(e) => setRole(e.target.value)}
+                            onChange={(e) => {
+                                const newRole = e.target.value;
+                                setRole(newRole);
+                                const cred = CREDENTIALS[newRole];
+                                if (cred) {
+                                    setId(cred.id);
+                                    setPassword(cred.password);
+                                }
+                            }}
                             className="form-select"
                         >
                             <option value="doctor">Doctor</option>

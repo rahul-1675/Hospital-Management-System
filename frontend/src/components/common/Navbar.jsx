@@ -32,6 +32,8 @@ const Navbar = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                     <Link to="/" style={{ fontWeight: 500 }}>Home</Link>
                     <Link to="/about" style={{ fontWeight: 500 }}>About</Link>
+                    <Link to="/patient" style={{ fontWeight: 500 }}>Find Doctors</Link>
+                    <Link to="/feedback" style={{ fontWeight: 500 }}>Feedback</Link>
 
                     {user ? (
                         <Link to="/portal">
@@ -39,7 +41,7 @@ const Navbar = () => {
                         </Link>
                     ) : (
                         <div className="flex gap-sm" style={{ gap: '0.5rem' }}>
-                            <Link to="/login" style={{ padding: '0.75rem 1rem', fontWeight: 600, color: 'var(--primary-color)' }}>Staff Login</Link>
+                            <Link to="/login" style={{ padding: '0.5rem 1rem', fontWeight: 600, color: 'var(--primary-color)' }}>Staff Login</Link>
                         </div>
                     )}
                 </div>
