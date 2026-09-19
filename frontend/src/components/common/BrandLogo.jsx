@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import prohealthLogo from '../../assets/prohealth-logo.png';
+import prohealthLogo from '../../assets/prohealth-logo.svg';
 
 export const BrandLogo = ({
     size = 'md',
