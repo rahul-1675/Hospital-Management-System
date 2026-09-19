@@ -158,12 +158,12 @@ const Home = () => {
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
                         gap: '1.25rem',
-                        background: 'rgba(255, 255, 255, 0.92)',
-                        backdropFilter: 'blur(16px)',
-                        padding: '1.5rem',
+                        background: '#ffffff',
+                        backgroundColor: '#ffffff',
+                        padding: '1.75rem 1.5rem',
                         borderRadius: '18px',
-                        border: '1px solid rgba(226, 232, 240, 0.95)',
-                        boxShadow: '0 12px 30px -10px rgba(15, 23, 42, 0.08)'
+                        border: '1.5px solid #e2e8f0',
+                        boxShadow: '0 15px 35px -10px rgba(0, 0, 0, 0.1)'
                     }}>
                         {STATS.map((stat, i) => (
                             <div key={i} style={{ textAlign: 'center' }}>
@@ -221,12 +221,12 @@ const Home = () => {
                             <div
                                 key={index}
                                 style={{
-                                    background: 'rgba(255, 255, 255, 0.95)',
-                                    backdropFilter: 'blur(12px)',
+                                    background: '#ffffff',
+                                    backgroundColor: '#ffffff',
                                     borderRadius: '16px',
                                     padding: '1.75rem',
-                                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-                                    border: '1px solid rgba(255, 255, 255, 0.6)',
+                                    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
+                                    border: '1.5px solid #e2e8f0',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'space-between',
