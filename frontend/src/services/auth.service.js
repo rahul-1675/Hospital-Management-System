@@ -1,13 +1,24 @@
 import { apiClient } from './api';
 
 export const authService = {
-    login: async (role, id, password) => {
+    login: async (arg1, arg2, arg3) => {
+        let role, id, password;
+        if (arg3 !== undefined) {
+            role = arg1;
+            id = arg2;
+            password = arg3;
+        } else {
+            id = arg1;
+            password = arg2;
+        }
+
+        const cleanId = id ? id.trim() : '';
         const payload = {
-            role,
-            id: id ? id.trim() : '',
-            email: id && id.includes('@') ? id.trim() : undefined,
+            id: cleanId,
+            email: cleanId.includes('@') ? cleanId : undefined,
             password
         };
+        if (role) payload.role = role;
 
         const res = await apiClient.post('/auth/login', payload);
 

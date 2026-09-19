@@ -12,7 +12,6 @@ const Login = () => {
     const { login } = useAuth();
 
     // Form State
-    const [role, setRole] = useState('admin');
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +31,7 @@ const Login = () => {
 
         setLoading(true);
 
-        const result = await login(role, identifier.trim(), password);
+        const result = await login(identifier.trim(), password);
 
         if (result.success) {
             const redirectPath = location.state?.redirect || location.state?.from?.pathname || location.state?.from;
@@ -84,7 +83,7 @@ const Login = () => {
                         Welcome to ProHealth
                     </h2>
                     <p style={{ color: '#475569', fontSize: '0.9rem', margin: '0.35rem 0 0', fontWeight: 500 }}>
-                        Authorized Staff & Management Portal
+                        Unified Clinical & Staff Portal Login
                     </p>
                 </div>
 
@@ -111,44 +110,14 @@ const Login = () => {
                 <form onSubmit={handleLogin} className="login-form">
                     <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                         <label className="form-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
-                            Access Role
-                        </label>
-                        <select
-                            value={role}
-                            onChange={(e) => {
-                                setRole(e.target.value);
-                                setError('');
-                            }}
-                            className="form-select"
-                            style={{
-                                width: '100%',
-                                padding: '0.75rem 1rem',
-                                borderRadius: '10px',
-                                border: '1.5px solid #cbd5e1',
-                                fontSize: '0.95rem',
-                                color: '#1e293b',
-                                outline: 'none'
-                            }}
-                        >
-                            <option value="admin">Administrator</option>
-                            <option value="doctor">Doctor</option>
-                            <option value="receptionist">Receptionist / Front Desk</option>
-                            <option value="pharmacy">Pharmacist</option>
-                            <option value="staff">Clinical / Support Staff</option>
-                            <option value="patient">Patient Account</option>
-                        </select>
-                    </div>
-
-                    <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-                        <label className="form-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
-                            Staff ID or Email Address
+                            Email Address or Staff ID
                         </label>
                         <div style={{ position: 'relative' }}>
                             <input
                                 type="text"
                                 value={identifier}
                                 onChange={(e) => setIdentifier(e.target.value)}
-                                placeholder={role === 'admin' ? 'admin@hms.com or ADM001' : 'Enter your registered email / ID'}
+                                placeholder="Enter email or ID (e.g. admin@hms.com)"
                                 required
                                 className="form-input"
                                 style={{

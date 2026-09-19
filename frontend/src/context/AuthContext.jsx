@@ -42,11 +42,21 @@ export const AuthProvider = ({ children }) => {
         initAuth();
     }, []);
 
-    const login = async (role, identifier, password) => {
+    const login = async (arg1, arg2, arg3) => {
         try {
+            let role, identifier, password;
+            if (arg3 !== undefined) {
+                role = arg1;
+                identifier = arg2;
+                password = arg3;
+            } else {
+                identifier = arg1;
+                password = arg2;
+            }
+
             const userData = await authService.login(role, identifier, password);
 
-            // Normalized uppercase role for client routing
+            // Normalized uppercase role for client routing based on user's actual role from credentials
             const normalizedRole = (userData.role || role || 'PATIENT').toUpperCase();
             const safeUser = { ...userData, role: normalizedRole };
 
