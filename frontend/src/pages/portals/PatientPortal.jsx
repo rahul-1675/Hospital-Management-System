@@ -190,7 +190,7 @@ const PatientPortal = () => {
     };
 
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: '#08090d', color: '#f8fafc' }}>
+        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '5rem', background: 'transparent', color: '#f8fafc' }}>
             <AnimatedGlassBackground isFixed={true} opacity={0.9} />
 
             <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '2.5rem' }}>
