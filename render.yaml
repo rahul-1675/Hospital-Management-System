@@ -33,5 +33,5 @@ services:
         fromService:
           type: web
           name: hms-backend
-          property: url
-          format: "%s/api"
+          property: host
+          format: "https://%s/api"
