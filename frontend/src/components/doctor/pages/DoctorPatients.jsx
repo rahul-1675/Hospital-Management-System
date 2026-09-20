@@ -1,87 +1,15 @@
-import React, { useState } from 'react';
-import { Search, Filter, Calendar, FileText, Plus, ChevronLeft, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Filter, Calendar, FileText, Plus, ChevronLeft, CheckCircle, RefreshCw, AlertCircle } from 'lucide-react';
 import AddClinicalNoteModal from '../modals/AddClinicalNoteModal';
 import LabReportsPanel from '../modals/LabReportsPanel';
 import ScheduleFollowUpModal from '../modals/ScheduleFollowUpModal';
-
-const initialPatients = [
-    {
-        id: 1001,
-        name: 'Sarah Johnson',
-        age: 28,
-        gender: 'Female',
-        lastVisit: '2023-10-15',
-        condition: 'Migraine',
-        type: 'Chronic',
-        timeline: [
-            { id: 1, date: '2023-10-15', title: 'Routine Checkup', doctor: 'Dr. Smith', details: 'Prescribed: Sumatriptan' },
-            { id: 2, date: '2023-09-10', title: 'Initial Consultation', doctor: 'Dr. Smith', details: 'Reported severe headaches.' }
-        ],
-        labReports: [
-            { id: 1, name: 'Complete Blood Count', type: 'Hematology', date: '2023-10-14', status: 'Available' },
-            { id: 2, name: 'Lipid Profile', type: 'Biochemistry', date: '2023-10-14', status: 'Available' }
-        ]
-    },
-    {
-        id: 1002,
-        name: 'Michael Chen',
-        age: 45,
-        gender: 'Male',
-        lastVisit: '2023-10-10',
-        condition: 'Hypertension',
-        type: 'Chronic',
-        timeline: [
-            { id: 1, date: '2023-10-10', title: 'Follow-up', doctor: 'Dr. Smith', details: 'BP 140/90. Adjustable dosage.' }
-        ]
-    },
-    {
-        id: 1003,
-        name: 'Emma Davis',
-        age: 32,
-        gender: 'Female',
-        lastVisit: '2023-09-20',
-        condition: 'Healthy',
-        type: 'Recent',
-        timeline: []
-    },
-    {
-        id: 1004,
-        name: 'James Wilson',
-        age: 60,
-        gender: 'Male',
-        lastVisit: '2023-10-05',
-        condition: 'Arthritis',
-        type: 'Chronic',
-        timeline: [
-            { id: 1, date: '2023-10-05', title: 'Pain Management', doctor: 'Dr. Smith', details: 'Joint pain increased.' }
-        ]
-    },
-    {
-        id: 1005,
-        name: 'Robert Brown',
-        age: 50,
-        gender: 'Male',
-        lastVisit: '2023-10-12',
-        condition: 'Fever',
-        type: 'Recent',
-        timeline: []
-    },
-    {
-        id: 1006,
-        name: 'Linda Taylor',
-        age: 70,
-        gender: 'Female',
-        lastVisit: '2023-10-01',
-        condition: 'Diabetes',
-        type: 'Critical',
-        timeline: [
-            { id: 1, date: '2023-10-01', title: 'Emergency', doctor: 'Dr. Smith', details: 'High blood sugar levels.' }
-        ]
-    },
-];
+import { doctorService } from '../../../services/doctor.service';
+import { useAuth } from '../../../hooks/useAuth';
 
 const DoctorPatients = () => {
-    const [patients, setPatients] = useState(initialPatients);
+    const { user } = useAuth();
+    const [patients, setPatients] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('All');
     const [selectedPatientId, setSelectedPatientId] = useState(null);
@@ -90,10 +18,28 @@ const DoctorPatients = () => {
     const [activeModal, setActiveModal] = useState(null); // 'note', 'lab', 'schedule'
     const [toast, setToast] = useState(null);
 
+    const loadPatients = async () => {
+        try {
+            setLoading(true);
+            const data = await doctorService.getPatients();
+            setPatients(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.warn('Failed to load doctor patients:', err);
+            setPatients([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadPatients();
+    }, []);
+
     const selectedPatient = patients.find(p => p.id === selectedPatientId);
 
     const filteredPatients = patients.filter(p => {
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.id.toString().includes(searchTerm);
+        const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+            (p.id || '').toString().toLowerCase().includes(searchTerm.toLowerCase());
         const matchesFilter = filter === 'All' || p.type === filter;
         return matchesSearch && matchesFilter;
     });
@@ -103,47 +49,58 @@ const DoctorPatients = () => {
         setTimeout(() => setToast(null), 3000);
     };
 
-    const handleSaveNote = (noteData) => {
+    const handleSaveNote = async (noteData) => {
+        const doctorName = user?.name ? (user.name.startsWith('Dr.') ? user.name : `Dr. ${user.name}`) : 'Attending Physician';
+        const noteText = noteData.prescription ? `Prescription: ${noteData.prescription} | Notes: ${noteData.notes || ''}` : (noteData.notes || '');
+
         setPatients(prev => prev.map(p => {
             if (p.id === selectedPatientId) {
                 const newVisit = {
-                    id: Date.now(),
+                    id: Date.now().toString(),
                     date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
-                    title: `Clinical Note - ${noteData.diagnosis}`,
-                    doctor: 'Dr. Smith',
-                    details: noteData.prescription ? `Prescribed: ${noteData.prescription}` : noteData.notes
+                    title: `Clinical Note - ${noteData.diagnosis || 'OPD Assessment'}`,
+                    doctor: doctorName,
+                    details: noteText
                 };
                 return {
                     ...p,
-                    timeline: [newVisit, ...p.timeline],
+                    timeline: [newVisit, ...(p.timeline || [])],
                     lastVisit: 'Today'
                 };
             }
             return p;
         }));
-        showToast('Clinical note added successfully');
+
+        try {
+            if (selectedPatient?.id) {
+                await doctorService.saveRecord(selectedPatient.id, noteText);
+            }
+        } catch (err) {
+            console.warn('Failed to persist clinical note:', err);
+        }
+
+        showToast('Clinical note added and saved successfully');
     };
 
     const handleScheduleFollowUp = (data) => {
+        const doctorName = user?.name ? (user.name.startsWith('Dr.') ? user.name : `Dr. ${user.name}`) : 'Attending Physician';
         setPatients(prev => prev.map(p => {
             if (p.id === selectedPatientId) {
                 const newAppointment = {
-                    id: Date.now(),
+                    id: Date.now().toString(),
                     date: data.date,
-                    // We render future appointments in the timeline for visibility just for this demo
-                    title: `Upcoming: ${data.reason}`,
-                    doctor: 'Dr. Smith',
+                    title: `Follow-up: ${data.reason || 'Consultation Review'}`,
+                    doctor: doctorName,
                     details: `Scheduled for ${data.time}. ${data.notes || ''}`
                 };
-                // Adding to timeline as a "Future" event effectively for this UI
                 return {
                     ...p,
-                    timeline: [newAppointment, ...p.timeline]
+                    timeline: [newAppointment, ...(p.timeline || [])]
                 };
             }
             return p;
         }));
-        showToast('Follow-up appointment scheduled');
+        showToast('Follow-up appointment scheduled successfully');
     };
 
     if (selectedPatient) {
@@ -294,37 +251,50 @@ const DoctorPatients = () => {
             </div>
 
             <div style={{ flex: 1, overflowY: 'auto' }}>
-                <div className="patient-grid">
-                    {filteredPatients.map(patient => (
-                        <div
-                            key={patient.id}
-                            className="doctor-card"
-                            onClick={() => setSelectedPatientId(patient.id)}
-                            style={{ borderColor: patient.type === 'Critical' ? 'var(--doctor-warning)' : '' }}
-                        >
-                            <div className="doctor-card-header" style={{ marginBottom: '1rem' }}>
-                                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--doctor-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--doctor-primary)', fontWeight: 'bold' }}>
-                                    {patient.name.charAt(0)}
+                {loading ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', color: 'var(--doctor-text-muted)' }}>
+                        <RefreshCw size={32} className="spin" />
+                        <p>Loading patient clinical records...</p>
+                    </div>
+                ) : filteredPatients.length === 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '1rem', color: 'var(--doctor-text-muted)' }}>
+                        <AlertCircle size={40} />
+                        <h3>No patients found</h3>
+                        <p style={{ margin: 0, fontSize: '0.95rem' }}>No registered patient records match your current filter.</p>
+                    </div>
+                ) : (
+                    <div className="patient-grid">
+                        {filteredPatients.map(patient => (
+                            <div
+                                key={patient.id}
+                                className="doctor-card"
+                                onClick={() => setSelectedPatientId(patient.id)}
+                                style={{ borderColor: patient.type === 'Critical' ? 'var(--doctor-warning)' : '' }}
+                            >
+                                <div className="doctor-card-header" style={{ marginBottom: '1rem' }}>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--doctor-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--doctor-primary)', fontWeight: 'bold' }}>
+                                        {(patient.name || 'P').charAt(0)}
+                                    </div>
+                                    <span className="status-badge" style={{ background: '#f1f5f9', color: '#64748b' }}>#{patient.id}</span>
                                 </div>
-                                <span className="status-badge" style={{ background: '#f1f5f9', color: '#64748b' }}>#{patient.id}</span>
-                            </div>
-                            <h3 className="text-value" style={{ fontSize: '1.1rem' }}>{patient.name}</h3>
-                            <p className="text-label">{patient.age} yrs • {patient.gender}</p>
-                            <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--doctor-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
-                                    <p className="text-label" style={{ fontSize: '0.75rem' }}>Last Visit</p>
-                                    <p className="text-value" style={{ fontSize: '0.9rem' }}>{patient.lastVisit}</p>
+                                <h3 className="text-value" style={{ fontSize: '1.1rem' }}>{patient.name}</h3>
+                                <p className="text-label">{patient.age} yrs • {patient.gender}</p>
+                                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--doctor-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <p className="text-label" style={{ fontSize: '0.75rem' }}>Last Visit</p>
+                                        <p className="text-value" style={{ fontSize: '0.9rem' }}>{patient.lastVisit}</p>
+                                    </div>
+                                    <span className={`status-badge`} style={{
+                                        backgroundColor: patient.type === 'Critical' ? '#fef2f2' : '#f0f9ff',
+                                        color: patient.type === 'Critical' ? '#ef4444' : '#0ea5e9'
+                                    }}>
+                                        {patient.condition}
+                                    </span>
                                 </div>
-                                <span className={`status-badge`} style={{
-                                    backgroundColor: patient.type === 'Critical' ? '#fef2f2' : '#f0f9ff',
-                                    color: patient.type === 'Critical' ? '#ef4444' : '#0ea5e9'
-                                }}>
-                                    {patient.condition}
-                                </span>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

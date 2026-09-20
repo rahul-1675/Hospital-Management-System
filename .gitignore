@@ -31,5 +31,12 @@ backend/node_modules
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+
+# Local Project Reference (Not to be pushed to git)
+CONFIDENTIAL_CREDENTIALS.txt
+PROJECT_ROUTES.txt
+ROUTES_MAP.md
+*.routes.txt
+
+

@@ -1,5 +1,4 @@
-import React from 'react';
-import { LayoutDashboard, Users, ScrollText, DollarSign, Settings, LogOut, ShieldCheck, Menu, ChevronLeft } from 'lucide-react';
+import { LayoutDashboard, Users, ScrollText, DollarSign, Settings, LogOut, ShieldCheck, Menu, ChevronLeft, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +16,7 @@ const AdminSidebar = ({ activeTab, setActiveTab, isCollapsed, toggleSidebar }) =
     const menuItems = [
         { id: 'overview', label: 'Overview', icon: LayoutDashboard },
         { id: 'users', label: 'User Management', icon: Users },
+        { id: 'reviews', label: 'Patient Reviews', icon: MessageSquare },
         { id: 'logs', label: 'System Logs', icon: ScrollText },
         { id: 'finance', label: 'Finance', icon: DollarSign },
         { id: 'settings', label: 'Settings', icon: Settings },

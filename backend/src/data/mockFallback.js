@@ -357,5 +357,73 @@ export let mockUsers = [
         passwordHash: bcrypt.hashSync('Rahul@167', 10),
         status: 'Active',
         department: 'Management'
+    },
+    {
+        _id: 'usr-doc-001',
+        id: 'DOC001',
+        staffId: 'DOC001',
+        name: 'Dr. Sarah Smith',
+        email: 'dr.smith@hms.com',
+        role: 'doctor',
+        phone: '+1 555-0101',
+        password: 'doc@123',
+        passwordHash: bcrypt.hashSync('doc@123', 10),
+        status: 'Active',
+        department: 'Cardiology'
+    },
+    {
+        _id: 'usr-rec-001',
+        id: 'REC001',
+        staffId: 'REC001',
+        name: 'Receptionist Jane',
+        email: 'jane@hms.com',
+        role: 'receptionist',
+        phone: '+1 555-0102',
+        password: 'rec@123',
+        passwordHash: bcrypt.hashSync('rec@123', 10),
+        status: 'Active',
+        department: 'Front Desk'
+    },
+    {
+        _id: 'usr-pha-001',
+        id: 'PHA001',
+        staffId: 'PHA001',
+        name: 'Pharmacist Bob',
+        email: 'bob@hms.com',
+        role: 'pharmacy',
+        phone: '+1 555-0103',
+        password: 'pha@123',
+        passwordHash: bcrypt.hashSync('pha@123', 10),
+        status: 'Active',
+        department: 'Pharmacy'
+    },
+    {
+        _id: 'usr-stf-001',
+        id: 'STF001',
+        staffId: 'STF001',
+        name: 'Staff Member Mike',
+        email: 'mike@hms.com',
+        role: 'staff',
+        phone: '+1 555-0104',
+        password: 'stf@123',
+        passwordHash: bcrypt.hashSync('stf@123', 10),
+        status: 'Active',
+        department: 'General Ops'
+    },
+    {
+        _id: 'usr-pat-001',
+        id: 'PAT001',
+        staffId: 'PAT001',
+        name: 'Alex Johnson',
+        email: 'patient@hms.com',
+        role: 'patient',
+        phone: '+1 555-0199',
+        password: 'patient@123',
+        passwordHash: bcrypt.hashSync('patient@123', 10),
+        status: 'Active',
+        department: 'Patient',
+        savedHospitals: [],
+        savedDoctors: [],
+        notifications: []
     }
 ];

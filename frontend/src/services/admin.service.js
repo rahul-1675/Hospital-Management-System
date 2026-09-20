@@ -76,12 +76,33 @@ export const adminService = {
         }
     },
 
-    refundInvoice: async (id) => {
+    getOverviewStats: async () => {
         try {
-            return await apiClient.patch(`/admin/invoices/${id}/refund`);
+            const res = await apiClient.get('/admin/overview-stats');
+            return res.data || null;
         } catch (err) {
-            console.warn('Failed to refund invoice on backend', err);
+            console.warn('Failed to fetch overview stats from backend', err);
             return null;
+        }
+    },
+
+    getSettings: async () => {
+        try {
+            const res = await apiClient.get('/admin/settings');
+            return res.data || null;
+        } catch (err) {
+            console.warn('Failed to fetch settings from backend', err);
+            return null;
+        }
+    },
+
+    updateSettings: async (settingsData) => {
+        try {
+            const res = await apiClient.put('/admin/settings', settingsData);
+            return res;
+        } catch (err) {
+            console.warn('Failed to update settings on backend', err);
+            throw err;
         }
     }
 };

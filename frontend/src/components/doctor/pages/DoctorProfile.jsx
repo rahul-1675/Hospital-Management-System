@@ -1,13 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
-import { Edit, Lock, Save, Camera, Check } from 'lucide-react';
+import { Edit, Lock, Save, Camera, Check, Star, MessageSquare, CheckCircle2 } from 'lucide-react';
 import ChangePasswordModal from '../modals/ChangePasswordModal';
+import PeekRating from '../../ui/PeekRating';
+import { reviewService } from '../../../services/review.service';
 
 const DoctorProfile = () => {
     const { user } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [toast, setToast] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [stats, setStats] = useState({ totalReviews: 0, averageRating: 0 });
+    const [loadingReviews, setLoadingReviews] = useState(false);
+
+    useEffect(() => {
+        const loadDocReviews = async () => {
+            const docId = user?.doctorId || user?.id || user?._id || 'doc-1';
+            setLoadingReviews(true);
+            try {
+                const res = await reviewService.getDoctorReviews(docId);
+                const list = Array.isArray(res) ? res : (res?.data || []);
+                setReviews(list);
+                if (res?.stats) {
+                    setStats(res.stats);
+                } else if (list.length > 0) {
+                    const sum = list.reduce((acc, r) => acc + (r.rating || 0), 0);
+                    setStats({ totalReviews: list.length, averageRating: Number((sum / list.length).toFixed(2)) });
+                }
+            } catch (err) {
+                console.warn('Could not load doctor reviews:', err);
+            } finally {
+                setLoadingReviews(false);
+            }
+        };
+        loadDocReviews();
+    }, [user]);
 
     // Initial state matching the user context or defaults
     const [profileData, setProfileData] = useState({
@@ -152,6 +180,57 @@ const DoctorProfile = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Patient Reviews & Ratings Section */}
+                <div style={{ marginTop: '2rem', borderTop: '1px solid var(--doctor-border)', paddingTop: '1.5rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <div>
+                            <h3 className="section-title" style={{ margin: 0 }}>Patient Reviews & Ratings</h3>
+                            <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: 'var(--doctor-text-muted)' }}>
+                                Real ratings from verified patient appointments
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                            <PeekRating
+                                value={Math.round(stats.averageRating) || 0}
+                                count={5}
+                                shape="star"
+                                readOnly={true}
+                                size={18}
+                                activeColor="#f5b400"
+                                idleColor="#cbd5e1"
+                            />
+                            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
+                                {stats.averageRating > 0 ? stats.averageRating : '5.0'} / 5.0
+                            </span>
+                        </div>
+                    </div>
+
+                    {reviews.length === 0 ? (
+                        <div style={{ padding: '1.5rem', textAlign: 'center', background: '#f8fafc', borderRadius: '10px', color: '#64748b' }}>
+                            <p style={{ margin: 0, fontSize: '0.88rem' }}>No patient reviews received yet.</p>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '240px', overflowY: 'auto' }}>
+                            {reviews.map((r) => (
+                                <div key={r._id || r.id} style={{ padding: '0.85rem 1rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>
+                                            <span>{r.patientName || 'Verified Patient'}</span>
+                                            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
+                                                <CheckCircle2 size={11} /> Verified
+                                            </span>
+                                        </div>
+                                        <PeekRating value={r.rating} count={5} shape="star" readOnly={true} size={14} activeColor="#f5b400" idleColor="#e2e8f0" />
+                                    </div>
+                                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#334155', lineHeight: 1.4 }}>
+                                        "{r.comment}"
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Action Footer */}

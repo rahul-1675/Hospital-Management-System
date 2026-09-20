@@ -107,7 +107,7 @@ const Login = () => {
                 )}
 
                 {/* Login Form */}
-                <form onSubmit={handleLogin} className="login-form">
+                <form onSubmit={handleLogin} className="login-form" autoComplete="off">
                     <div className="form-group" style={{ marginBottom: '1.25rem' }}>
                         <label className="form-label" style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
                             Email Address or Staff ID
@@ -115,10 +115,13 @@ const Login = () => {
                         <div style={{ position: 'relative' }}>
                             <input
                                 type="text"
+                                name="username"
+                                id="login-identifier"
                                 value={identifier}
                                 onChange={(e) => setIdentifier(e.target.value)}
-                                placeholder="Enter email or ID (e.g. admin@hms.com)"
+                                placeholder="Enter your email or Staff ID"
                                 required
+                                autoComplete="off"
                                 className="form-input"
                                 style={{
                                     width: '100%',
@@ -149,10 +152,13 @@ const Login = () => {
                         <div style={{ position: 'relative' }}>
                             <input
                                 type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                id="login-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter secure password"
+                                placeholder="Enter your password"
                                 required
+                                autoComplete="new-password"
                                 className="form-input"
                                 style={{
                                     width: '100%',

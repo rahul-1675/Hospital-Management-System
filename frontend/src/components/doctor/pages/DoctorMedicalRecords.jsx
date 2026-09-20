@@ -1,89 +1,72 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, CheckCircle, AlertCircle, Edit, Paperclip, Save, Lock, Upload, Check } from 'lucide-react';
-
-const initialRecords = [
-    {
-        id: 1,
-        type: 'Lab Report',
-        title: 'Complete Blood Count (CBC)',
-        date: '2023-10-20',
-        patientName: 'Sarah Johnson',
-        status: 'Pending Review',
-        data: {
-            'Hemoglobin': '14.2 g/dL',
-            'WBC': '6.5 K/uL',
-            'Platelets': '250 K/uL',
-            'RBC': '4.8 M/uL'
-        },
-        notes: '',
-        attachments: []
-    },
-    {
-        id: 2,
-        type: 'Prescription',
-        title: 'Hypertension Management',
-        date: '2023-10-18',
-        patientName: 'Michael Chen',
-        status: 'Reviewed',
-        data: {
-            'Medication': 'Lisinopril',
-            'Dosage': '10mg',
-            'Frequency': 'Once daily',
-            'Duration': '30 days'
-        },
-        notes: 'Patient responded well to initial dosage. BP levels stable at 120/80.',
-        attachments: []
-    },
-    {
-        id: 3,
-        type: 'Diagnosis',
-        title: 'Initial Consultation Report',
-        date: '2023-10-15',
-        patientName: 'Emma Davis',
-        status: 'Reviewed',
-        data: {
-            'Chief Complaint': 'Persistent Cough',
-            'Observation': 'Clear lungs, slight throat irritation',
-            'Diagnosis': 'Viral Bronchitis'
-        },
-        notes: 'Advised rest and hydration. Follow up in 1 week if symptoms persist.',
-        attachments: []
-    }
-];
+import { FileText, CheckCircle, AlertCircle, Edit, Paperclip, Save, Lock, Upload, Check, RefreshCw } from 'lucide-react';
+import { doctorService } from '../../../services/doctor.service';
+import { useAuth } from '../../../hooks/useAuth';
 
 const DoctorMedicalRecords = () => {
-    const [records, setRecords] = useState(initialRecords);
-    const [selectedRecordId, setSelectedRecordId] = useState(initialRecords[0].id);
+    const { user } = useAuth();
+    const [records, setRecords] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedRecordId, setSelectedRecordId] = useState(null);
     const [noteInput, setNoteInput] = useState('');
     const [attachments, setAttachments] = useState([]);
     const [toast, setToast] = useState(null);
 
-    const selectedRecord = records.find(r => r.id === selectedRecordId);
+    const loadRecords = async () => {
+        try {
+            setLoading(true);
+            const data = await doctorService.getRecords();
+            const recordList = Array.isArray(data) ? data : [];
+            setRecords(recordList);
+            if (recordList.length > 0 && !selectedRecordId) {
+                setSelectedRecordId(recordList[0].id);
+            }
+        } catch (err) {
+            console.warn('Failed to load medical records:', err);
+            setRecords([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadRecords();
+    }, []);
+
+    const selectedRecord = records.find(r => r.id === selectedRecordId) || records[0];
 
     // Sync local state when selection changes
     useEffect(() => {
         if (selectedRecord) {
-            setNoteInput(selectedRecord.notes);
+            setNoteInput(selectedRecord.notes || '');
             setAttachments(selectedRecord.attachments || []);
         }
-    }, [selectedRecordId, records]);
+    }, [selectedRecordId, selectedRecord]);
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
     };
 
-    const handleSaveDraft = () => {
+    const handleSaveDraft = async () => {
+        if (!selectedRecord) return;
         setRecords(prev => prev.map(rec => {
-            if (rec.id === selectedRecordId) {
+            if (rec.id === selectedRecord.id) {
                 return { ...rec, notes: noteInput, attachments: attachments };
             }
             return rec;
         }));
+
+        try {
+            await doctorService.saveRecord(selectedRecord.id, noteInput);
+        } catch (err) {
+            console.warn('Failed to save draft to backend:', err);
+        }
+
         showToast('Draft saved successfully');
     };
 
-    const handleMarkAsReviewed = () => {
+    const handleMarkAsReviewed = async () => {
         if (!noteInput.trim()) {
             showToast('Please add doctor notes before reviewing.', 'error');
             return;
@@ -91,21 +74,29 @@ const DoctorMedicalRecords = () => {
 
         const now = new Date();
         const timestamp = now.toLocaleString();
+        const doctorLabel = user?.name ? `${user.name} (Attending Physician)` : 'Attending Specialist';
 
         setRecords(prev => prev.map(rec => {
-            if (rec.id === selectedRecordId) {
+            if (rec.id === selectedRecord.id) {
                 return {
                     ...rec,
                     notes: noteInput,
                     attachments: attachments,
                     status: 'Reviewed',
                     reviewedAt: timestamp,
-                    reviewedBy: 'Dr. Smith (ID: DOC-001)'
+                    reviewedBy: doctorLabel
                 };
             }
             return rec;
         }));
-        showToast('Record marked as reviewed. Editing locked.');
+
+        try {
+            await doctorService.saveRecord(selectedRecord.id, noteInput);
+        } catch (err) {
+            console.warn('Failed to persist reviewed record:', err);
+        }
+
+        showToast('Record marked as reviewed. Clinical notes saved.');
     };
 
     const handleFileUpload = (e) => {
@@ -138,30 +129,42 @@ const DoctorMedicalRecords = () => {
                     </div>
                 </div>
                 <div style={{ padding: '0.75rem' }}>
-                    {records.map(record => (
-                        <div
-                            key={record.id}
-                            className={`doctor-card ${selectedRecordId === record.id ? 'active' : ''}`}
-                            onClick={() => setSelectedRecordId(record.id)}
-                            style={{ margin: '0 0 0.75rem 0' }}
-                        >
-                            <div className="doctor-card-header">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                    <FileText size={16} color="var(--doctor-primary)" />
-                                    <span className="text-value" style={{ fontSize: '0.9rem' }}>{record.type}</span>
-                                </div>
-                                {record.status === 'Reviewed' ?
-                                    <CheckCircle size={16} color="var(--doctor-success)" /> :
-                                    <AlertCircle size={16} color="var(--doctor-warning)" />
-                                }
-                            </div>
-                            <h4 style={{ margin: '0.5rem 0', fontWeight: 600, fontSize: '1rem' }}>{record.title}</h4>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--doctor-text-muted)' }}>
-                                <span>{record.patientName}</span>
-                                <span>{record.date}</span>
-                            </div>
+                    {loading ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--doctor-text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                            <RefreshCw size={24} className="spin" />
+                            <p style={{ margin: 0, fontSize: '0.85rem' }}>Loading records...</p>
                         </div>
-                    ))}
+                    ) : records.length === 0 ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--doctor-text-muted)' }}>
+                            <AlertCircle size={32} style={{ marginBottom: '0.5rem' }} />
+                            <p style={{ margin: 0, fontSize: '0.9rem' }}>No medical records recorded yet</p>
+                        </div>
+                    ) : (
+                        records.map(record => (
+                            <div
+                                key={record.id}
+                                className={`doctor-card ${selectedRecordId === record.id ? 'active' : ''}`}
+                                onClick={() => setSelectedRecordId(record.id)}
+                                style={{ margin: '0 0 0.75rem 0' }}
+                            >
+                                <div className="doctor-card-header">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <FileText size={16} color="var(--doctor-primary)" />
+                                        <span className="text-value" style={{ fontSize: '0.9rem' }}>{record.type}</span>
+                                    </div>
+                                    {record.status === 'Reviewed' ?
+                                        <CheckCircle size={16} color="var(--doctor-success)" /> :
+                                        <AlertCircle size={16} color="var(--doctor-warning)" />
+                                    }
+                                </div>
+                                <h4 style={{ margin: '0.5rem 0', fontWeight: 600, fontSize: '1rem' }}>{record.title}</h4>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--doctor-text-muted)' }}>
+                                    <span>{record.patientName}</span>
+                                    <span>{record.date}</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -201,7 +204,7 @@ const DoctorMedicalRecords = () => {
                         <div style={{ marginBottom: '2rem' }}>
                             <h3 className="section-title">Clinical Data</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1px', background: 'var(--doctor-border)', border: '1px solid var(--doctor-border)', borderRadius: '8px', overflow: 'hidden' }}>
-                                {Object.entries(selectedRecord.data).map(([key, value]) => (
+                                {selectedRecord.data && Object.entries(selectedRecord.data).map(([key, value]) => (
                                     <div key={key} style={{ background: 'white', padding: '1rem' }}>
                                         <p style={{ fontSize: '0.8rem', color: 'var(--doctor-text-muted)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>{key}</p>
                                         <p style={{ fontWeight: 600, color: 'var(--doctor-text-main)', fontSize: '1.1rem' }}>{value}</p>

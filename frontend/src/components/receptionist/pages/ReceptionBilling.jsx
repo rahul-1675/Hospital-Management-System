@@ -44,12 +44,12 @@ const ReceptionBilling = () => {
         // Header
         doc.setFontSize(22);
         doc.setTextColor(2, 132, 199); // Medical Blue
-        doc.text('HMS Hospital', 14, 20);
+        doc.text('ProHealth Medical Center', 14, 20);
 
         doc.setFontSize(10);
         doc.setTextColor(100);
-        doc.text('123 Health Avenue, Med City', 14, 26);
-        doc.text('Phone: +1 555-0123', 14, 30);
+        doc.text('Department of Clinical Billing & Patient Accounts', 14, 26);
+        doc.text('Central Healthcare Systems • inquiries@prohealth.org', 14, 30);
 
         // Invoice Info
         doc.setFontSize(12);

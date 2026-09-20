@@ -14,8 +14,8 @@ const StaffProfile = () => {
         name: staff.name,
         phone: staff.phone,
         email: staff.email,
-        emergencyContact: 'John Doe (+1 555-0000)', // Default placeholder if not in context
-        shiftPreference: 'Morning'
+        emergencyContact: staff.emergencyContact || 'Primary Contact (+1 555-0199)',
+        shiftPreference: staff.shiftPreference || 'Morning'
     });
 
     const showToast = (message) => {

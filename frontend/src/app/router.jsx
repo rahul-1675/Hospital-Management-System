@@ -36,7 +36,9 @@ export const router = createBrowserRouter([
             { index: true, element: <Home /> },
             { path: 'about', element: <About /> },
             { path: 'feedback', element: <Feedback /> },
+            { path: 'reviews', element: <Feedback /> },
             { path: 'patient', element: <PatientPortal /> },
+            { path: 'doctors', element: <PatientPortal /> },
             // { path: 'patient/form', element: <PatientForm /> }, // Moved to top level for no layout
         ],
     },

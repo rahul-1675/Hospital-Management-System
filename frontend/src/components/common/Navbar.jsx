@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Activity, Menu, X, PhoneCall, ShieldCheck, UserCheck, Stethoscope } from 'lucide-react';
+import { PhoneCall, ShieldCheck, UserCheck, Stethoscope, Menu, X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import BrandLogo from './BrandLogo';
+import GooeyNav from '../ui/GooeyNav';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -18,14 +19,19 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const navLinks = [
-        { path: '/', label: 'Home' },
-        { path: '/patient', label: 'Find Doctors' },
-        { path: '/about', label: 'About HMS' },
-        { path: '/feedback', label: 'Patient Reviews' }
+    const navItems = [
+        { label: "Home", href: "/" },
+        { label: "Find Doctors", href: "/doctors" },
+        { label: "About HMS", href: "/about" },
+        { label: "Patient Reviews", href: "/reviews" }
     ];
 
-    const isActive = (path) => location.pathname === path;
+    const isActive = (path) => {
+        if (path === '/') return location.pathname === '/';
+        if (path === '/doctors') return location.pathname === '/doctors' || location.pathname === '/patient';
+        if (path === '/reviews') return location.pathname === '/reviews' || location.pathname === '/feedback';
+        return location.pathname === path || location.pathname.startsWith(path);
+    };
 
     return (
         <header style={{
@@ -33,7 +39,7 @@ const Navbar = () => {
             top: 0,
             zIndex: 999,
             transition: 'all 0.3s ease',
-            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.94)' : 'rgba(255, 255, 255, 0.98)',
+            backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.98)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             borderBottom: isScrolled ? '1px solid rgba(2, 132, 199, 0.15)' : '1px solid #e2e8f0',
@@ -43,7 +49,7 @@ const Navbar = () => {
             <div style={{
                 background: '#ffffff',
                 color: '#0f172a',
-                borderBottom: '1px solid #e2e8f0',
+                borderBottom: '1px solid #f1f5f9',
                 padding: '0.4rem 1rem',
                 fontSize: '0.8rem',
                 fontWeight: '600'
@@ -69,48 +75,38 @@ const Navbar = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                height: '70px'
+                height: '70px',
+                gap: '1.5rem'
             }}>
                 {/* Official Brand Logo */}
-                <BrandLogo size={52} href="/" />
+                <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                    <BrandLogo size={44} href="/" />
+                </div>
 
-                {/* Desktop Navigation Links */}
-                <nav className="hidden md-flex" style={{ alignItems: 'center', gap: '0.5rem' }}>
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.path}
-                            to={link.path}
-                            style={{
-                                padding: '0.5rem 1rem',
-                                borderRadius: '8px',
-                                fontSize: '0.92rem',
-                                fontWeight: isActive(link.path) ? '700' : '600',
-                                color: isActive(link.path) ? '#0284c7' : '#475569',
-                                background: isActive(link.path) ? 'rgba(2, 132, 199, 0.08)' : 'transparent',
-                                transition: 'all 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!isActive(link.path)) e.currentTarget.style.color = '#0284c7';
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!isActive(link.path)) e.currentTarget.style.color = '#475569';
-                            }}
-                        >
-                            {link.label}
-                        </Link>
-                    ))}
-                </nav>
+                {/* Desktop Gooey Navigation */}
+                <div className="hidden md-flex" style={{ alignItems: 'center', justifyContent: 'center', flex: '1 1 auto', margin: '0 1rem' }}>
+                    <GooeyNav
+                        items={navItems}
+                        particleCount={15}
+                        particleDistances={[90, 10]}
+                        particleR={100}
+                        initialActiveIndex={0}
+                        animationTime={600}
+                        timeVariance={300}
+                        colors={[1, 2, 3, 1, 2, 3, 1, 4]}
+                    />
+                </div>
 
                 {/* Action Buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <Link to="/patient">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                    <Link to="/doctors">
                         <button className="btn btn-outline" style={{
-                            padding: '0.5rem 1rem',
+                            padding: '0.5rem 1.1rem',
                             fontSize: '0.88rem',
                             borderRadius: '8px',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.4rem',
+                            gap: '0.45rem',
                             borderColor: '#0284c7',
                             color: '#0284c7',
                             fontWeight: '600'
@@ -122,14 +118,14 @@ const Navbar = () => {
 
                     {user ? (
                         <Link to="/portal">
-                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.1rem', fontSize: '0.88rem', borderRadius: '8px' }}>
+                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
                                 <UserCheck size={16} />
                                 <span>Portal ({user.role})</span>
                             </button>
                         </Link>
                     ) : (
                         <Link to="/login">
-                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.1rem', fontSize: '0.88rem', borderRadius: '8px' }}>
+                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
                                 <ShieldCheck size={16} />
                                 <span>Staff Login</span>
                             </button>
@@ -139,8 +135,11 @@ const Navbar = () => {
                     {/* Mobile Hamburger Button */}
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle navigation menu"
                         style={{
-                            display: 'none',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
                             padding: '0.4rem',
                             color: '#0f172a'
                         }}
@@ -160,20 +159,21 @@ const Navbar = () => {
                     boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
                 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {navLinks.map((link) => (
+                        {navItems.map((item) => (
                             <Link
-                                key={link.path}
-                                to={link.path}
+                                key={item.href}
+                                to={item.href}
                                 onClick={() => setMobileMenuOpen(false)}
                                 style={{
                                     padding: '0.75rem 1rem',
                                     borderRadius: '8px',
                                     fontWeight: '600',
-                                    color: isActive(link.path) ? '#0284c7' : '#334155',
-                                    background: isActive(link.path) ? '#f0f9ff' : 'transparent'
+                                    color: isActive(item.href) ? '#0284c7' : '#334155',
+                                    background: isActive(item.href) ? '#f0f9ff' : 'transparent',
+                                    textDecoration: 'none'
                                 }}
                             >
-                                {link.label}
+                                {item.label}
                             </Link>
                         ))}
                     </div>

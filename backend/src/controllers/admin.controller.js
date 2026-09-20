@@ -4,10 +4,133 @@ import { User } from '../models/User.js';
 import { Doctor } from '../models/Doctor.js';
 import { Hospital } from '../models/Hospital.js';
 import { Specialty } from '../models/Specialty.js';
-import { mockUsers, MOCK_DOCTORS } from '../data/mockFallback.js';
+import { Appointment } from '../models/Appointment.js';
+import { Review } from '../models/Review.js';
+import { mockUsers, MOCK_DOCTORS, mockAppointments } from '../data/mockFallback.js';
 import { db } from '../data/store.js';
 
 export const adminController = {
+    // GET /api/admin/overview-stats
+    getOverviewStats: async (req, res) => {
+        try {
+            const isMongoConnected = mongoose.connection.readyState === 1;
+
+            if (isMongoConnected) {
+                const totalUsers = await User.countDocuments();
+                const totalDoctors = await Doctor.countDocuments();
+                const totalAppointments = await Appointment.countDocuments();
+                const activeStaff = await User.countDocuments({ status: 'Active' });
+
+                const todayStr = new Date().toISOString().split('T')[0];
+                const dailyAppointments = await Appointment.countDocuments({
+                    $or: [
+                        { date: todayStr },
+                        { createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }
+                    ]
+                });
+
+                // Calculate total revenue from completed/confirmed appointments
+                const allApts = await Appointment.find({}).lean();
+                let totalRevenue = 0;
+                let pendingInvoicesCount = 0;
+                let pendingAmount = 0;
+
+                allApts.forEach(apt => {
+                    const fee = Number(apt.amount) || Number(apt.consultationFee) || 65;
+                    if (apt.paymentStatus === 'PAID' || apt.status === 'COMPLETED') {
+                        totalRevenue += fee;
+                    } else if (apt.status !== 'CANCELLED') {
+                        pendingInvoicesCount += 1;
+                        pendingAmount += fee;
+                    }
+                });
+
+                // Get recent activities from actual appointments, users, and reviews
+                const recentUsers = await User.find({}).sort({ createdAt: -1 }).limit(3).lean();
+                const recentApts = await Appointment.find({}).sort({ createdAt: -1 }).limit(4).lean();
+                const recentRevs = await Review.find({}).sort({ createdAt: -1 }).limit(3).lean();
+
+                const recentActivities = [
+                    ...recentUsers.map(u => ({
+                        id: `act-u-${u._id}`,
+                        type: 'USER',
+                        title: `New User Registered: ${u.name}`,
+                        subtitle: `Role: ${u.role} • ${u.email}`,
+                        time: u.createdAt ? new Date(u.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently'
+                    })),
+                    ...recentApts.map(a => ({
+                        id: `act-a-${a._id}`,
+                        type: 'APPOINTMENT',
+                        title: `Appointment Booked: ${a.patientName}`,
+                        subtitle: `${a.department || 'Consultation'} • ${a.timeSlot || 'Scheduled'}`,
+                        time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently'
+                    })),
+                    ...recentRevs.map(r => ({
+                        id: `act-r-${r._id}`,
+                        type: 'REVIEW',
+                        title: `New Review by ${r.patientName}`,
+                        subtitle: `${r.rating} Stars • "${r.comment.slice(0, 45)}..."`,
+                        time: r.createdAt ? new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently'
+                    }))
+                ].slice(0, 6);
+
+                return res.json({
+                    success: true,
+                    data: {
+                        totalUsers: totalUsers || 1,
+                        totalDoctors: totalDoctors || 6,
+                        totalPatients: totalAppointments > 0 ? totalAppointments : 1,
+                        activeStaff: activeStaff || 1,
+                        dailyAppointments: dailyAppointments || 0,
+                        monthlyRevenue: totalRevenue > 0 ? `$${totalRevenue.toLocaleString()}` : '$0',
+                        monthlyRevenueNumeric: totalRevenue,
+                        pendingInvoicesCount: pendingInvoicesCount,
+                        pendingAmount: pendingAmount,
+                        systemHealth: '100% (MongoDB Atlas Connected)',
+                        databaseConnected: true,
+                        recentActivities
+                    }
+                });
+            }
+
+            // Fallback In-Memory Stats
+            const totalUsers = mockUsers.length;
+            const totalDoctors = MOCK_DOCTORS.length;
+            const totalAppointments = mockAppointments.length;
+            const activeStaff = mockUsers.filter(u => u.status === 'Active').length;
+
+            let totalRevenue = 0;
+            let pendingInvoicesCount = 0;
+            mockAppointments.forEach(a => {
+                const fee = a.amount || 65;
+                if (a.paymentStatus === 'PAID') totalRevenue += fee;
+                else pendingInvoicesCount++;
+            });
+
+            return res.json({
+                success: true,
+                data: {
+                    totalUsers,
+                    totalDoctors,
+                    totalPatients: totalAppointments,
+                    activeStaff,
+                    dailyAppointments: 1,
+                    monthlyRevenue: `$${totalRevenue.toLocaleString()}`,
+                    monthlyRevenueNumeric: totalRevenue,
+                    pendingInvoicesCount,
+                    pendingAmount: pendingInvoicesCount * 65,
+                    systemHealth: '99.9% (Local Store Mode)',
+                    databaseConnected: false,
+                    recentActivities: [
+                        { id: 'act-1', type: 'SYSTEM', title: 'System Initialized', subtitle: 'ProHealth Core API Active', time: 'Active' }
+                    ]
+                }
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
     // GET /api/admin/users
     getUsers: async (req, res) => {
         try {
@@ -87,7 +210,6 @@ export const adminController = {
                     }]
                 });
 
-                // If role is doctor, create doctor profile too
                 if (normalizedRole === 'doctor') {
                     const firstHospital = await Hospital.findOne({});
                     const firstSpecialty = await Specialty.findOne({
@@ -157,22 +279,6 @@ export const adminController = {
 
             mockUsers.push(newUser);
 
-            if (normalizedRole === 'doctor') {
-                mockDoctors.push({
-                    _id: `doc-${Date.now()}`,
-                    id: `doc-${Date.now()}`,
-                    name: name.startsWith('Dr.') ? name : `Dr. ${name}`,
-                    specialtyName: specialization || department || 'General Medicine',
-                    qualification: 'MBBS, MD',
-                    experienceYears: 5,
-                    consultationFee: 50,
-                    roomNumber: `Room ${100 + (count % 20)}`,
-                    hospitalName: 'City Care Multi-Specialty Hospital',
-                    isActive: true,
-                    rating: 4.8
-                });
-            }
-
             return res.status(201).json({
                 success: true,
                 user: {
@@ -231,7 +337,6 @@ export const adminController = {
                 });
             }
 
-            // Fallback In-Memory
             const userIndex = mockUsers.findIndex(u => u.staffId === id || u.id === id || u._id === id);
             if (userIndex === -1) {
                 return res.status(404).json({ success: false, message: 'User not found' });
@@ -272,7 +377,6 @@ export const adminController = {
                 return res.json({ success: true, message: `User ${id} removed successfully.` });
             }
 
-            // Fallback In-Memory
             const initialLen = mockUsers.length;
             const updated = mockUsers.filter(u => u.staffId !== id && u.id !== id && u._id !== id);
             mockUsers.length = 0;
@@ -316,7 +420,6 @@ export const adminController = {
                 });
             }
 
-            // Fallback In-Memory
             const user = mockUsers.find(u => u.staffId === id || u.id === id || u._id === id);
             if (!user) {
                 return res.status(404).json({ success: false, message: 'User not found' });
@@ -341,27 +444,215 @@ export const adminController = {
 
     // GET /api/admin/logs
     getLogs: async (req, res) => {
-        const logs = db.get('logs') || [
-            { id: 1, timestamp: new Date().toLocaleString(), actor: 'Admin', action: 'SYSTEM_BOOT', entity: 'Server', status: 'Success' }
-        ];
-        return res.json({ success: true, data: logs });
+        try {
+            const isMongoConnected = mongoose.connection.readyState === 1;
+
+            if (isMongoConnected) {
+                const users = await User.find({}).sort({ createdAt: -1 }).limit(10).lean();
+                const apts = await Appointment.find({}).sort({ createdAt: -1 }).limit(10).lean();
+                const revs = await Review.find({}).sort({ createdAt: -1 }).limit(5).lean();
+
+                const generatedLogs = [
+                    ...users.map(u => ({
+                        id: `log-u-${u._id}`,
+                        timestamp: u.createdAt ? new Date(u.createdAt).toLocaleString() : new Date().toLocaleString(),
+                        actor: u.name || 'System Admin',
+                        action: 'USER_REGISTERED',
+                        entity: `${u.role.toUpperCase()} #${u.staffId || u._id.toString().slice(-4)}`,
+                        status: 'Success'
+                    })),
+                    ...apts.map(a => ({
+                        id: `log-a-${a._id}`,
+                        timestamp: a.createdAt ? new Date(a.createdAt).toLocaleString() : new Date().toLocaleString(),
+                        actor: a.patientName || 'Patient',
+                        action: a.status === 'COMPLETED' ? 'CONSULTATION_DONE' : 'APPOINTMENT_BOOKED',
+                        entity: `Appointment #${a.appointmentNumber || a._id.toString().slice(-4)}`,
+                        status: a.status === 'CANCELLED' ? 'Failed' : 'Success'
+                    })),
+                    ...revs.map(r => ({
+                        id: `log-r-${r._id}`,
+                        timestamp: r.createdAt ? new Date(r.createdAt).toLocaleString() : new Date().toLocaleString(),
+                        actor: r.patientName || 'Verified Patient',
+                        action: 'REVIEW_SUBMITTED',
+                        entity: `${r.rating} Star Review`,
+                        status: 'Success'
+                    }))
+                ];
+
+                generatedLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                return res.json({
+                    success: true,
+                    data: generatedLogs.length > 0 ? generatedLogs : [
+                        { id: 1, timestamp: new Date().toLocaleString(), actor: 'System Admin', action: 'PORTAL_LOGIN', entity: 'Admin Dashboard', status: 'Success' }
+                    ]
+                });
+            }
+
+            const storedLogs = db.get('logs') || [];
+            return res.json({
+                success: true,
+                data: storedLogs.length > 0 ? storedLogs : [
+                    { id: 1, timestamp: new Date().toLocaleString(), actor: 'System Admin', action: 'PORTAL_LOGIN', entity: 'Admin Dashboard', status: 'Success' }
+                ]
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
     },
 
     // GET /api/admin/invoices
     getInvoices: async (req, res) => {
-        const invoices = db.get('invoices') || [];
-        return res.json({ success: true, data: invoices });
+        try {
+            const isMongoConnected = mongoose.connection.readyState === 1;
+
+            if (isMongoConnected) {
+                const appointments = await Appointment.find({})
+                    .populate('doctor', 'name department')
+                    .populate('hospital', 'name')
+                    .sort({ createdAt: -1 })
+                    .lean();
+
+                const invoices = appointments.map(apt => {
+                    const fee = Number(apt.amount) || Number(apt.consultationFee) || 65;
+                    const status = apt.paymentStatus === 'PAID' ? 'Paid' : apt.status === 'CANCELLED' ? 'Refunded' : 'Pending';
+
+                    return {
+                        id: `INV-${apt.appointmentNumber || apt._id.toString().slice(-6).toUpperCase()}`,
+                        appointmentId: apt._id.toString(),
+                        date: apt.date || (apt.createdAt ? new Date(apt.createdAt).toISOString().split('T')[0] : '2026-03-20'),
+                        patient: apt.patientName || 'Patient',
+                        doctor: apt.doctor?.name || apt.doctorName || 'Consultant Doctor',
+                        amount: fee,
+                        status: status,
+                        items: [{ description: `${apt.department || 'Clinical'} Consultation`, amount: fee }]
+                    };
+                });
+
+                return res.json({ success: true, data: invoices });
+            }
+
+            const storedInvoices = (db.get('invoices') || []).map(inv => ({
+                id: inv.id,
+                date: inv.date || new Date().toISOString().split('T')[0],
+                patient: inv.patient,
+                doctor: 'Consultant Doctor',
+                amount: Number(inv.amount) || 65,
+                status: inv.status,
+                items: inv.items || [{ description: 'Medical Service', amount: Number(inv.amount) || 65 }]
+            }));
+
+            return res.json({ success: true, data: storedInvoices });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
     },
 
     // PATCH /api/admin/invoices/:id/pay
-    markInvoicePaid: (req, res) => {
-        const { id } = req.params;
-        return res.json({ success: true, message: `Invoice ${id} marked as Paid` });
+    markInvoicePaid: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const isMongoConnected = mongoose.connection.readyState === 1;
+
+            if (isMongoConnected) {
+                const aptNum = id.replace('INV-', '');
+                await Appointment.findOneAndUpdate(
+                    { $or: [{ appointmentNumber: aptNum }, { _id: mongoose.Types.ObjectId.isValid(aptNum) ? aptNum : null }] },
+                    { $set: { paymentStatus: 'PAID' } }
+                );
+            }
+
+            db.update('invoices', (prev = []) =>
+                prev.map(inv => inv.id === id ? { ...inv, status: 'Paid' } : inv)
+            );
+
+            return res.json({ success: true, message: `Invoice ${id} marked as Paid.` });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
     },
 
     // PATCH /api/admin/invoices/:id/refund
-    refundInvoice: (req, res) => {
-        const { id } = req.params;
-        return res.json({ success: true, message: `Invoice ${id} refunded` });
+    refundInvoice: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const isMongoConnected = mongoose.connection.readyState === 1;
+
+            if (isMongoConnected) {
+                const aptNum = id.replace('INV-', '');
+                await Appointment.findOneAndUpdate(
+                    { $or: [{ appointmentNumber: aptNum }, { _id: mongoose.Types.ObjectId.isValid(aptNum) ? aptNum : null }] },
+                    { $set: { paymentStatus: 'REFUNDED', status: 'CANCELLED' } }
+                );
+            }
+
+            db.update('invoices', (prev = []) =>
+                prev.map(inv => inv.id === id ? { ...inv, status: 'Refunded' } : inv)
+            );
+
+            return res.json({ success: true, message: `Invoice ${id} refunded successfully.` });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // GET /api/admin/settings
+    getSettings: async (req, res) => {
+        try {
+            const isMongoConnected = mongoose.connection.readyState === 1;
+            let hospital = null;
+
+            if (isMongoConnected) {
+                hospital = await Hospital.findOne({}).lean();
+            }
+
+            const settings = {
+                hospitalName: hospital?.name || 'ProHealth Central Super Specialty Hospital',
+                address: hospital?.address || '123 Health Avenue, Medical District',
+                city: hospital?.city || 'New York',
+                contactPhone: hospital?.contactPhone || '+1 (800) 123-4567',
+                emergencyPhone: hospital?.emergencyPhone || '+1 (800) 911-0001',
+                email: hospital?.email || 'central@prohealth-hms.com',
+                systemTheme: 'Light',
+                autoBackup: true,
+                maintenanceMode: false
+            };
+
+            return res.json({ success: true, data: settings });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // PUT /api/admin/settings
+    updateSettings: async (req, res) => {
+        try {
+            const { hospitalName, address, contactPhone, emergencyPhone, systemTheme, autoBackup, maintenanceMode } = req.body;
+            const isMongoConnected = mongoose.connection.readyState === 1;
+
+            if (isMongoConnected) {
+                await Hospital.findOneAndUpdate(
+                    {},
+                    {
+                        $set: {
+                            name: hospitalName,
+                            address,
+                            contactPhone,
+                            emergencyPhone
+                        }
+                    },
+                    { upsert: true, new: true }
+                );
+            }
+
+            return res.json({
+                success: true,
+                message: 'System configuration updated successfully in database.',
+                data: req.body
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
+

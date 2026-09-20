@@ -1,71 +1,46 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { pharmacyService } from '../services/pharmacy.service';
+import { useAuth } from '../hooks/useAuth';
 
 const PharmacyContext = createContext();
 
 export const usePharmacy = () => useContext(PharmacyContext);
 
 const initialInventory = [
-    { id: 1, name: 'Amoxicillin 500mg', category: 'Antibiotic', stock: 120, reorderLevel: 50, expiry: '2024-12-01', price: 15.00 },
-    { id: 2, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 45, reorderLevel: 50, expiry: '2025-06-15', price: 5.00 },
-    { id: 3, name: 'Metformin 850mg', category: 'Diabetes', stock: 200, reorderLevel: 60, expiry: '2024-10-20', price: 12.50 },
-    { id: 4, name: 'Atorvastatin 20mg', category: 'Cardiology', stock: 10, reorderLevel: 30, expiry: '2024-08-30', price: 25.00 },
-    { id: 5, name: 'Omeprazole 20mg', category: 'Gastro', stock: 80, reorderLevel: 40, expiry: '2025-02-10', price: 8.00 }
+    { id: 1, name: 'Amoxicillin 500mg', category: 'Antibiotic', stock: 120, reorderLevel: 50, expiry: '2025-12-01', price: 15.00 },
+    { id: 2, name: 'Paracetamol 500mg', category: 'Pain Relief', stock: 45, reorderLevel: 50, expiry: '2026-06-15', price: 5.00 },
+    { id: 3, name: 'Metformin 850mg', category: 'Diabetes', stock: 200, reorderLevel: 60, expiry: '2025-10-20', price: 12.50 },
+    { id: 4, name: 'Atorvastatin 20mg', category: 'Cardiology', stock: 10, reorderLevel: 30, expiry: '2025-08-30', price: 25.00 },
+    { id: 5, name: 'Omeprazole 20mg', category: 'Gastro', stock: 80, reorderLevel: 40, expiry: '2026-02-10', price: 8.00 }
 ];
 
-const initialPrescriptions = [
-    {
-        id: 'RX-2024-001',
-        patientName: 'John Doe',
-        doctorName: 'Dr. Smith',
-        date: '2024-02-01',
-        status: 'pending',
-        items: [
-            { medicineId: 1, name: 'Amoxicillin 500mg', dosage: '1 tablet', freq: '3x daily', duration: '7 days', qty: 21 },
-            { medicineId: 2, name: 'Paracetamol 500mg', dosage: '1 tablet', freq: 'SOS', duration: '5 days', qty: 10 }
-        ]
-    },
-    {
-        id: 'RX-2024-002',
-        patientName: 'Sarah Connor',
-        doctorName: 'Dr. Jones',
-        date: '2024-02-01',
-        status: 'pending',
-        items: [
-            { medicineId: 4, name: 'Atorvastatin 20mg', dosage: '1 tablet', freq: 'Nightly', duration: '30 days', qty: 30 }
-        ]
-    },
-    {
-        id: 'RX-2024-003',
-        patientName: 'Kyle Reese',
-        doctorName: 'Dr. Silberman',
-        date: '2024-02-02',
-        status: 'dispensed',
-        dispensedAt: '2024-02-02T10:30:00',
-        items: [
-            { medicineId: 5, name: 'Omeprazole 20mg', dosage: '1 capsule', freq: 'Morning', duration: '14 days', qty: 14 }
-        ]
-    }
-];
+const initialPrescriptions = [];
 
 export const PharmacyProvider = ({ children }) => {
+    const { user } = useAuth();
     const [inventory, setInventory] = useState(initialInventory);
     const [prescriptions, setPrescriptions] = useState(initialPrescriptions);
-    const [recentDispenses, setRecentDispenses] = useState([
-        { id: 101, medicine: 'Omeprazole 20mg', patient: 'Kyle Reese', qty: 14, date: '2024-02-02 10:30 AM', status: 'Completed' }
-    ]);
-    const [orders, setOrders] = useState([
-        { id: 'ORD-2024-001', supplier: 'PharmaDist Inc.', date: '2024-02-01', status: 'Received', totalCost: 450.00, items: [{ medicineId: 1, name: 'Amoxicillin 500mg', qty: 100 }] },
-        { id: 'ORD-2024-002', supplier: 'MediSupply Co.', date: '2024-02-03', status: 'Pending', totalCost: 200.00, items: [{ medicineId: 3, name: 'Metformin 850mg', qty: 50 }] }
-    ]);
+    const [recentDispenses, setRecentDispenses] = useState([]);
+    const [orders, setOrders] = useState([]);
 
     const [pharmacistProfile, setPharmacistProfile] = useState({
-        name: 'Sarah Pharmacist',
-        id: 'PH-9921',
-        email: 'sarah.p@hospital.com',
-        phone: '+1 (555) 000-8888',
+        name: user?.name || 'Pharmacist Bob',
+        id: user?.id || 'PHA001',
+        email: user?.email || 'bob@hms.com',
+        phone: user?.phone || '+1 (555) 019-8888',
         shift: 'Morning (8AM - 4PM)'
     });
+
+    useEffect(() => {
+        if (user) {
+            setPharmacistProfile(prev => ({
+                ...prev,
+                name: user.name || prev.name,
+                id: user.id || prev.id,
+                email: user.email || prev.email
+            }));
+        }
+    }, [user]);
 
     useEffect(() => {
         const fetchPharmacyData = async () => {

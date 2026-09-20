@@ -44,6 +44,69 @@ export const doctorService = {
     },
 
     // Staff / Doctor Portal Methods
+    getDashboardStats: async () => {
+        try {
+            const res = await apiClient.get('/doctors/portal/dashboard-stats');
+            return res?.data || res || null;
+        } catch (err) {
+            console.warn('Failed to fetch doctor dashboard stats from backend', err);
+            return null;
+        }
+    },
+
+    getPortalAppointments: async () => {
+        try {
+            const res = await apiClient.get('/doctors/portal/appointments');
+            const data = res?.data || res;
+            return Array.isArray(data) ? data : [];
+        } catch (err) {
+            console.warn('Failed to fetch doctor portal appointments', err);
+            return [];
+        }
+    },
+
+    updateConsultation: async (id, data) => {
+        try {
+            const res = await apiClient.put(`/doctors/portal/appointments/${id}/consultation`, data);
+            return res?.data || res || null;
+        } catch (err) {
+            console.warn(`Failed to update consultation for appointment ${id}`, err);
+            return null;
+        }
+    },
+
+    getPatients: async () => {
+        try {
+            const res = await apiClient.get('/doctors/portal/patients');
+            const data = res?.data || res;
+            return Array.isArray(data) ? data : [];
+        } catch (err) {
+            console.warn('Failed to fetch doctor portal patients', err);
+            return [];
+        }
+    },
+
+    getRecords: async () => {
+        try {
+            const res = await apiClient.get('/doctors/portal/records');
+            const data = res?.data || res;
+            return Array.isArray(data) ? data : [];
+        } catch (err) {
+            console.warn('Failed to fetch doctor portal records', err);
+            return [];
+        }
+    },
+
+    saveRecord: async (id, notes) => {
+        try {
+            const res = await apiClient.post('/doctors/portal/records', { id, notes });
+            return res?.data || res || null;
+        } catch (err) {
+            console.warn('Failed to save doctor record', err);
+            return null;
+        }
+    },
+
     getAppointments: async (doctorName) => {
         try {
             const query = doctorName ? `?doctorName=${encodeURIComponent(doctorName)}` : '';
@@ -74,4 +137,5 @@ export const doctorService = {
         }
     }
 };
+
 

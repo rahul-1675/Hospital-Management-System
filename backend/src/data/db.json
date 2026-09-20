@@ -223,26 +223,16 @@
   "queueState": {
     "doctors": {
       "Dr. Smith": {
-        "status": "BUSY",
+        "status": "AVAILABLE",
         "department": "General Med",
-        "current": {
-          "token": "A-101",
-          "name": "Liam Wilson",
-          "time": "10:00 AM"
-        },
+        "current": null,
         "waiting": []
       },
       "Dr. Jones": {
         "status": "AVAILABLE",
         "department": "Cardiology",
         "current": null,
-        "waiting": [
-          {
-            "token": "A-102",
-            "name": "Bob Martin",
-            "time": "09:15 AM"
-          }
-        ]
+        "waiting": []
       },
       "Dr. Williams": {
         "status": "AVAILABLE",

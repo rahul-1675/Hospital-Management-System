@@ -3,6 +3,9 @@ import { receptionController } from '../controllers/reception.controller.js';
 
 const router = Router();
 
+router.get('/overview-stats', receptionController.getOverviewStats);
+router.get('/doctors', receptionController.getDoctors);
+
 router.get('/appointments', receptionController.getAppointments);
 router.post('/appointments', receptionController.createAppointment);
 router.put('/appointments/:id', receptionController.updateAppointment);
@@ -15,3 +18,4 @@ router.get('/invoices', receptionController.getInvoices);
 router.post('/invoices', receptionController.createInvoice);
 
 export default router;
+

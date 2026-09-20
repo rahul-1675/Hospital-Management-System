@@ -50,6 +50,18 @@
     .md-block {
         display: block !important;
     }
+
+    .mobile-toggle {
+        display: none !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .mobile-toggle {
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
 .grid {

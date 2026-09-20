@@ -1,13 +1,33 @@
 import { apiClient } from './api';
 
 export const receptionService = {
+    getOverviewStats: async () => {
+        try {
+            const res = await apiClient.get('/reception/overview-stats');
+            return res.data || null;
+        } catch (err) {
+            console.warn('Failed to fetch reception overview stats', err);
+            return null;
+        }
+    },
+
+    getDoctors: async () => {
+        try {
+            const res = await apiClient.get('/reception/doctors');
+            return res.data || [];
+        } catch (err) {
+            console.warn('Failed to fetch doctors list for reception', err);
+            return [];
+        }
+    },
+
     getAppointments: async () => {
         try {
             const res = await apiClient.get('/reception/appointments');
             return res.data || [];
         } catch (err) {
             console.warn('Failed to fetch appointments from backend', err);
-            return null;
+            return [];
         }
     },
 

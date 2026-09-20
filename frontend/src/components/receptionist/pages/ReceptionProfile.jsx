@@ -12,15 +12,27 @@ const ReceptionProfile = () => {
     const [toast, setToast] = useState(null);
 
     const [profileData, setProfileData] = useState({
-        name: user?.name || 'Reception Staff',
+        name: user?.name || 'Receptionist Jane',
         role: 'Senior Receptionist',
-        email: user?.email || 'reception@hospital.com',
-        phone: '+1 (555) 012-3456',
-        id: user?.id || 'REC-1001',
-        shift: 'Morning Shift',
+        email: user?.email || 'jane@hms.com',
+        phone: user?.phone || '+1 (555) 0102',
+        id: user?.staffId || user?.id || 'REC001',
+        shift: 'Day Shift',
         shiftTime: '08:00 AM - 04:00 PM',
-        department: 'Front Desk & Admissions'
+        department: 'Front Desk & Patient Intake'
     });
+
+    useEffect(() => {
+        if (user) {
+            setProfileData(prev => ({
+                ...prev,
+                name: user.name || prev.name,
+                email: user.email || prev.email,
+                phone: user.phone || prev.phone,
+                id: user.staffId || user.id || prev.id
+            }));
+        }
+    }, [user]);
 
     const showToast = (message) => {
         setToast(message);

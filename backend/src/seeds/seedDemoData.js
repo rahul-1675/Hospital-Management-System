@@ -321,23 +321,89 @@ export const seedDemoData = async () => {
 
 export const ensureMasterAdmin = async () => {
     try {
-        const passAdmin = await bcrypt.hash('Rahul@167', 10);
-        await User.findOneAndUpdate(
-            { $or: [{ staffId: 'ADM167' }, { email: 'admin@hms.com' }] },
+        const defaultAccounts = [
             {
                 name: 'Rahul (Administrator)',
                 email: 'admin@hms.com',
                 staffId: 'ADM167',
-                passwordHash: passAdmin,
+                password: 'Rahul@167',
                 role: 'admin',
                 phone: '+1 555-0100',
                 status: 'Active',
                 department: 'Management'
             },
-            { upsert: true, new: true }
-        );
-        console.log('🔒 Master Admin ADM167 verified and active.');
+            {
+                name: 'Dr. Sarah Smith',
+                email: 'dr.smith@hms.com',
+                staffId: 'DOC001',
+                password: 'doc@123',
+                role: 'doctor',
+                phone: '+1 555-0101',
+                status: 'Active',
+                department: 'Cardiology'
+            },
+            {
+                name: 'Receptionist Jane',
+                email: 'jane@hms.com',
+                staffId: 'REC001',
+                password: 'rec@123',
+                role: 'receptionist',
+                phone: '+1 555-0102',
+                status: 'Active',
+                department: 'Front Desk'
+            },
+            {
+                name: 'Pharmacist Bob',
+                email: 'bob@hms.com',
+                staffId: 'PHA001',
+                password: 'pha@123',
+                role: 'pharmacy',
+                phone: '+1 555-0103',
+                status: 'Active',
+                department: 'Pharmacy'
+            },
+            {
+                name: 'Staff Member Mike',
+                email: 'mike@hms.com',
+                staffId: 'STF001',
+                password: 'stf@123',
+                role: 'staff',
+                phone: '+1 555-0104',
+                status: 'Active',
+                department: 'General Ops'
+            },
+            {
+                name: 'Alex Johnson',
+                email: 'patient@hms.com',
+                staffId: 'PAT001',
+                password: 'patient@123',
+                role: 'patient',
+                phone: '+1 555-0199',
+                status: 'Active',
+                department: 'Patient'
+            }
+        ];
+
+        for (const acc of defaultAccounts) {
+            const passwordHash = await bcrypt.hash(acc.password, 10);
+            await User.findOneAndUpdate(
+                { $or: [{ staffId: acc.staffId }, { email: acc.email }] },
+                {
+                    name: acc.name,
+                    email: acc.email,
+                    staffId: acc.staffId,
+                    passwordHash,
+                    role: acc.role,
+                    phone: acc.phone,
+                    status: acc.status,
+                    department: acc.department
+                },
+                { upsert: true, new: true }
+            );
+        }
+
+        console.log('🔒 Master Portal Accounts (Admin, Doctor, Receptionist, Pharmacy, Staff, Patient) verified and active.');
     } catch (err) {
-        console.error('⚠️ Could not verify master admin:', err.message);
+        console.error('⚠️ Could not verify master accounts:', err.message);
     }
 };

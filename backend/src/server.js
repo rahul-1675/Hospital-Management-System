@@ -19,6 +19,7 @@ import receptionRoutes from './routes/reception.routes.js';
 import pharmacyRoutes from './routes/pharmacy.routes.js';
 import staffRoutes from './routes/staff.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
+import reviewRoutes from './routes/review.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,6 +64,7 @@ app.use('/api/reception', receptionRoutes);
 app.use('/api/pharmacy', pharmacyRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

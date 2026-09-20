@@ -7,6 +7,7 @@ import AdminUsers from '../../components/admin/pages/AdminUsers';
 import AdminLogs from '../../components/admin/pages/AdminLogs';
 import AdminFinance from '../../components/admin/pages/AdminFinance';
 import AdminSettings from '../../components/admin/pages/AdminSettings';
+import AdminReviews from '../../components/admin/pages/AdminReviews';
 import AdminBg from '../../assets/Admin.png';
 
 const AdminPortal = () => {
@@ -18,9 +19,11 @@ const AdminPortal = () => {
     const renderContent = () => {
         switch (activeTab) {
             case 'overview':
-                return <AdminOverview />;
+                return <AdminOverview setActiveTab={setActiveTab} />;
             case 'users':
                 return <AdminUsers />;
+            case 'reviews':
+                return <AdminReviews />;
             case 'logs':
                 return <AdminLogs />;
             case 'finance':

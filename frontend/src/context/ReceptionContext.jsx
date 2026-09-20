@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { receptionService } from '../services/reception.service';
 
 const ReceptionContext = createContext();
@@ -7,138 +7,48 @@ export const useReception = () => {
     return useContext(ReceptionContext);
 };
 
-// Initial Data
-const initialAppointments = [
-    {
-        id: 1,
-        time: '09:00 AM',
-        patientName: 'Alice Springs',
-        doctorName: 'Dr. Smith',
-        type: 'New Visit',
-        status: 'scheduled',
-        details: 'Initial consultation for persistent headaches.',
-        contact: '+1 555-0101',
-        department: 'General Med'
-    },
-    {
-        id: 2,
-        time: '09:15 AM',
-        patientName: 'Bob Martin',
-        doctorName: 'Dr. Jones',
-        type: 'Follow-up',
-        status: 'checked-in',
-        details: 'Post-surgery checkup.',
-        contact: '+1 555-0102',
-        department: 'Cardiology'
-    },
-    {
-        id: 3,
-        time: '09:30 AM',
-        patientName: 'Charlie Davis',
-        doctorName: 'Dr. Smith',
-        type: 'New Visit',
-        status: 'cancelled',
-        details: 'Cancelled by patient.',
-        contact: '+1 555-0103',
-        department: 'General Med'
-    },
-    {
-        id: 4,
-        time: '10:00 AM',
-        patientName: 'Diana Prince',
-        doctorName: 'Dr. Williams',
-        type: 'New Visit',
-        status: 'scheduled',
-        details: 'Annual physical.',
-        contact: '+1 555-0104',
-        department: 'General Med'
-    }
-];
-
-const initialQueueState = {
-    doctors: {
-        'Dr. Smith': {
-            status: 'BUSY',
-            department: 'General Med',
-            current: {
-                token: 'A-101',
-                name: 'Liam Wilson',
-                time: '10:00 AM'
-            },
-            waiting: []
-        },
-        'Dr. Jones': {
-            status: 'AVAILABLE',
-            department: 'Cardiology',
-            current: null,
-            waiting: [
-                {
-                    token: 'A-102',
-                    name: 'Bob Martin',
-                    time: '09:15 AM'
-                }
-            ]
-        },
-        'Dr. Williams': {
-            status: 'AVAILABLE',
-            department: 'General Med',
-            current: null,
-            waiting: []
-        }
-    }
-};
-
-const initialInvoices = [
-    {
-        id: 'INV-2023-001',
-        patient: 'Sarah Johnson',
-        date: '2023-10-25',
-        status: 'Paid',
-        items: [
-            { description: 'Consultation - Dr. Smith', amount: 50.00 },
-            { description: 'Blood Test (CBC)', amount: 100.00 }
-        ]
-    },
-    {
-        id: 'INV-2023-002',
-        patient: 'Michael Chen',
-        date: '2023-10-25',
-        status: 'Pending',
-        items: [
-            { description: 'Pharmacy - Amoxicillin', amount: 45.00 }
-        ]
-    },
-    {
-        id: 'INV-2023-003',
-        patient: 'Emma Davis',
-        date: '2023-10-24',
-        status: 'Unpaid',
-        items: [
-            { description: 'X-Ray - Chest', amount: 150.00 },
-            { description: 'Consultation - Dr. Jones', amount: 150.00 }
-        ]
-    },
-];
-
 export const ReceptionProvider = ({ children }) => {
-    const [appointments, setAppointments] = useState(initialAppointments);
-    const [queue, setQueue] = useState(initialQueueState);
-    const [invoices, setInvoices] = useState(initialInvoices);
+    const [appointments, setAppointments] = useState([]);
+    const [queue, setQueue] = useState({ doctors: {} });
+    const [invoices, setInvoices] = useState([]);
+    const [doctorsList, setDoctorsList] = useState([]);
+    const [overviewStats, setOverviewStats] = useState({
+        todayAppointments: 0,
+        checkedIn: 0,
+        inQueue: 0,
+        availableDoctors: 0,
+        totalDoctors: 0,
+        departmentQueues: {}
+    });
+    const [loading, setLoading] = useState(true);
     const [notifications, setNotifications] = useState([]);
 
-    useEffect(() => {
-        const fetchReceptionData = async () => {
-            const fetchedAppointments = await receptionService.getAppointments();
-            if (fetchedAppointments && fetchedAppointments.length > 0) setAppointments(fetchedAppointments);
+    const fetchReceptionData = useCallback(async () => {
+        try {
+            setLoading(true);
+            const [fetchedAppointments, fetchedQueue, fetchedInvoices, fetchedDoctors, fetchedStats] = await Promise.all([
+                receptionService.getAppointments(),
+                receptionService.getQueueState(),
+                receptionService.getInvoices(),
+                receptionService.getDoctors(),
+                receptionService.getOverviewStats()
+            ]);
 
-            const fetchedQueue = await receptionService.getQueueState();
+            if (Array.isArray(fetchedAppointments)) setAppointments(fetchedAppointments);
             if (fetchedQueue && fetchedQueue.doctors) setQueue(fetchedQueue);
-
-            const fetchedInvoices = await receptionService.getInvoices();
-            if (fetchedInvoices && fetchedInvoices.length > 0) setInvoices(fetchedInvoices);
-        };
-        fetchReceptionData();
+            if (Array.isArray(fetchedInvoices)) setInvoices(fetchedInvoices);
+            if (Array.isArray(fetchedDoctors)) setDoctorsList(fetchedDoctors);
+            if (fetchedStats) setOverviewStats(fetchedStats);
+        } catch (err) {
+            console.error('Error fetching reception data:', err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchReceptionData();
+    }, [fetchReceptionData]);
 
     const showNotification = (message) => {
         const id = Date.now();
@@ -146,6 +56,22 @@ export const ReceptionProvider = ({ children }) => {
         setTimeout(() => {
             setNotifications(prev => prev.filter(n => n.id !== id));
         }, 3000);
+    };
+
+    const registerNewPatient = async (formData) => {
+        try {
+            const res = await receptionService.createAppointment(formData);
+            if (res && res.data) {
+                setAppointments(prev => [res.data, ...prev]);
+                showNotification(`Patient ${res.data.patientName || 'Registration'} added successfully!`);
+                await fetchReceptionData();
+                return { success: true, data: res.data };
+            }
+            return { success: false, message: 'Failed to create patient record' };
+        } catch (err) {
+            showNotification(`Error: ${err.message}`);
+            return { success: false, message: err.message };
+        }
     };
 
     const updateInvoiceItem = (invoiceId, itemIndex, field, value) => {
@@ -166,14 +92,15 @@ export const ReceptionProvider = ({ children }) => {
         showNotification(`Invoice ${invoiceId} marked as PAID`);
     };
 
-    const checkInPatient = (appointmentId) => {
+    const checkInPatient = async (appointmentId) => {
         const appointment = appointments.find(a => a.id === appointmentId);
         if (!appointment) return;
 
         setAppointments(prev => prev.map(app =>
             app.id === appointmentId ? { ...app, status: 'checked-in' } : app
         ));
-        receptionService.updateAppointment(appointmentId, { status: 'checked-in' });
+
+        await receptionService.updateAppointment(appointmentId, { status: 'checked-in' });
 
         setQueue(prev => {
             const docName = appointment.doctorName;
@@ -184,7 +111,7 @@ export const ReceptionProvider = ({ children }) => {
                 waiting: []
             };
 
-            const newToken = `${docName.charAt(4) || 'D'}-${100 + Math.floor(Math.random() * 900)}`;
+            const newToken = appointment.queueToken || `OPD-${100 + Math.floor(Math.random() * 900)}`;
             const newPatient = {
                 token: newToken,
                 name: appointment.patientName,
@@ -197,7 +124,7 @@ export const ReceptionProvider = ({ children }) => {
                     ...prev.doctors,
                     [docName]: {
                         ...docState,
-                        waiting: [...docState.waiting, newPatient]
+                        waiting: [...(docState.waiting || []), newPatient]
                     }
                 }
             };
@@ -206,38 +133,45 @@ export const ReceptionProvider = ({ children }) => {
         });
 
         showNotification(`Checked in ${appointment.patientName}`);
+        fetchReceptionData();
     };
 
-    const rescheduleAppointment = (appointmentId, newDate, newTime, newDoctor) => {
+    const rescheduleAppointment = async (appointmentId, newDate, newTime, newDoctor) => {
         setAppointments(prev => prev.map(app =>
             app.id === appointmentId ? {
                 ...app,
+                date: newDate || app.date,
                 time: newTime,
                 doctorName: newDoctor || app.doctorName,
                 status: 'scheduled'
             } : app
         ));
-        receptionService.updateAppointment(appointmentId, {
+
+        await receptionService.updateAppointment(appointmentId, {
+            date: newDate,
             time: newTime,
             doctorName: newDoctor,
             status: 'scheduled'
         });
+
         showNotification('Appointment rescheduled successfully');
+        fetchReceptionData();
     };
 
-    const cancelAppointment = (appointmentId) => {
+    const cancelAppointment = async (appointmentId) => {
         const app = appointments.find(a => a.id === appointmentId);
         setAppointments(prev => prev.map(a =>
             a.id === appointmentId ? { ...a, status: 'cancelled' } : a
         ));
-        receptionService.cancelAppointment(appointmentId);
 
-        if (app) {
+        await receptionService.cancelAppointment(appointmentId);
+
+        if (app && queue.doctors[app.doctorName]) {
             setQueue(prev => {
                 const docState = prev.doctors[app.doctorName];
                 if (!docState) return prev;
 
-                const updatedWaiting = docState.waiting.filter(p => p.name !== app.patientName);
+                const updatedWaiting = (docState.waiting || []).filter(p => p.name !== app.patientName);
                 const updatedQueue = {
                     ...prev,
                     doctors: {
@@ -253,13 +187,14 @@ export const ReceptionProvider = ({ children }) => {
             });
         }
         showNotification('Appointment cancelled');
+        fetchReceptionData();
     };
 
     // QUEUE LOGIC: Call Next
     const callNext = (doctorName) => {
         setQueue(prev => {
             const docState = prev.doctors[doctorName];
-            if (!docState || docState.waiting.length === 0) return prev;
+            if (!docState || !docState.waiting || docState.waiting.length === 0) return prev;
 
             const nextPatient = docState.waiting[0];
 
@@ -309,7 +244,12 @@ export const ReceptionProvider = ({ children }) => {
             appointments,
             queue,
             invoices,
+            doctorsList,
+            overviewStats,
+            loading,
             notifications,
+            refreshData: fetchReceptionData,
+            registerNewPatient,
             checkInPatient,
             rescheduleAppointment,
             cancelAppointment,
@@ -332,3 +272,4 @@ export const ReceptionProvider = ({ children }) => {
         </ReceptionContext.Provider>
     );
 };
+
