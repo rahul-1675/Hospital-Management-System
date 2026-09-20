@@ -12,6 +12,7 @@ export const ReceptionProvider = ({ children }) => {
     const [queue, setQueue] = useState({ doctors: {} });
     const [invoices, setInvoices] = useState([]);
     const [doctorsList, setDoctorsList] = useState([]);
+    const [pendingPatients, setPendingPatients] = useState([]);
     const [overviewStats, setOverviewStats] = useState({
         todayAppointments: 0,
         checkedIn: 0,
@@ -26,12 +27,13 @@ export const ReceptionProvider = ({ children }) => {
     const fetchReceptionData = useCallback(async () => {
         try {
             setLoading(true);
-            const [fetchedAppointments, fetchedQueue, fetchedInvoices, fetchedDoctors, fetchedStats] = await Promise.all([
+            const [fetchedAppointments, fetchedQueue, fetchedInvoices, fetchedDoctors, fetchedStats, fetchedPending] = await Promise.all([
                 receptionService.getAppointments(),
                 receptionService.getQueueState(),
                 receptionService.getInvoices(),
                 receptionService.getDoctors(),
-                receptionService.getOverviewStats()
+                receptionService.getOverviewStats(),
+                receptionService.getPendingPatients()
             ]);
 
             if (Array.isArray(fetchedAppointments)) setAppointments(fetchedAppointments);
@@ -39,6 +41,7 @@ export const ReceptionProvider = ({ children }) => {
             if (Array.isArray(fetchedInvoices)) setInvoices(fetchedInvoices);
             if (Array.isArray(fetchedDoctors)) setDoctorsList(fetchedDoctors);
             if (fetchedStats) setOverviewStats(fetchedStats);
+            if (Array.isArray(fetchedPending)) setPendingPatients(fetchedPending);
         } catch (err) {
             console.error('Error fetching reception data:', err);
         } finally {
@@ -239,17 +242,46 @@ export const ReceptionProvider = ({ children }) => {
         showNotification(`Consultation completed for ${doctorName}`);
     };
 
+    const approvePatient = async (patientId) => {
+        try {
+            await receptionService.approvePatient(patientId);
+            setPendingPatients(prev => prev.filter(p => (p._id !== patientId && p.id !== patientId && p.staffId !== patientId)));
+            showNotification('Patient registration approved & activated successfully!');
+            fetchReceptionData();
+            return { success: true };
+        } catch (err) {
+            showNotification(`Error approving patient: ${err.message}`);
+            return { success: false, message: err.message };
+        }
+    };
+
+    const rejectPatient = async (patientId) => {
+        try {
+            await receptionService.rejectPatient(patientId);
+            setPendingPatients(prev => prev.filter(p => (p._id !== patientId && p.id !== patientId && p.staffId !== patientId)));
+            showNotification('Patient registration rejected.');
+            fetchReceptionData();
+            return { success: true };
+        } catch (err) {
+            showNotification(`Error: ${err.message}`);
+            return { success: false, message: err.message };
+        }
+    };
+
     return (
         <ReceptionContext.Provider value={{
             appointments,
             queue,
             invoices,
             doctorsList,
+            pendingPatients,
             overviewStats,
             loading,
             notifications,
             refreshData: fetchReceptionData,
             registerNewPatient,
+            approvePatient,
+            rejectPatient,
             checkInPatient,
             rescheduleAppointment,
             cancelAppointment,

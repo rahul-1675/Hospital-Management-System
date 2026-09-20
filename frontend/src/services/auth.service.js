@@ -38,7 +38,7 @@ export const authService = {
 
     register: async (userData) => {
         const res = await apiClient.post('/auth/register', userData);
-        if (res.success && res.user) {
+        if (res.success) {
             if (res.token) {
                 localStorage.setItem('hms_auth_token', res.token);
                 localStorage.setItem('hms_token', res.token);
@@ -59,8 +59,11 @@ export const authService = {
             }
         } catch (err) {
             console.warn('Failed to verify session token:', err.message);
-            localStorage.removeItem('hms_auth_token');
-            localStorage.removeItem('hms_token');
+            // Only remove token if explicitly unauthorized
+            if (err.response?.status === 401) {
+                localStorage.removeItem('hms_auth_token');
+                localStorage.removeItem('hms_token');
+            }
         }
         return null;
     },

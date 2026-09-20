@@ -326,7 +326,7 @@ export let mockAppointments = [
         _id: 'apt-1',
         id: 'apt-1',
         appointmentNumber: 'APT-100201',
-        patient: { _id: 'usr-patient', name: 'Alex Johnson', email: 'patient@hms.com', phone: '+1 555-0199' },
+        patient: { _id: 'usr-pat-001', id: 'PAT001', name: 'Alex Johnson', email: 'patient@hms.com', phone: '+1 555-0199' },
         patientName: 'Alex Johnson',
         patientEmail: 'patient@hms.com',
         patientPhone: '+1 555-0199',
@@ -425,5 +425,22 @@ export let mockUsers = [
         savedHospitals: [],
         savedDoctors: [],
         notifications: []
+    }
+];
+
+export const mockPatientRemovalRequests = [
+    {
+        _id: 'rem-req-001',
+        id: 'rem-req-001',
+        patientId: 'PAT001',
+        patientName: 'Alex Johnson',
+        doctorId: 'DOC001',
+        doctorName: 'Dr. Sarah Smith',
+        reason: 'Treatment Completed',
+        notes: 'Patient completed 6-month cardiac rehabilitation successfully with normal ECG.',
+        status: 'Pending',
+        adminNote: '',
+        requestedAt: new Date(Date.now() - 3600000 * 5).toISOString(),
+        createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
     }
 ];

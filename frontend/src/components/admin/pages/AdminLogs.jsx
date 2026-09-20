@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../../../context/AdminContext';
 import { adminService } from '../../../services/admin.service';
-import { Download, Filter, Search, Eye, FileText, ChevronDown, RefreshCw, ShieldCheck } from 'lucide-react';
+import { Download, Filter, Search, Eye, FileText, ChevronDown, RefreshCw, ShieldCheck, Trash2, AlertTriangle } from 'lucide-react';
 
 const AdminLogs = () => {
-    const { logs: contextLogs } = useAdmin();
+    const { logs: contextLogs, clearLogs: contextClearLogs } = useAdmin();
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('All');
     const [selectedLog, setSelectedLog] = useState(null);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
 
     const fetchLiveLogs = async () => {
         setLoading(true);
@@ -30,6 +31,16 @@ const AdminLogs = () => {
     useEffect(() => {
         fetchLiveLogs();
     }, []);
+
+    const handleClearLogs = async () => {
+        try {
+            await contextClearLogs();
+            setLogs([]);
+            setShowClearConfirm(false);
+        } catch (err) {
+            alert('Failed to clear logs: ' + err.message);
+        }
+    };
 
     const filteredLogs = logs.filter(log => {
         const matchesSearch = (log.actor || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,7 +88,7 @@ const AdminLogs = () => {
                         Real-time audit trail of database operations, staff logins, and patient bookings.
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                     <button
                         onClick={fetchLiveLogs}
                         disabled={loading}
@@ -101,6 +112,13 @@ const AdminLogs = () => {
                         style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                     >
                         <FileText size={16} /> Export PDF
+                    </button>
+                    <button
+                        onClick={() => setShowClearConfirm(true)}
+                        className="action-btn"
+                        style={{ background: '#fef2f2', color: '#ef4444', border: '1px solid #fee2e2', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}
+                    >
+                        <Trash2 size={16} /> Clear Logs
                     </button>
                 </div>
             </header>

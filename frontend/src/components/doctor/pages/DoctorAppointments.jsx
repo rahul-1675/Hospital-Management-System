@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, User, AlertCircle, CheckCircle, FileText, Activity, Save, X, ChevronRight, History, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, User, AlertCircle, CheckCircle, FileText, Activity, Save, X, ChevronRight, History, RefreshCw, CalendarX } from 'lucide-react';
 import { doctorService } from '../../../services/doctor.service';
+import CancelAppointmentModal from '../modals/CancelAppointmentModal';
 
 const DoctorAppointments = ({ appointments = [], setAppointments, onRefresh, loading }) => {
     const [selectedId, setSelectedId] = useState(null);
     const [showHistory, setShowHistory] = useState(false);
     const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState(null);
 
@@ -98,6 +100,28 @@ const DoctorAppointments = ({ appointments = [], setAppointments, onRefresh, loa
             if (onRefresh) onRefresh();
         } catch (err) {
             console.warn('Failed to finalize consultation:', err);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleCancelAppointment = async (id, reason) => {
+        setSaving(true);
+        try {
+            const res = await doctorService.cancelAppointment(id, reason);
+            if (res && res.success !== false) {
+                const updated = appointments.map(app =>
+                    app.id === id ? { ...app, status: 'cancelled', cancellationReason: reason } : app
+                );
+                setAppointments(updated);
+                showToast('Appointment cancelled successfully');
+                if (onRefresh) onRefresh();
+            } else {
+                showToast('Failed to cancel appointment');
+            }
+        } catch (err) {
+            console.warn('Failed to cancel appointment:', err);
+            showToast('Error cancelling appointment');
         } finally {
             setSaving(false);
         }
@@ -295,10 +319,23 @@ const DoctorAppointments = ({ appointments = [], setAppointments, onRefresh, loa
                                         <button className="action-btn btn-outline" disabled style={{ opacity: 0.6, flex: 1 }}>
                                             Consultation Completed
                                         </button>
-                                    ) : (
-                                        <button className="action-btn btn-primary" style={{ flex: 1 }} onClick={handleStartConsultation}>
-                                            Start Consultation
+                                    ) : selectedAppointment.status === 'cancelled' ? (
+                                        <button className="action-btn btn-outline" disabled style={{ opacity: 0.6, flex: 1, color: '#ef4444', borderColor: '#fca5a5' }}>
+                                            Appointment Cancelled
                                         </button>
+                                    ) : (
+                                        <>
+                                            <button className="action-btn btn-primary" style={{ flex: 1 }} onClick={handleStartConsultation}>
+                                                Start Consultation
+                                            </button>
+                                            <button
+                                                className="action-btn btn-outline"
+                                                onClick={() => setShowCancelModal(true)}
+                                                style={{ color: '#ef4444', borderColor: '#fca5a5', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                            >
+                                                <CalendarX size={16} /> Cancel Appointment
+                                            </button>
+                                        </>
                                     )}
                                     <button className="action-btn btn-outline" onClick={() => setShowHistory(true)}>
                                         View History
@@ -390,6 +427,16 @@ const DoctorAppointments = ({ appointments = [], setAppointments, onRefresh, loa
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Cancel Appointment Modal */}
+            {showCancelModal && selectedAppointment && (
+                <CancelAppointmentModal
+                    isOpen={showCancelModal}
+                    onClose={() => setShowCancelModal(false)}
+                    appointment={selectedAppointment}
+                    onConfirm={handleCancelAppointment}
+                />
             )}
 
             {/* Toast Notification */}

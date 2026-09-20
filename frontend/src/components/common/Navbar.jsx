@@ -117,19 +117,34 @@ const Navbar = () => {
                     </Link>
 
                     {user ? (
-                        <Link to="/portal">
+                        <Link to={(() => {
+                            const role = (user.role || '').toUpperCase();
+                            if (role === 'ADMIN') return '/portal/admin';
+                            if (role === 'DOCTOR') return '/portal/doctor';
+                            if (role === 'RECEPTION' || role === 'RECEPTIONIST') return '/portal/receptionist';
+                            if (role === 'PHARMACY') return '/portal/pharmacy';
+                            if (role === 'STAFF') return '/portal/staff';
+                            return '/patient';
+                        })()}>
                             <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
                                 <UserCheck size={16} />
-                                <span>Portal ({user.role})</span>
+                                <span>{user.role === 'ADMIN' || user.role === 'admin' ? 'Admin Console' : `Portal (${user.role})`}</span>
                             </button>
                         </Link>
                     ) : (
-                        <Link to="/login">
-                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
-                                <ShieldCheck size={16} />
-                                <span>Staff Login</span>
-                            </button>
-                        </Link>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Link to="/register">
+                                <button className="btn btn-outline" style={{ padding: '0.5rem 0.9rem', fontSize: '0.88rem', borderRadius: '8px', color: '#0f172a', borderColor: '#cbd5e1' }}>
+                                    <span>Register</span>
+                                </button>
+                            </Link>
+                            <Link to="/login">
+                                <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
+                                    <ShieldCheck size={16} />
+                                    <span>Sign In</span>
+                                </button>
+                            </Link>
+                        </div>
                     )}
 
                     {/* Mobile Hamburger Button */}

@@ -14,11 +14,21 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Fix 4: Harden Role Guard & Normalization check
-    // We compare Uppercase to Uppercase to be safe
-    if (allowedRoles) {
-        const userRole = user?.role?.toUpperCase();
-        const hasPermission = allowedRoles.some(role => role.toUpperCase() === userRole);
+    // Harden Role Guard & Normalization check with role synonyms
+    if (allowedRoles && allowedRoles.length > 0) {
+        const normalize = (r) => {
+            if (!r) return '';
+            const upper = r.toUpperCase().trim();
+            if (upper === 'RECEPTION' || upper === 'RECEPTIONIST') return 'RECEPTIONIST';
+            if (upper === 'PHARMACY' || upper === 'PHARMACIST') return 'PHARMACY';
+            if (upper === 'STAFF' || upper === 'NURSE' || upper === 'WARD') return 'STAFF';
+            if (upper === 'DOCTOR' || upper === 'DOC') return 'DOCTOR';
+            if (upper === 'ADMIN' || upper === 'ADMINISTRATOR') return 'ADMIN';
+            return upper;
+        };
+
+        const userRole = normalize(user?.role);
+        const hasPermission = allowedRoles.some(role => normalize(role) === userRole);
 
         if (!hasPermission) {
             return <Navigate to="/unauthorized" replace />;

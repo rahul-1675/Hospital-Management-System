@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Lock, AlertCircle, ShieldCheck, Mail, KeyRound, Eye, EyeOff, Building2 } from 'lucide-react';
+import { Lock, AlertCircle, ShieldCheck, Mail, KeyRound, Eye, EyeOff, Building2, UserPlus, Clock } from 'lucide-react';
 import BrandLogo from '../../components/common/BrandLogo';
 import Button from '../../components/common/Button';
 import LoginBg from '../../assets/LoginBg.png';
@@ -9,7 +9,7 @@ import LoginBg from '../../assets/LoginBg.png';
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login } = useAuth();
+    const { login, user, isAuthenticated } = useAuth();
 
     // Form State
     const [identifier, setIdentifier] = useState('');
@@ -17,6 +17,42 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    // Auto-redirect if already authenticated (fixes unintentional logout experience)
+    useEffect(() => {
+        if (isAuthenticated && user) {
+            const redirectPath = location.state?.redirect || location.state?.from?.pathname || location.state?.from;
+            if (redirectPath) {
+                navigate(redirectPath, { replace: true });
+                return;
+            }
+
+            const normalizedRole = (user.role || '').toUpperCase();
+            switch (normalizedRole) {
+                case 'ADMIN':
+                    navigate('/portal/admin', { replace: true });
+                    break;
+                case 'DOCTOR':
+                    navigate('/portal/doctor', { replace: true });
+                    break;
+                case 'RECEPTION':
+                case 'RECEPTIONIST':
+                    navigate('/portal/receptionist', { replace: true });
+                    break;
+                case 'PHARMACY':
+                    navigate('/portal/pharmacy', { replace: true });
+                    break;
+                case 'STAFF':
+                    navigate('/portal/staff', { replace: true });
+                    break;
+                case 'PATIENT':
+                    navigate('/patient', { replace: true });
+                    break;
+                default:
+                    navigate('/portal', { replace: true });
+            }
+        }
+    }, [isAuthenticated, user, navigate, location.state]);
 
     const from = location.state?.from?.pathname || null;
 
@@ -43,12 +79,14 @@ const Login = () => {
                 return;
             }
 
-            const normalizedRole = result.role;
+            const normalizedRole = (result.role || '').toUpperCase();
             switch (normalizedRole) {
                 case "ADMIN":
+                case "ADMINISTRATOR":
                     navigate("/portal/admin");
                     break;
                 case "DOCTOR":
+                case "DOC":
                     navigate("/portal/doctor");
                     break;
                 case "RECEPTION":
@@ -56,9 +94,12 @@ const Login = () => {
                     navigate("/portal/receptionist");
                     break;
                 case "PHARMACY":
+                case "PHARMACIST":
                     navigate("/portal/pharmacy");
                     break;
                 case "STAFF":
+                case "NURSE":
+                case "WARD":
                     navigate("/portal/staff");
                     break;
                 case "PATIENT":
@@ -218,9 +259,22 @@ const Login = () => {
                     </Button>
                 </form>
 
+                {/* Register Link */}
+                <div style={{
+                    marginTop: '1.5rem',
+                    textAlign: 'center',
+                    fontSize: '0.88rem',
+                    color: '#64748b'
+                }}>
+                    Need a new account?{' '}
+                    <Link to="/register" style={{ color: '#0284c7', fontWeight: 700, textDecoration: 'none' }}>
+                        Register for access
+                    </Link>
+                </div>
+
                 {/* Footer Security Notice */}
                 <div style={{
-                    marginTop: '2rem',
+                    marginTop: '1.5rem',
                     textAlign: 'center',
                     paddingTop: '1.25rem',
                     borderTop: '1px solid #f1f5f9',

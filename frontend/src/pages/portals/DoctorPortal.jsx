@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import '../../styles/doctor-portal.css';
-import DoctorBg from '../../assets/Doctor.jpg';
 import DoctorSidebar from '../../components/doctor/layout/DoctorSidebar';
 import DoctorDashboard from '../../components/doctor/pages/DoctorDashboard';
 import DoctorAppointments from '../../components/doctor/pages/DoctorAppointments';
@@ -52,10 +51,8 @@ const DoctorPortal = () => {
 
     return (
         <div className="doctor-portal-container" style={{
-            backgroundImage: `url(${DoctorBg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f0fdf4 30%, #f1f5f9 100%)',
+            minHeight: '100vh'
         }}>
             <DoctorSidebar
                 activeTab={activeTab}

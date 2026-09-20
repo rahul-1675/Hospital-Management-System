@@ -17,5 +17,9 @@ router.put('/queue', receptionController.updateQueueState);
 router.get('/invoices', receptionController.getInvoices);
 router.post('/invoices', receptionController.createInvoice);
 
+router.get('/patients/pending', receptionController.getPendingPatients);
+router.patch('/patients/:id/approve', receptionController.approvePatient);
+router.patch('/patients/:id/reject', receptionController.rejectPatient);
+
 export default router;
 

@@ -11,6 +11,8 @@ import PatientForm from '../pages/public/PatientForm'; // Future file
 
 // Auth Pages
 import Login from '../pages/auth/Login';
+import Register from '../pages/auth/Register';
+import { useAuth } from '../hooks/useAuth';
 
 // Portals
 import AdminPortal from '../pages/portals/AdminPortal';
@@ -23,6 +25,37 @@ import PatientPortal from '../pages/portals/PatientPortal';
 // Error Pages
 import Unauthorized from '../pages/Unauthorized';
 import NotFound from '../pages/NotFound';
+
+// Smart redirect for /portal index
+const PortalIndexRedirect = () => {
+    const { user, isAuthenticated } = useAuth();
+    if (!isAuthenticated || !user) {
+        return <Navigate to="/login" replace />;
+    }
+    const role = (user.role || '').toUpperCase();
+    switch (role) {
+        case 'ADMIN':
+        case 'ADMINISTRATOR':
+            return <Navigate to="/portal/admin" replace />;
+        case 'DOCTOR':
+        case 'DOC':
+            return <Navigate to="/portal/doctor" replace />;
+        case 'RECEPTION':
+        case 'RECEPTIONIST':
+            return <Navigate to="/portal/receptionist" replace />;
+        case 'PHARMACY':
+        case 'PHARMACIST':
+            return <Navigate to="/portal/pharmacy" replace />;
+        case 'STAFF':
+        case 'NURSE':
+        case 'WARD':
+            return <Navigate to="/portal/staff" replace />;
+        case 'PATIENT':
+            return <Navigate to="/patient" replace />;
+        default:
+            return <Navigate to="/portal/admin" replace />;
+    }
+};
 
 export const router = createBrowserRouter([
     {
@@ -39,7 +72,6 @@ export const router = createBrowserRouter([
             { path: 'reviews', element: <Feedback /> },
             { path: 'patient', element: <PatientPortal /> },
             { path: 'doctors', element: <PatientPortal /> },
-            // { path: 'patient/form', element: <PatientForm /> }, // Moved to top level for no layout
         ],
     },
     {
@@ -47,8 +79,20 @@ export const router = createBrowserRouter([
         element: <Login />,
     },
     {
+        path: '/register',
+        element: <Register />,
+    },
+    {
         path: '/unauthorized',
         element: <Unauthorized />,
+    },
+    {
+        path: '/patient',
+        element: (
+            <PublicLayout>
+                <PatientPortal />
+            </PublicLayout>
+        ),
     },
     {
         element: <AuthLayout />,
@@ -64,12 +108,12 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <Navigate to="/login" replace />,
+                element: <PortalIndexRedirect />,
             },
             {
                 path: 'admin',
                 element: (
-                    <ProtectedRoute allowedRoles={['admin']}>
+                    <ProtectedRoute allowedRoles={['admin', 'administrator']}>
                         <AdminPortal />
                     </ProtectedRoute>
                 ),
@@ -77,7 +121,7 @@ export const router = createBrowserRouter([
             {
                 path: 'doctor',
                 element: (
-                    <ProtectedRoute allowedRoles={['doctor']}>
+                    <ProtectedRoute allowedRoles={['doctor', 'doc']}>
                         <DoctorPortal />
                     </ProtectedRoute>
                 ),
@@ -85,7 +129,7 @@ export const router = createBrowserRouter([
             {
                 path: 'receptionist',
                 element: (
-                    <ProtectedRoute allowedRoles={['receptionist']}>
+                    <ProtectedRoute allowedRoles={['receptionist', 'reception']}>
                         <ReceptionistPortal />
                     </ProtectedRoute>
                 ),
@@ -93,7 +137,7 @@ export const router = createBrowserRouter([
             {
                 path: 'pharmacy',
                 element: (
-                    <ProtectedRoute allowedRoles={['pharmacy']}>
+                    <ProtectedRoute allowedRoles={['pharmacy', 'pharmacist']}>
                         <PharmacyPortal />
                     </ProtectedRoute>
                 ),
@@ -101,8 +145,16 @@ export const router = createBrowserRouter([
             {
                 path: 'staff',
                 element: (
-                    <ProtectedRoute allowedRoles={['staff']}>
+                    <ProtectedRoute allowedRoles={['staff', 'nurse', 'ward']}>
                         <StaffPortal />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: 'patient',
+                element: (
+                    <ProtectedRoute allowedRoles={['patient']}>
+                        <PatientPortal />
                     </ProtectedRoute>
                 ),
             },

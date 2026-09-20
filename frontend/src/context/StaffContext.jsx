@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { staffService } from '../services/staff.service';
+import { useAuth } from '../hooks/useAuth';
 
 const StaffContext = createContext();
 
@@ -65,19 +66,32 @@ const initialSchedule = [
 ];
 
 export const StaffProvider = ({ children }) => {
+    const { user } = useAuth();
     const [staffData, setStaffData] = useState({
-        id: "STF001",
-        name: "Sarah Jenkins",
-        role: "Nurse / Staff",
-        email: "sarah.j@hms.com",
-        phone: "+1 (555) 123-9999",
-        department: "General Ward",
+        id: user?.staffId || user?.id || "STF001",
+        name: user?.name || "Staff Member Mike",
+        role: "Nurse / Ward Staff",
+        email: user?.email || "mike@hms.com",
+        phone: user?.phone || "+1 555-0104",
+        department: "General Ops & Ward",
         shift: {
             status: "ON",
             startTime: Date.now() - 3600000,
             endTime: Date.now() + 14400000
         }
     });
+
+    useEffect(() => {
+        if (user) {
+            setStaffData(prev => ({
+                ...prev,
+                id: user.staffId || user.id || prev.id,
+                name: user.name || prev.name,
+                email: user.email || prev.email,
+                phone: user.phone || prev.phone
+            }));
+        }
+    }, [user]);
 
     const [tasks, setTasks] = useState(initialTasks);
     const [schedule, setSchedule] = useState(initialSchedule);

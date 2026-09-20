@@ -135,6 +135,59 @@ export const doctorService = {
             console.warn('Failed to submit prescription to backend', err);
             return null;
         }
+    },
+
+    cancelAppointment: async (id, reason) => {
+        try {
+            const res = await apiClient.post(`/doctors/portal/appointments/${id}/cancel`, { reason });
+            return res || { success: true };
+        } catch (err) {
+            console.warn(`Failed to cancel appointment ${id}:`, err);
+            return { success: false, error: err.message };
+        }
+    },
+
+    getPatientRemovalRequests: async (doctorId) => {
+        try {
+            const query = doctorId ? `?doctorId=${encodeURIComponent(doctorId)}` : '';
+            const res = await apiClient.get(`/doctors/portal/patient-removal-requests${query}`);
+            const data = res?.data || res;
+            return Array.isArray(data) ? data : [];
+        } catch (err) {
+            console.warn('Failed to fetch patient removal requests:', err);
+            return [];
+        }
+    },
+
+    requestPatientRemoval: async (data) => {
+        try {
+            const res = await apiClient.post('/doctors/portal/patient-removal-requests', data);
+            return res || { success: true };
+        } catch (err) {
+            console.warn('Failed to request patient removal:', err);
+            return { success: false, error: err.message };
+        }
+    },
+
+    getDoctorProfile: async (email) => {
+        try {
+            const query = email ? `?email=${encodeURIComponent(email)}` : '';
+            const res = await apiClient.get(`/doctors/portal/profile${query}`);
+            return res?.data || res || null;
+        } catch (err) {
+            console.warn('Failed to fetch doctor profile:', err);
+            return null;
+        }
+    },
+
+    updateDoctorProfile: async (data) => {
+        try {
+            const res = await apiClient.put('/doctors/portal/profile', data);
+            return res || { success: true };
+        } catch (err) {
+            console.warn('Failed to update doctor profile:', err);
+            return { success: false, error: err.message };
+        }
     }
 };
 

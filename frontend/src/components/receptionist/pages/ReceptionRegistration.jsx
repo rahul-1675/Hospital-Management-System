@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { UserPlus, Save, X, CheckCircle, Loader2 } from 'lucide-react';
+import { UserPlus, Save, X, CheckCircle, Loader2, Clock, Check, Trash2, ShieldCheck, Search, Users } from 'lucide-react';
 import { useReception } from '../../../context/ReceptionContext';
 
 const ReceptionRegistration = () => {
-    const { doctorsList, registerNewPatient } = useReception();
+    const { doctorsList, registerNewPatient, pendingPatients, approvePatient, rejectPatient } = useReception();
+    const [activeSubTab, setActiveSubTab] = useState('walkin'); // 'walkin' or 'online-approvals'
     const [loading, setLoading] = useState(false);
+    const [actionLoadingId, setActionLoadingId] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -25,6 +28,28 @@ const ReceptionRegistration = () => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
+
+    const handleApprovePatient = async (patient) => {
+        const pId = patient._id || patient.id || patient.staffId;
+        setActionLoadingId(pId);
+        await approvePatient(pId);
+        setActionLoadingId(null);
+    };
+
+    const handleRejectPatient = async (patient) => {
+        const pId = patient._id || patient.id || patient.staffId;
+        if (!window.confirm(`Reject online registration for ${patient.name}?`)) return;
+        setActionLoadingId(pId);
+        await rejectPatient(pId);
+        setActionLoadingId(null);
+    };
+
+    const filteredPending = (pendingPatients || []).filter(p => {
+        const q = searchTerm.toLowerCase();
+        return (p.name || '').toLowerCase().includes(q) ||
+            (p.email || '').toLowerCase().includes(q) ||
+            (p.phone || '').includes(q);
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -77,37 +102,206 @@ const ReceptionRegistration = () => {
         : doctorsList;
 
     return (
-        <div style={{ padding: '2rem', height: '100%', overflowY: 'auto', display: 'flex', justifyContent: 'center' }}>
-            <div className="detail-card" style={{ maxWidth: '800px', width: '100%', padding: '2.5rem' }}>
-                <div className="detail-header" style={{ borderBottom: '1px solid var(--reception-border)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
-                    <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>
-                        <UserPlus size={28} color="var(--reception-primary)" />
-                        New Patient Intake & Registration
-                    </h1>
-                    <p className="text-label" style={{ marginTop: '0.5rem', fontSize: '0.95rem' }}>
-                        Register walk-in patients and instantly issue an OPD queue token.
-                    </p>
+        <div style={{ padding: '2rem', height: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Tab selector */}
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', maxWidth: '800px', width: '100%' }}>
+                <button
+                    onClick={() => setActiveSubTab('walkin')}
+                    className="action-btn"
+                    style={{
+                        background: activeSubTab === 'walkin' ? '#0284c7' : '#ffffff',
+                        color: activeSubTab === 'walkin' ? '#ffffff' : '#334155',
+                        border: '1px solid',
+                        borderColor: activeSubTab === 'walkin' ? '#0284c7' : '#e2e8f0',
+                        fontWeight: 700,
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}
+                >
+                    <UserPlus size={18} />
+                    <span>Walk-in Patient Intake</span>
+                </button>
+                <button
+                    onClick={() => setActiveSubTab('online-approvals')}
+                    className="action-btn"
+                    style={{
+                        background: activeSubTab === 'online-approvals' ? '#0284c7' : '#ffffff',
+                        color: activeSubTab === 'online-approvals' ? '#ffffff' : '#334155',
+                        border: '1px solid',
+                        borderColor: activeSubTab === 'online-approvals' ? '#0284c7' : '#e2e8f0',
+                        fontWeight: 700,
+                        padding: '0.65rem 1.25rem',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}
+                >
+                    <Clock size={18} color={activeSubTab === 'online-approvals' ? '#ffffff' : '#d97706'} />
+                    <span>Online Patient Approvals</span>
+                    {pendingPatients.length > 0 && (
+                        <span style={{
+                            background: activeSubTab === 'online-approvals' ? '#ffffff' : '#d97706',
+                            color: activeSubTab === 'online-approvals' ? '#0284c7' : '#ffffff',
+                            padding: '0.15rem 0.55rem',
+                            borderRadius: '99px',
+                            fontSize: '0.75rem',
+                            fontWeight: 800
+                        }}>
+                            {pendingPatients.length}
+                        </span>
+                    )}
+                </button>
+            </div>
+
+            {activeSubTab === 'online-approvals' ? (
+                <div className="detail-card" style={{ maxWidth: '800px', width: '100%', padding: '2.5rem' }}>
+                    <div className="detail-header" style={{ borderBottom: '1px solid var(--reception-border)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+                        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>
+                            <Clock size={28} color="#d97706" />
+                            Online Patient Account Approvals
+                        </h1>
+                        <p className="text-label" style={{ marginTop: '0.5rem', fontSize: '0.95rem' }}>
+                            Verify patient registrations created online and activate their accounts for appointment bookings.
+                        </p>
+                    </div>
+
+                    <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+                        <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                        <input
+                            type="text"
+                            placeholder="Search by patient name, email, or phone..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="form-input"
+                            style={{ paddingLeft: '2.5rem', width: '100%', boxSizing: 'border-box' }}
+                        />
+                    </div>
+
+                    {filteredPending.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '3.5rem 1rem', color: '#94a3b8' }}>
+                            <Users size={48} style={{ opacity: 0.3, margin: '0 auto 1rem' }} />
+                            <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#64748b' }}>No Pending Patient Registrations</h3>
+                            <p style={{ margin: '0.35rem 0 0', fontSize: '0.88rem' }}>All online patient accounts have been processed.</p>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {filteredPending.map(patient => {
+                                const id = patient._id || patient.id || patient.staffId;
+                                const isActionLoading = actionLoadingId === id;
+
+                                return (
+                                    <div
+                                        key={id}
+                                        style={{
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '14px',
+                                            padding: '1.25rem 1.5rem',
+                                            background: '#ffffff',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            gap: '1rem',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                            <div style={{
+                                                width: '48px', height: '48px', borderRadius: '12px',
+                                                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                                                color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                fontSize: '1.25rem', fontWeight: 800
+                                            }}>
+                                                {patient.name ? patient.name.charAt(0).toUpperCase() : 'P'}
+                                            </div>
+                                            <div>
+                                                <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>
+                                                    {patient.name}
+                                                </h4>
+                                                <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.82rem', color: '#64748b', marginTop: '3px' }}>
+                                                    <span>{patient.email}</span>
+                                                    {patient.phone && <span>• {patient.phone}</span>}
+                                                    <span style={{ color: '#d97706', fontWeight: 700 }}>• Pending Approval</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ display: 'flex', gap: '0.6rem' }}>
+                                            <button
+                                                disabled={isActionLoading}
+                                                onClick={() => handleApprovePatient(patient)}
+                                                className="action-btn"
+                                                style={{
+                                                    background: '#10b981',
+                                                    color: '#ffffff',
+                                                    border: 'none',
+                                                    padding: '0.5rem 0.9rem',
+                                                    borderRadius: '8px',
+                                                    fontWeight: 700,
+                                                    fontSize: '0.85rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '0.35rem'
+                                                }}
+                                            >
+                                                <Check size={16} />
+                                                <span>Approve & Activate</span>
+                                            </button>
+                                            <button
+                                                disabled={isActionLoading}
+                                                onClick={() => handleRejectPatient(patient)}
+                                                className="action-btn btn-outline"
+                                                style={{
+                                                    color: '#ef4444',
+                                                    borderColor: '#fca5a5',
+                                                    padding: '0.5rem 0.75rem',
+                                                    borderRadius: '8px',
+                                                    fontSize: '0.85rem'
+                                                }}
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
-
-                {error && (
-                    <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '8px', color: '#b91c1c', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-                        {error}
+            ) : (
+                <div className="detail-card" style={{ maxWidth: '800px', width: '100%', padding: '2.5rem' }}>
+                    <div className="detail-header" style={{ borderBottom: '1px solid var(--reception-border)', paddingBottom: '1.5rem', marginBottom: '2rem' }}>
+                        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.75rem', fontWeight: 800, margin: 0 }}>
+                            <UserPlus size={28} color="var(--reception-primary)" />
+                            New Patient Intake & Registration
+                        </h1>
+                        <p className="text-label" style={{ marginTop: '0.5rem', fontSize: '0.95rem' }}>
+                            Register walk-in patients and instantly issue an OPD queue token.
+                        </p>
                     </div>
-                )}
 
-                {submitted ? (
-                    <div style={{ padding: '3rem', background: '#f0fdf4', border: '1px solid var(--reception-success)', borderRadius: '12px', textAlign: 'center', color: 'var(--reception-text-main)', marginBottom: '2rem' }}>
-                        <CheckCircle size={48} color="var(--reception-success)" style={{ margin: '0 auto 1rem' }} />
-                        <h3 style={{ color: 'var(--reception-success)', marginBottom: '0.5rem', fontSize: '1.35rem', fontWeight: 700 }}>Registration Successful!</h3>
-                        <p style={{ margin: 0, color: '#475569' }}>The patient has been saved to the database and assigned an OPD queue token.</p>
-                        <button
-                            className="action-btn btn-primary"
-                            style={{ marginTop: '1.5rem' }}
-                            onClick={() => setSubmitted(false)}
-                        >
-                            Register Another Patient
-                        </button>
-                    </div>
+                    {error && (
+                        <div style={{ padding: '1rem', background: '#fef2f2', border: '1px solid #fee2e2', borderRadius: '8px', color: '#b91c1c', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                            {error}
+                        </div>
+                    )}
+
+                    {submitted ? (
+                        <div style={{ padding: '3rem', background: '#f0fdf4', border: '1px solid var(--reception-success)', borderRadius: '12px', textAlign: 'center', color: 'var(--reception-text-main)', marginBottom: '2rem' }}>
+                            <CheckCircle size={48} color="var(--reception-success)" style={{ margin: '0 auto 1rem' }} />
+                            <h3 style={{ color: 'var(--reception-success)', marginBottom: '0.5rem', fontSize: '1.35rem', fontWeight: 700 }}>Registration Successful!</h3>
+                            <p style={{ margin: 0, color: '#475569' }}>The patient has been saved to the database and assigned an OPD queue token.</p>
+                            <button
+                                className="action-btn btn-primary"
+                                style={{ marginTop: '1.5rem' }}
+                                onClick={() => setSubmitted(false)}
+                            >
+                                Register Another Patient
+                            </button>
+                        </div>
                 ) : (
                     <form onSubmit={handleSubmit}>
                         <h3 className="section-title">Personal Information</h3>
@@ -210,6 +404,7 @@ const ReceptionRegistration = () => {
                     </form>
                 )}
             </div>
+            )}
         </div>
     );
 };

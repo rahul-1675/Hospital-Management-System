@@ -94,5 +94,33 @@ export const receptionService = {
             console.warn('Failed to create invoice on backend', err);
             return null;
         }
+    },
+
+    getPendingPatients: async () => {
+        try {
+            const res = await apiClient.get('/reception/patients/pending');
+            return res.data || [];
+        } catch (err) {
+            console.warn('Failed to fetch pending patients on backend', err);
+            return [];
+        }
+    },
+
+    approvePatient: async (id) => {
+        try {
+            return await apiClient.patch(`/reception/patients/${id}/approve`);
+        } catch (err) {
+            console.warn('Failed to approve patient on backend', err);
+            throw err;
+        }
+    },
+
+    rejectPatient: async (id) => {
+        try {
+            return await apiClient.patch(`/reception/patients/${id}/reject`);
+        } catch (err) {
+            console.warn('Failed to reject patient on backend', err);
+            throw err;
+        }
     }
 };

@@ -445,6 +445,105 @@ export const receptionController = {
         } catch (error) {
             return res.status(500).json({ success: false, message: error.message });
         }
+    },
+
+    // GET /api/reception/patients/pending
+    getPendingPatients: async (req, res) => {
+        try {
+            if (mongoose.connection.readyState === 1) {
+                const pendingPatients = await User.find({ role: 'patient', status: 'Pending' })
+                    .select('-passwordHash')
+                    .sort({ createdAt: -1 })
+                    .lean();
+                return res.json({ success: true, data: pendingPatients });
+            }
+
+            const pending = mockUsers.filter(u => u.role === 'patient' && u.status === 'Pending');
+            return res.json({ success: true, data: pending });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // PATCH /api/reception/patients/:id/approve
+    approvePatient: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            if (mongoose.connection.readyState === 1) {
+                const query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { staffId: id };
+                const user = await User.findOne(query);
+                if (!user) {
+                    return res.status(404).json({ success: false, message: 'Patient not found' });
+                }
+
+                user.status = 'Active';
+                user.notifications.push({
+                    id: Date.now().toString(),
+                    title: 'Patient Account Activated',
+                    message: 'Your patient account has been verified and activated by the Reception Desk. You may now sign in and manage your health records.',
+                    type: 'SYSTEM',
+                    date: new Date().toISOString()
+                });
+                await user.save();
+
+                return res.json({
+                    success: true,
+                    message: `Patient ${user.name} approved and activated successfully.`,
+                    patient: user
+                });
+            }
+
+            const user = mockUsers.find(u => u.staffId === id || u.id === id || u._id === id);
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'Patient not found' });
+            }
+
+            user.status = 'Active';
+            return res.json({
+                success: true,
+                message: `Patient ${user.name} approved and activated successfully.`,
+                patient: user
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // PATCH /api/reception/patients/:id/reject
+    rejectPatient: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            if (mongoose.connection.readyState === 1) {
+                const query = mongoose.Types.ObjectId.isValid(id) ? { _id: id } : { staffId: id };
+                const user = await User.findOne(query);
+                if (!user) {
+                    return res.status(404).json({ success: false, message: 'Patient not found' });
+                }
+
+                user.status = 'Rejected';
+                await user.save();
+
+                return res.json({
+                    success: true,
+                    message: `Registration for patient ${user.name} was rejected.`
+                });
+            }
+
+            const user = mockUsers.find(u => u.staffId === id || u.id === id || u._id === id);
+            if (!user) {
+                return res.status(404).json({ success: false, message: 'Patient not found' });
+            }
+
+            user.status = 'Rejected';
+            return res.json({
+                success: true,
+                message: `Registration for patient ${user.name} was rejected.`
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 

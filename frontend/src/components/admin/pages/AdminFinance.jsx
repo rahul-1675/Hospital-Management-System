@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useAdmin } from '../../../context/AdminContext';
-import { DollarSign, TrendingUp, AlertCircle, CheckCircle, RotateCcw, Download, Printer, RefreshCw } from 'lucide-react';
+import { DollarSign, TrendingUp, AlertCircle, CheckCircle, RotateCcw, Download, Printer, RefreshCw, Trash2, AlertTriangle } from 'lucide-react';
 
 const AdminFinance = () => {
-    const { invoices, markInvoicePaid, refundInvoice } = useAdmin();
+    const { invoices, markInvoicePaid, refundInvoice, deleteInvoice } = useAdmin();
     const [refundId, setRefundId] = useState(null);
+    const [deleteInvoiceId, setDeleteInvoiceId] = useState(null);
     const [selectedInvoiceForReceipt, setSelectedInvoiceForReceipt] = useState(null);
 
     // Compute dynamic financial KPIs from live invoice records
@@ -18,6 +19,13 @@ const AdminFinance = () => {
         if (refundId) {
             refundInvoice(refundId);
             setRefundId(null);
+        }
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (deleteInvoiceId) {
+            await deleteInvoice(deleteInvoiceId);
+            setDeleteInvoiceId(null);
         }
     };
 
@@ -182,6 +190,15 @@ const AdminFinance = () => {
                                                         <RotateCcw size={14} /> Refund
                                                     </button>
                                                 )}
+
+                                                <button
+                                                    className="btn-ghost"
+                                                    title="Delete Invoice Record"
+                                                    style={{ color: '#ef4444', padding: '0.4rem', cursor: 'pointer' }}
+                                                    onClick={() => setDeleteInvoiceId(inv.id)}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -223,20 +240,17 @@ const AdminFinance = () => {
                                 <span style={{ fontWeight: 700, color: '#0f172a' }}>{selectedInvoiceForReceipt.patient}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#64748b' }}>Department:</span>
-                                <span style={{ fontWeight: 600, color: '#0284c7' }}>General Consultation</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
-                                <span style={{ fontWeight: 800, color: '#0f172a' }}>Total Amount:</span>
-                                <span style={{ fontWeight: 800, color: '#059669', fontSize: '1.1rem' }}>
-                                    ${Number(selectedInvoiceForReceipt.amount || 0).toFixed(2)}
+                                <span style={{ color: '#64748b' }}>Payment Status:</span>
+                                <span style={{ fontWeight: 700, color: selectedInvoiceForReceipt.status === 'Paid' ? '#059669' : '#d97706' }}>
+                                    {selectedInvoiceForReceipt.status}
                                 </span>
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#64748b' }}>Status:</span>
-                                <span style={{ fontWeight: 700, color: (selectedInvoiceForReceipt.status || '').toLowerCase() === 'paid' ? '#059669' : '#d97706' }}>
-                                    {(selectedInvoiceForReceipt.status || 'PENDING').toUpperCase()}
-                                </span>
+                        </div>
+
+                        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '12px', marginBottom: '1.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '1.1rem', color: '#0f172a' }}>
+                                <span>Total Amount:</span>
+                                <span>${Number(selectedInvoiceForReceipt.amount || 0).toFixed(2)}</span>
                             </div>
                         </div>
 
@@ -283,9 +297,32 @@ const AdminFinance = () => {
                     </div>
                 </div>
             )}
+
+            {/* Delete Invoice Confirmation Modal */}
+            {deleteInvoiceId && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15,23,42,0.6)',
+                    backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+                }}>
+                    <div className="detail-card" style={{ width: '420px', padding: '2rem', borderRadius: '20px', background: '#ffffff' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ padding: '0.75rem', background: '#fef2f2', borderRadius: '50%', color: '#ef4444' }}>
+                                <AlertTriangle size={24} />
+                            </div>
+                            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: '#0f172a' }}>Delete Invoice?</h2>
+                        </div>
+                        <p style={{ color: '#64748b', fontSize: '0.92rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+                            Are you sure you want to permanently delete billing record <strong>{deleteInvoiceId}</strong>? This action cannot be undone.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <button className="action-btn btn-outline" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setDeleteInvoiceId(null)}>Cancel</button>
+                            <button className="action-btn" style={{ flex: 1, background: '#ef4444', color: 'white', justifyContent: 'center', border: 'none', fontWeight: 700 }} onClick={handleDeleteConfirm}>Delete Invoice</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
 export default AdminFinance;
-

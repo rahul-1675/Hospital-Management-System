@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
-import { Edit, Lock, Save, Camera, Check, Star, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { Edit2, Lock, Save, Check, Star, MessageSquare, ShieldCheck, Mail, Phone, Stethoscope, Award, MapPin, DollarSign, Loader2 } from 'lucide-react';
 import ChangePasswordModal from '../modals/ChangePasswordModal';
-import PeekRating from '../../ui/PeekRating';
 import { reviewService } from '../../../services/review.service';
+import { doctorService } from '../../../services/doctor.service';
 
 const DoctorProfile = () => {
     const { user } = useAuth();
@@ -11,8 +11,39 @@ const DoctorProfile = () => {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [toast, setToast] = useState(null);
     const [reviews, setReviews] = useState([]);
-    const [stats, setStats] = useState({ totalReviews: 0, averageRating: 0 });
+    const [stats, setStats] = useState({ totalReviews: 0, averageRating: 5.0 });
     const [loadingReviews, setLoadingReviews] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    // Initial state matching the user context or defaults
+    const [profileData, setProfileData] = useState({
+        name: user?.name || 'Dr. Sarah Smith',
+        department: user?.department || 'Cardiology',
+        id: user?.staffId || user?.id || 'DOC001',
+        email: user?.email || 'dr.smith@hms.com',
+        phone: user?.phone || '+1 (555) 123-4567',
+        specialization: 'Cardiologist (MD)',
+        experience: '12 Years',
+        roomNumber: 'Room 104',
+        consultationFee: 65
+    });
+
+    useEffect(() => {
+        const fetchDocProfile = async () => {
+            const data = await doctorService.getDoctorProfile(user?.email);
+            if (data) {
+                setProfileData(prev => ({
+                    ...prev,
+                    ...data,
+                    name: data.name || user?.name || prev.name,
+                    email: data.email || user?.email || prev.email,
+                    phone: data.phone || user?.phone || prev.phone,
+                    department: data.department || user?.department || prev.department
+                }));
+            }
+        };
+        fetchDocProfile();
+    }, [user]);
 
     useEffect(() => {
         const loadDocReviews = async () => {
@@ -26,7 +57,7 @@ const DoctorProfile = () => {
                     setStats(res.stats);
                 } else if (list.length > 0) {
                     const sum = list.reduce((acc, r) => acc + (r.rating || 0), 0);
-                    setStats({ totalReviews: list.length, averageRating: Number((sum / list.length).toFixed(2)) });
+                    setStats({ totalReviews: list.length, averageRating: Number((sum / list.length).toFixed(1)) });
                 }
             } catch (err) {
                 console.warn('Could not load doctor reviews:', err);
@@ -36,17 +67,6 @@ const DoctorProfile = () => {
         };
         loadDocReviews();
     }, [user]);
-
-    // Initial state matching the user context or defaults
-    const [profileData, setProfileData] = useState({
-        name: user?.name || 'Dr. Smith',
-        department: 'Cardiology Department',
-        id: user?.id || 'DOC-001',
-        email: user?.email || 'dr.smith@hms.com',
-        phone: '+1 (555) 123-4567',
-        specialization: 'Cardiologist (MD)',
-        experience: '12 Years'
-    });
 
     const showToast = (message) => {
         setToast(message);
@@ -61,10 +81,20 @@ const DoctorProfile = () => {
         }));
     };
 
-    const handleSave = () => {
-        // Simulate API save
-        setIsEditing(false);
-        showToast('Profile updated successfully');
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            await doctorService.updateDoctorProfile({
+                ...profileData,
+                email: user?.email || profileData.email
+            });
+            setIsEditing(false);
+            showToast('Clinical profile updated successfully');
+        } catch (err) {
+            showToast('Failed to save profile updates');
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handlePasswordChangeResult = (success) => {
@@ -75,233 +105,328 @@ const DoctorProfile = () => {
     };
 
     return (
-        <div style={{ padding: '2rem', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ padding: '1.75rem', height: '100%', overflowY: 'auto', display: 'flex', justifyContent: 'center' }}>
+            {toast && (
+                <div style={{
+                    position: 'fixed',
+                    top: '24px',
+                    right: '24px',
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    padding: '0.85rem 1.4rem',
+                    borderRadius: '10px',
+                    zIndex: 9999,
+                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    fontSize: '0.9rem',
+                    fontWeight: 600,
+                    animation: 'fadeIn 0.2s ease'
+                }}>
+                    <Check size={18} color="#10b981" />
+                    {toast}
+                </div>
+            )}
 
-            {/* Background decorative elements */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '30%', background: 'linear-gradient(180deg, var(--doctor-secondary) 0%, transparent 100%)', zIndex: 0 }}></div>
-
-            <div
-                className="detail-card profile-card"
-                style={{
-                    position: 'relative',
-                    width: '100%',
-                    maxWidth: '800px',
-                    zIndex: 1,
-                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                    animation: 'floatUp 0.5s ease-out'
-                }}
-            >
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: '2.5rem', position: 'relative' }}>
-                    <div style={{
-                        width: '120px', height: '120px', margin: '0 auto 1.5rem',
-                        borderRadius: '50%', background: 'var(--doctor-primary)', color: 'white',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '3rem', fontWeight: 'bold', border: '4px solid white',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                    }}>
-                        {profileData.name.charAt(0)}
-                    </div>
-                    {isEditing ? (
-                        <div style={{ marginBottom: '1rem' }}>
-                            <input
-                                type="text"
-                                name="name"
-                                value={profileData.name}
-                                onChange={handleInputChange}
-                                className="search-input"
-                                style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: '700', width: '300px', margin: '0 auto', display: 'block' }}
-                            />
+            <div style={{ width: '100%', maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {/* Main Profile Header Card */}
+                <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '18px',
+                    padding: '1.75rem',
+                    boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.05)',
+                    position: 'relative'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+                            <div style={{
+                                width: '72px',
+                                height: '72px',
+                                borderRadius: '18px',
+                                background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                                color: '#ffffff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '2rem',
+                                fontWeight: 800,
+                                boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)'
+                            }}>
+                                {profileData.name.replace('Dr. ', '').charAt(0) || 'D'}
+                            </div>
+                            <div>
+                                {isEditing ? (
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={profileData.name}
+                                        onChange={handleInputChange}
+                                        className="form-input"
+                                        style={{ fontSize: '1.25rem', fontWeight: 800, padding: '0.4rem 0.6rem', width: '260px' }}
+                                    />
+                                ) : (
+                                    <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#0f172a' }}>
+                                        {profileData.name}
+                                    </h2>
+                                )}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.35rem' }}>
+                                    <span style={{ fontSize: '0.85rem', color: '#0284c7', fontWeight: 700, background: '#e0f2fe', padding: '0.2rem 0.6rem', borderRadius: '6px' }}>
+                                        {profileData.department}
+                                    </span>
+                                    <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+                                        ID: {profileData.id}
+                                    </span>
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.75rem', color: '#16a34a', fontWeight: 700, background: '#dcfce7', padding: '0.2rem 0.5rem', borderRadius: '6px' }}>
+                                        <ShieldCheck size={12} /> Active Physician
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>{profileData.name}</h1>
-                    )}
 
-                    <p style={{ color: 'var(--doctor-text-muted)', fontSize: '1.1rem', marginBottom: '0.25rem' }}>{profileData.department}</p>
-                    <span className="status-badge" style={{ backgroundColor: '#f1f5f9', color: '#64748b' }}>ID: {profileData.id}</span>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            {isEditing ? (
+                                <button
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                    className="action-btn"
+                                    style={{
+                                        background: '#0284c7',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        padding: '0.55rem 1.1rem',
+                                        borderRadius: '8px',
+                                        fontWeight: 700,
+                                        fontSize: '0.85rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.4rem'
+                                    }}
+                                >
+                                    {saving ? <Loader2 size={15} className="spin" /> : <Save size={15} />}
+                                    Save Profile
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="action-btn btn-outline"
+                                    style={{
+                                        padding: '0.55rem 1rem',
+                                        borderRadius: '8px',
+                                        fontSize: '0.85rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.4rem',
+                                        borderColor: '#cbd5e1'
+                                    }}
+                                >
+                                    <Edit2 size={15} /> Edit Info
+                                </button>
+                            )}
+                            <button
+                                onClick={() => setShowPasswordModal(true)}
+                                className="action-btn btn-outline"
+                                style={{
+                                    padding: '0.55rem 1rem',
+                                    borderRadius: '8px',
+                                    fontSize: '0.85rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.4rem',
+                                    borderColor: '#cbd5e1'
+                                }}
+                            >
+                                <Lock size={15} /> Password
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem' }}>
+                        {/* Email */}
+                        <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>
+                                <Mail size={14} /> Email Address
+                            </div>
+                            <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                                {profileData.email}
+                            </span>
+                        </div>
+
+                        {/* Phone */}
+                        <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>
+                                <Phone size={14} /> Contact Phone
+                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={profileData.phone}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    style={{ padding: '0.3rem 0.5rem', fontSize: '0.88rem', width: '100%' }}
+                                />
+                            ) : (
+                                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                                    {profileData.phone}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Specialization */}
+                        <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>
+                                <Stethoscope size={14} /> Specialization & Degrees
+                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    name="specialization"
+                                    value={profileData.specialization}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    style={{ padding: '0.3rem 0.5rem', fontSize: '0.88rem', width: '100%' }}
+                                />
+                            ) : (
+                                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                                    {profileData.specialization}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Experience */}
+                        <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>
+                                <Award size={14} /> Clinical Experience
+                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    name="experience"
+                                    value={profileData.experience}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    style={{ padding: '0.3rem 0.5rem', fontSize: '0.88rem', width: '100%' }}
+                                />
+                            ) : (
+                                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                                    {profileData.experience}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Clinic Room */}
+                        <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>
+                                <MapPin size={14} /> Assigned Consultation Room
+                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    name="roomNumber"
+                                    value={profileData.roomNumber}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    style={{ padding: '0.3rem 0.5rem', fontSize: '0.88rem', width: '100%' }}
+                                />
+                            ) : (
+                                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                                    {profileData.roomNumber}
+                                </span>
+                            )}
+                        </div>
+
+                        {/* Consultation Fee */}
+                        <div style={{ background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#64748b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>
+                                <DollarSign size={14} /> Consultation Fee
+                            </div>
+                            {isEditing ? (
+                                <input
+                                    type="number"
+                                    name="consultationFee"
+                                    value={profileData.consultationFee}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    style={{ padding: '0.3rem 0.5rem', fontSize: '0.88rem', width: '100%' }}
+                                />
+                            ) : (
+                                <span style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b' }}>
+                                    ${profileData.consultationFee} / session
+                                </span>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Body */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', padding: '0 1rem 1rem' }}>
-                    {/* Personal Info */}
-                    <div>
-                        <h3 className="section-title" style={{ borderBottom: '1px solid var(--doctor-border)', paddingBottom: '0.5rem' }}>Personal Information</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
-                            <div>
-                                <label className="text-label" style={{ display: 'block', marginBottom: '0.25rem' }}>Email Address</label>
-                                {isEditing ? (
-                                    <input
-                                        type="email" name="email" value={profileData.email} onChange={handleInputChange}
-                                        className="search-input" style={{ width: '100%' }}
-                                    />
-                                ) : (
-                                    <p className="text-value" style={{ fontSize: '1.05rem' }}>{profileData.email}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="text-label" style={{ display: 'block', marginBottom: '0.25rem' }}>Phone Number</label>
-                                {isEditing ? (
-                                    <input
-                                        type="tel" name="phone" value={profileData.phone} onChange={handleInputChange}
-                                        className="search-input" style={{ width: '100%' }}
-                                    />
-                                ) : (
-                                    <p className="text-value" style={{ fontSize: '1.05rem' }}>{profileData.phone}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Professional Info */}
-                    <div>
-                        <h3 className="section-title" style={{ borderBottom: '1px solid var(--doctor-border)', paddingBottom: '0.5rem' }}>Professional Details</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
-                            <div>
-                                <label className="text-label" style={{ display: 'block', marginBottom: '0.25rem' }}>Specialization</label>
-                                {isEditing ? (
-                                    <input
-                                        type="text" name="specialization" value={profileData.specialization} onChange={handleInputChange}
-                                        className="search-input" style={{ width: '100%' }}
-                                    />
-                                ) : (
-                                    <p className="text-value" style={{ fontSize: '1.05rem' }}>{profileData.specialization}</p>
-                                )}
-                            </div>
-                            <div>
-                                <label className="text-label" style={{ display: 'block', marginBottom: '0.25rem' }}>Years of Experience</label>
-                                {isEditing ? (
-                                    <input
-                                        type="text" name="experience" value={profileData.experience} onChange={handleInputChange}
-                                        className="search-input" style={{ width: '100%' }}
-                                    />
-                                ) : (
-                                    <p className="text-value" style={{ fontSize: '1.05rem' }}>{profileData.experience}</p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Patient Reviews & Ratings Section */}
-                <div style={{ marginTop: '2rem', borderTop: '1px solid var(--doctor-border)', paddingTop: '1.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                {/* Ratings and Reviews Card */}
+                <div style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '18px',
+                    padding: '1.5rem',
+                    boxShadow: '0 4px 16px -2px rgba(0, 0, 0, 0.05)'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                         <div>
-                            <h3 className="section-title" style={{ margin: 0 }}>Patient Reviews & Ratings</h3>
-                            <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: 'var(--doctor-text-muted)' }}>
-                                Real ratings from verified patient appointments
+                            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                                Verified Patient Reviews & Rating
+                            </h3>
+                            <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: '#64748b' }}>
+                                Aggregate feedback from completed patient consultations
                             </p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                            <PeekRating
-                                value={Math.round(stats.averageRating) || 0}
-                                count={5}
-                                shape="star"
-                                readOnly={true}
-                                size={18}
-                                activeColor="#f5b400"
-                                idleColor="#cbd5e1"
-                            />
-                            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: '0.95rem' }}>
-                                {stats.averageRating > 0 ? stats.averageRating : '5.0'} / 5.0
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fef3c7', padding: '0.4rem 0.8rem', borderRadius: '10px' }}>
+                            <Star size={16} fill="#f59e0b" color="#f59e0b" />
+                            <span style={{ fontWeight: 800, color: '#92400e', fontSize: '1rem' }}>
+                                {stats.averageRating || '5.0'}
+                            </span>
+                            <span style={{ fontSize: '0.78rem', color: '#b45309', fontWeight: 600 }}>
+                                ({stats.totalReviews} reviews)
                             </span>
                         </div>
                     </div>
 
-                    {reviews.length === 0 ? (
-                        <div style={{ padding: '1.5rem', textAlign: 'center', background: '#f8fafc', borderRadius: '10px', color: '#64748b' }}>
-                            <p style={{ margin: 0, fontSize: '0.88rem' }}>No patient reviews received yet.</p>
+                    {loadingReviews ? (
+                        <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                            <Loader2 size={24} className="spin" style={{ margin: '0 auto' }} />
+                        </div>
+                    ) : reviews.length === 0 ? (
+                        <div style={{ padding: '1.5rem', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', color: '#64748b', fontSize: '0.88rem' }}>
+                            <MessageSquare size={28} style={{ opacity: 0.3, margin: '0 auto 0.5rem' }} />
+                            <p style={{ margin: 0 }}>No verified patient reviews recorded yet.</p>
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '240px', overflowY: 'auto' }}>
-                            {reviews.map((r) => (
-                                <div key={r._id || r.id} style={{ padding: '0.85rem 1rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>
-                                            <span>{r.patientName || 'Verified Patient'}</span>
-                                            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '2px' }}>
-                                                <CheckCircle2 size={11} /> Verified
-                                            </span>
+                            {reviews.map((rev, idx) => (
+                                <div key={rev._id || rev.id || idx} style={{ padding: '0.85rem 1rem', background: '#f8fafc', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                                        <span style={{ fontWeight: 700, fontSize: '0.88rem', color: '#1e293b' }}>{rev.patientName || 'Verified Patient'}</span>
+                                        <div style={{ display: 'flex', gap: '2px' }}>
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} size={12} fill={i < (rev.rating || 5) ? '#f59e0b' : '#e2e8f0'} color={i < (rev.rating || 5) ? '#f59e0b' : '#cbd5e1'} />
+                                            ))}
                                         </div>
-                                        <PeekRating value={r.rating} count={5} shape="star" readOnly={true} size={14} activeColor="#f5b400" idleColor="#e2e8f0" />
                                     </div>
-                                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#334155', lineHeight: 1.4 }}>
-                                        "{r.comment}"
+                                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#475569', lineHeight: 1.4 }}>
+                                        {rev.comment || 'Excellent physician care and clear treatment plan.'}
                                     </p>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
-
-                {/* Action Footer */}
-                <div style={{ marginTop: '3rem', paddingTop: '1.5rem', borderTop: '1px solid var(--doctor-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <button
-                        onClick={() => setShowPasswordModal(true)}
-                        className="action-btn btn-outline"
-                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--doctor-text-muted)' }}
-                    >
-                        <Lock size={16} /> Change Password
-                    </button>
-
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        {isEditing ? (
-                            <button
-                                onClick={handleSave}
-                                className="action-btn btn-primary"
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                            >
-                                <Save size={18} /> Save Changes
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="action-btn btn-primary"
-                                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                            >
-                                <Edit size={18} /> Edit Profile
-                            </button>
-                        )}
-                    </div>
-                </div>
             </div>
 
-            {/* Modals */}
-            <ChangePasswordModal
-                isOpen={showPasswordModal}
-                onClose={handlePasswordChangeResult}
-            />
-
-            {/* Toast Notification */}
-            {toast && (
-                <div style={{
-                    position: 'fixed', bottom: '2rem', right: '2rem',
-                    backgroundColor: '#10b981', color: 'white',
-                    padding: '1rem 1.5rem', borderRadius: '8px',
-                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                    display: 'flex', alignItems: 'center', gap: '0.75rem',
-                    zIndex: 2000, animation: 'slideUp 0.3s ease-out'
-                }}>
-                    <Check size={20} />
-                    <span style={{ fontWeight: '600' }}>{toast}</span>
-                </div>
+            {showPasswordModal && (
+                <ChangePasswordModal
+                    isOpen={showPasswordModal}
+                    onClose={() => setShowPasswordModal(false)}
+                    onSuccess={() => handlePasswordChangeResult(true)}
+                />
             )}
-
-            <style>
-                {`
-                    @keyframes floatUp {
-                        from { opacity: 0; transform: translateY(20px); }
-                        to { opacity: 1; transform: translateY(0); }
-                    }
-                    .profile-card {
-                        transition: transform 0.3s ease;
-                    }
-                    @media (min-width: 1024px) {
-                        .profile-card:hover {
-                            transform: translateY(-5px);
-                        }
-                    }
-                `}
-            </style>
         </div>
     );
 };

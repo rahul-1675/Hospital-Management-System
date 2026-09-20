@@ -113,6 +113,35 @@ export const AdminProvider = ({ children }) => {
         }
     };
 
+    const approveUser = async (id) => {
+        try {
+            const res = await adminService.approveUser(id);
+            if (res && res.success && res.user) {
+                setUsers(prev => prev.map(u => (u.id === id || u._id === id) ? { ...u, status: 'Active' } : u));
+                logAction('Admin', 'APPROVE_USER', `${res.user.name || id} activated`, 'Success');
+                return { success: true, user: res.user };
+            }
+            setUsers(prev => prev.map(u => (u.id === id || u._id === id) ? { ...u, status: 'Active' } : u));
+            logAction('Admin', 'APPROVE_USER', `ID: ${id} activated`, 'Success');
+            return { success: true };
+        } catch (err) {
+            console.error('Error approving user:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const rejectUser = async (id) => {
+        try {
+            const res = await adminService.rejectUser(id);
+            setUsers(prev => prev.map(u => (u.id === id || u._id === id) ? { ...u, status: 'Rejected' } : u));
+            logAction('Admin', 'REJECT_USER', `ID: ${id} rejected`, 'Warning');
+            return { success: true };
+        } catch (err) {
+            console.error('Error rejecting user:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
     const resetPassword = (id) => {
         logAction('Admin', 'RESET_PASSWORD', `ID: ${id}`, 'Success');
     };
@@ -128,6 +157,56 @@ export const AdminProvider = ({ children }) => {
         setInvoices(prev => prev.map(inv => inv.id === id ? { ...inv, status: 'Refunded' } : inv));
         logAction('Admin', 'REFUND_ISSUED', `Invoice ${id}`, 'Warning');
         adminService.refundInvoice(id);
+    };
+
+    const deleteInvoice = async (id) => {
+        try {
+            await adminService.deleteInvoice(id);
+            setInvoices(prev => prev.filter(inv => inv.id !== id));
+            logAction('Admin', 'DELETE_INVOICE', `Invoice ${id} deleted`, 'Success');
+            return { success: true };
+        } catch (err) {
+            console.error('Error deleting invoice:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const deleteAppointment = async (id) => {
+        try {
+            await adminService.deleteAppointment(id);
+            logAction('Admin', 'DELETE_APPOINTMENT', `Appointment ${id} deleted`, 'Success');
+            return { success: true };
+        } catch (err) {
+            console.error('Error deleting appointment:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const clearLogs = async () => {
+        try {
+            await adminService.clearLogs();
+            setLogs([]);
+            return { success: true };
+        } catch (err) {
+            console.error('Error clearing logs:', err);
+            return { success: false, error: err.message };
+        }
+    };
+
+    const purgeData = async (target) => {
+        try {
+            const res = await adminService.purgeData(target);
+            if (target === 'logs') setLogs([]);
+            if (target === 'all-demo') {
+                setLogs([]);
+                await fetchUsers();
+            }
+            logAction('Admin', 'DATA_PURGE', `Purged ${target}`, 'Warning');
+            return { success: true, message: res?.message };
+        } catch (err) {
+            console.error('Error purging data:', err);
+            return { success: false, error: err.message };
+        }
     };
 
     // Helper
@@ -154,10 +233,16 @@ export const AdminProvider = ({ children }) => {
             addUser,
             updateUser,
             deleteUser,
+            approveUser,
+            rejectUser,
             toggleUserStatus,
             resetPassword,
             markInvoicePaid,
-            refundInvoice
+            refundInvoice,
+            deleteInvoice,
+            deleteAppointment,
+            clearLogs,
+            purgeData
         }}>
             {children}
         </AdminContext.Provider>

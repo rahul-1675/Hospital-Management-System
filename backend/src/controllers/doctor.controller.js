@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import { Doctor } from '../models/Doctor.js';
 import { Appointment } from '../models/Appointment.js';
-import { MOCK_DOCTORS, mockAppointments } from '../data/mockFallback.js';
+import { User } from '../models/User.js';
+import { PatientRemovalRequest } from '../models/PatientRemovalRequest.js';
+import { MOCK_DOCTORS, mockAppointments, mockPatientRemovalRequests, mockUsers } from '../data/mockFallback.js';
 
 // Helper: Convert 24hr string ("09:30") to readable 12hr slot ("09:30 AM")
 const formatTime12Hr = (timeStr24) => {
@@ -520,6 +522,231 @@ export const doctorController = {
                 totalSlots: computedSlots.length,
                 availableSlotsCount: computedSlots.filter(s => s.isAvailable).length,
                 slots: computedSlots
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // POST /api/doctors/portal/appointments/:id/cancel
+    cancelAppointment: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { reason = 'Cancelled by attending physician' } = req.body;
+
+            if (mongoose.connection.readyState === 1 && mongoose.Types.ObjectId.isValid(id)) {
+                const app = await Appointment.findById(id);
+                if (!app) return res.status(404).json({ success: false, message: 'Appointment not found' });
+
+                app.status = 'CANCELLED';
+                app.cancellationReason = reason;
+                if (!app.notes) {
+                    app.notes = `Cancellation Note: ${reason}`;
+                } else {
+                    app.notes = `${app.notes} | Cancellation Note: ${reason}`;
+                }
+                await app.save();
+
+                return res.json({
+                    success: true,
+                    message: 'Appointment cancelled successfully.',
+                    data: app
+                });
+            }
+
+            const app = mockAppointments.find(a => a._id === id || a.id === id);
+            if (!app) return res.status(404).json({ success: false, message: 'Appointment not found' });
+
+            app.status = 'CANCELLED';
+            app.cancellationReason = reason;
+            app.notes = app.notes ? `${app.notes} | Cancellation Note: ${reason}` : `Cancellation Note: ${reason}`;
+
+            return res.json({
+                success: true,
+                message: 'Appointment cancelled successfully.',
+                data: app
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // GET /api/doctors/portal/patient-removal-requests
+    getPatientRemovalRequests: async (req, res) => {
+        try {
+            const { doctorId } = req.query;
+
+            if (mongoose.connection.readyState === 1) {
+                const filter = doctorId ? { doctorId } : {};
+                const requests = await PatientRemovalRequest.find(filter).sort({ createdAt: -1 });
+                return res.json({ success: true, data: requests });
+            }
+
+            const requests = doctorId
+                ? mockPatientRemovalRequests.filter(r => r.doctorId === doctorId)
+                : mockPatientRemovalRequests;
+
+            return res.json({ success: true, data: requests });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // POST /api/doctors/portal/patient-removal-requests
+    requestPatientRemoval: async (req, res) => {
+        try {
+            const { patientId, patientName, reason, notes, doctorId, doctorName } = req.body;
+
+            if (!patientName || !reason) {
+                return res.status(400).json({ success: false, message: 'Patient name and removal reason are required.' });
+            }
+
+            const docName = doctorName || (req.user ? req.user.name : 'Attending Physician');
+            const docId = doctorId || (req.user ? (req.user.staffId || req.user.id || req.user._id) : 'DOC001');
+
+            if (mongoose.connection.readyState === 1) {
+                const request = await PatientRemovalRequest.create({
+                    patientId: patientId || `pat-${Date.now()}`,
+                    patientName,
+                    doctorId: docId,
+                    doctorName: docName,
+                    reason,
+                    notes: notes || '',
+                    status: 'Pending',
+                    requestedAt: new Date()
+                });
+
+                return res.status(201).json({
+                    success: true,
+                    message: 'Patient removal request submitted for Administrator approval.',
+                    data: request
+                });
+            }
+
+            const newRequest = {
+                _id: `rem-req-${Date.now()}`,
+                id: `rem-req-${Date.now()}`,
+                patientId: patientId || `pat-${Date.now()}`,
+                patientName,
+                doctorId: docId,
+                doctorName: docName,
+                reason,
+                notes: notes || '',
+                status: 'Pending',
+                adminNote: '',
+                requestedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString()
+            };
+
+            mockPatientRemovalRequests.unshift(newRequest);
+
+            return res.status(201).json({
+                success: true,
+                message: 'Patient removal request submitted for Administrator approval.',
+                data: newRequest
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // GET /api/doctors/portal/profile
+    getDoctorProfile: async (req, res) => {
+        try {
+            const docEmail = req.user?.email || req.query.email || 'dr.smith@hms.com';
+
+            if (mongoose.connection.readyState === 1) {
+                const user = await User.findOne({ email: docEmail.toLowerCase() });
+                const doctor = await Doctor.findOne({ email: docEmail.toLowerCase() }).populate('specialty');
+
+                return res.json({
+                    success: true,
+                    data: {
+                        name: user?.name || doctor?.name || 'Dr. Sarah Smith',
+                        email: user?.email || doctor?.email || docEmail,
+                        phone: user?.phone || doctor?.phone || '+1 (555) 123-4567',
+                        department: user?.department || doctor?.department || 'Cardiology',
+                        specialization: doctor?.qualifications || 'Cardiologist (MD)',
+                        experience: doctor?.experienceYears ? `${doctor.experienceYears} Years` : '12 Years',
+                        roomNumber: doctor?.roomNumber || 'Room 104',
+                        consultationFee: doctor?.consultationFee || 65,
+                        id: user?.staffId || user?._id || 'DOC001'
+                    }
+                });
+            }
+
+            const user = mockUsers.find(u => u.email.toLowerCase() === docEmail.toLowerCase()) || mockUsers[1];
+            const doctor = MOCK_DOCTORS.find(d => d.email?.toLowerCase() === docEmail.toLowerCase()) || MOCK_DOCTORS[0];
+
+            return res.json({
+                success: true,
+                data: {
+                    name: user?.name || doctor?.name || 'Dr. Sarah Smith',
+                    email: user?.email || doctor?.email || docEmail,
+                    phone: user?.phone || doctor?.phone || '+1 (555) 123-4567',
+                    department: user?.department || doctor?.department || 'Cardiology',
+                    specialization: doctor?.qualifications || 'Cardiologist (MD)',
+                    experience: doctor?.experienceYears ? `${doctor.experienceYears} Years` : '12 Years',
+                    roomNumber: doctor?.roomNumber || 'Room 104',
+                    consultationFee: doctor?.consultationFee || 65,
+                    id: user?.staffId || user?._id || 'DOC001'
+                }
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
+        }
+    },
+
+    // PUT /api/doctors/portal/profile
+    updateDoctorProfile: async (req, res) => {
+        try {
+            const { name, phone, department, specialization, experience, roomNumber, consultationFee, email } = req.body;
+            const targetEmail = email || req.user?.email || 'dr.smith@hms.com';
+
+            if (mongoose.connection.readyState === 1) {
+                const user = await User.findOne({ email: targetEmail.toLowerCase() });
+                if (user) {
+                    if (name) user.name = name;
+                    if (phone) user.phone = phone;
+                    if (department) user.department = department;
+                    await user.save();
+                }
+
+                const doctor = await Doctor.findOne({ email: targetEmail.toLowerCase() });
+                if (doctor) {
+                    if (name) doctor.name = name.startsWith('Dr.') ? name : `Dr. ${name}`;
+                    if (department) doctor.department = department;
+                    if (specialization) doctor.qualifications = specialization;
+                    if (roomNumber) doctor.roomNumber = roomNumber;
+                    if (consultationFee) doctor.consultationFee = Number(consultationFee);
+                    if (experience) doctor.experienceYears = parseInt(experience, 10) || doctor.experienceYears;
+                    await doctor.save();
+                }
+
+                return res.json({
+                    success: true,
+                    message: 'Doctor profile updated successfully.',
+                    data: { name, phone, department, specialization, experience, roomNumber, consultationFee }
+                });
+            }
+
+            const user = mockUsers.find(u => u.email.toLowerCase() === targetEmail.toLowerCase());
+            if (user) {
+                if (name) user.name = name;
+                if (phone) user.phone = phone;
+                if (department) user.department = department;
+            }
+
+            const doctor = MOCK_DOCTORS.find(d => d.email?.toLowerCase() === targetEmail.toLowerCase());
+            if (doctor) {
+                if (name) doctor.name = name;
+                if (department) doctor.department = department;
+            }
+
+            return res.json({
+                success: true,
+                message: 'Doctor profile updated successfully.',
+                data: { name, phone, department, specialization, experience, roomNumber, consultationFee }
             });
         } catch (error) {
             return res.status(500).json({ success: false, message: error.message });

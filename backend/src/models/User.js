@@ -25,7 +25,8 @@ const UserSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
-        default: ''
+        required: [true, 'Phone number is required'],
+        trim: true
     },
     staffId: {
         type: String,
@@ -55,6 +56,15 @@ const UserSchema = new mongoose.Schema({
         date: { type: String, default: () => new Date().toISOString() },
         read: { type: Boolean, default: false }
     }],
+    status: {
+        type: String,
+        enum: ['Pending', 'Active', 'Suspended', 'Rejected'],
+        default: 'Pending'
+    },
+    department: {
+        type: String,
+        default: 'General'
+    },
     isDemoData: {
         type: Boolean,
         default: false
