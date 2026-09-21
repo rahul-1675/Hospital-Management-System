@@ -23,8 +23,8 @@
 .reception-portal-container {
     display: flex;
     height: 100vh;
-    background-color: transparent;
-    /* Removed solid color for bg image */
+    background: #ffffff;
+    background-color: #ffffff;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: var(--reception-text-main);
     overflow: hidden;

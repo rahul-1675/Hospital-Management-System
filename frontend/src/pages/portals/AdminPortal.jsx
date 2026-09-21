@@ -38,11 +38,8 @@ const AdminPortal = () => {
     return (
         <AdminProvider>
             <div className="doctor-portal-container" style={{
-                backgroundImage: `url(${AdminBg})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                backgroundAttachment: 'fixed',
+                background: '#ffffff',
+                backgroundColor: '#ffffff',
                 minHeight: '100vh'
             }}>
                 <AdminSidebar

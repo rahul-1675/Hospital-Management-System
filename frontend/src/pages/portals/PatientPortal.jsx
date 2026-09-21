@@ -242,9 +242,7 @@ const PatientPortal = () => {
     };
 
     return (
-        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '4rem', background: 'transparent', color: '#ffffff' }}>
-            <AnimatedGlassBackground isFixed={true} opacity={0.92} />
-
+        <div style={{ position: 'relative', minHeight: '100vh', paddingBottom: '4rem', background: '#ffffff', backgroundColor: '#ffffff', color: '#0f172a' }}>
             <div className="container" style={{ position: 'relative', zIndex: 10, paddingTop: '1.5rem' }}>
                 {/* Header & Tab Selector */}
                 <div style={{ textAlign: 'center', maxWidth: '820px', margin: '0 auto 1.5rem' }}>
@@ -254,26 +252,24 @@ const PatientPortal = () => {
                         gap: '0.5rem',
                         padding: '0.4rem 1rem',
                         borderRadius: '9999px',
-                        background: 'rgba(2, 132, 199, 0.25)',
-                        border: '1px solid rgba(56, 189, 248, 0.45)',
-                        color: '#38bdf8',
+                        background: '#f0f9ff',
+                        border: '1px solid #bae6fd',
+                        color: '#0284c7',
                         fontSize: '0.85rem',
                         fontWeight: '700',
-                        marginBottom: '0.85rem',
-                        backdropFilter: 'blur(10px)'
+                        marginBottom: '0.85rem'
                     }}>
-                        <Sparkles size={16} />
+                        <Sparkles size={16} color="#0284c7" />
                         <span>Verified Medical Specialists & Patient Portal</span>
                     </div>
 
                     <h1 style={{
                         fontSize: 'clamp(1.9rem, 3.8vw, 2.65rem)',
                         fontWeight: '900',
-                        color: '#ffffff',
+                        color: '#0f172a',
                         lineHeight: 1.2,
                         marginBottom: '0.75rem',
-                        letterSpacing: '-0.02em',
-                        textShadow: '0 3px 15px rgba(0,0,0,0.6)'
+                        letterSpacing: '-0.02em'
                     }}>
                         {activeTab === 'directory' ? 'Find Top Specialists & Book Consultations' :
                          activeTab === 'appointments' ? 'My Consultations & Appointments' :

@@ -50,7 +50,7 @@
     --color-slate-50: #f8fafc;
 
     /* Surfaces & Glassmorphism */
-    --bg-page: #f8fafc;
+    --bg-page: #ffffff;
     --bg-card: #ffffff;
     --bg-card-glass: rgba(255, 255, 255, 0.88);
     --bg-card-glass-dark: rgba(15, 23, 42, 0.82);

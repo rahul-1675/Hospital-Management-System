@@ -68,10 +68,9 @@ const PharmacyPortal = () => {
     return (
         <PharmacyProvider>
             <div className="pharmacy-portal-container" style={{
-                backgroundImage: `url(${MedicineBg})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
+                background: '#ffffff',
+                backgroundColor: '#ffffff',
+                minHeight: '100vh'
             }}>
                 <nav className={`pharmacy-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`} style={{ width: isSidebarCollapsed ? '80px' : '260px', transition: 'width 0.3s ease' }}>
                     <div className="pharmacy-sidebar-header" style={{ display: 'flex', alignItems: 'center', justifyContent: isSidebarCollapsed ? 'center' : 'space-between', padding: isSidebarCollapsed ? '1rem 0.5rem' : '1rem 1.25rem' }}>

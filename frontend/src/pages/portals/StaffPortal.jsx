@@ -32,10 +32,9 @@ const StaffPortal = () => {
     return (
         <StaffProvider>
             <div className="doctor-portal-container" style={{
-                backgroundImage: `url(${StaffBg})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
+                background: '#ffffff',
+                backgroundColor: '#ffffff',
+                minHeight: '100vh'
             }}>
                 <StaffSidebar
                     activeTab={activeTab}

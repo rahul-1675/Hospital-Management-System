@@ -48,10 +48,9 @@ const ReceptionistPortal = () => {
     return (
         <ReceptionProvider>
             <div className="reception-portal-container" style={{
-                backgroundImage: `url(${bgImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
+                background: '#ffffff',
+                backgroundColor: '#ffffff',
+                minHeight: '100vh'
             }}>
                 <ReceptionSidebar
                     activeTab={activeTab}

@@ -27,8 +27,8 @@
 .doctor-portal-container {
   display: flex;
   height: 100vh;
-  background-color: transparent;
-  /* Transparent for bg image */
+  background: #ffffff;
+  background-color: #ffffff;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--doctor-text-main);
   overflow: hidden;

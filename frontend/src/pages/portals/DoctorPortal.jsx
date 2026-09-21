@@ -51,7 +51,8 @@ const DoctorPortal = () => {
 
     return (
         <div className="doctor-portal-container" style={{
-            background: 'linear-gradient(135deg, #f8fafc 0%, #f0fdf4 30%, #f1f5f9 100%)',
+            background: '#ffffff',
+            backgroundColor: '#ffffff',
             minHeight: '100vh'
         }}>
             <DoctorSidebar
