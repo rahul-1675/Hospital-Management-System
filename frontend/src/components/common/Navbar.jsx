@@ -4,6 +4,8 @@ import { PhoneCall, ShieldCheck, UserCheck, Stethoscope, Menu, X } from 'lucide-
 import { useAuth } from '../../hooks/useAuth';
 import BrandLogo from './BrandLogo';
 import GooeyNav from '../ui/GooeyNav';
+import { RectangleButtons } from '../../shaders/RectangleButtons';
+import '../../shaders/threeui.css';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -97,16 +99,16 @@ const Navbar = () => {
                     />
                 </div>
 
-                {/* Action Buttons */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
+                {/* Desktop Action Buttons */}
+                <div className="hidden md-flex" style={{ alignItems: 'center', gap: '0.6rem', flexShrink: 0 }}>
                     <Link to="/doctors">
                         <button className="btn btn-outline" style={{
-                            padding: '0.5rem 1.1rem',
-                            fontSize: '0.88rem',
+                            padding: '0.45rem 0.95rem',
+                            fontSize: '0.85rem',
                             borderRadius: '8px',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.45rem',
+                            gap: '0.4rem',
                             borderColor: '#0284c7',
                             color: '#0284c7',
                             fontWeight: '600'
@@ -126,7 +128,7 @@ const Navbar = () => {
                             if (role === 'STAFF') return '/portal/staff';
                             return '/patient';
                         })()}>
-                            <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
+                            <button className="btn btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', borderRadius: '8px' }}>
                                 <UserCheck size={16} />
                                 <span>{user.role === 'ADMIN' || user.role === 'admin' ? 'Admin Console' : `Portal (${user.role})`}</span>
                             </button>
@@ -134,33 +136,64 @@ const Navbar = () => {
                     ) : (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Link to="/register">
-                                <button className="btn btn-outline" style={{ padding: '0.5rem 0.9rem', fontSize: '0.88rem', borderRadius: '8px', color: '#0f172a', borderColor: '#cbd5e1' }}>
+                                <button className="btn btn-outline" style={{ padding: '0.45rem 0.85rem', fontSize: '0.85rem', borderRadius: '8px', color: '#0f172a', borderColor: '#cbd5e1' }}>
                                     <span>Register</span>
                                 </button>
                             </Link>
-                            <Link to="/login">
-                                <button className="btn btn-primary" style={{ padding: '0.5rem 1.15rem', fontSize: '0.88rem', borderRadius: '8px' }}>
-                                    <ShieldCheck size={16} />
-                                    <span>Sign In</span>
-                                </button>
+                            <Link to="/login" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+                                <RectangleButtons
+                                    variant="floating-dots-cta"
+                                    mode="dark"
+                                    hue={0}
+                                    saturation={1.00}
+                                    brightness={1.00}
+                                    style={{ width: '130px', height: '38px', borderRadius: '8px' }}
+                                />
                             </Link>
                         </div>
                     )}
+                </div>
 
-                    {/* Mobile Hamburger Button */}
+                {/* Mobile Right Controls: Compact Sign In + Hamburger */}
+                <div className="mobile-toggle" style={{ gap: '0.5rem', alignItems: 'center' }}>
+                    {!user && (
+                        <Link to="/login" style={{ textDecoration: 'none' }}>
+                            <button className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem', borderRadius: '8px' }}>
+                                Sign In
+                            </button>
+                        </Link>
+                    )}
+                    {user && (
+                        <Link to={(() => {
+                            const role = (user.role || '').toUpperCase();
+                            if (role === 'ADMIN') return '/portal/admin';
+                            if (role === 'DOCTOR') return '/portal/doctor';
+                            if (role === 'RECEPTION' || role === 'RECEPTIONIST') return '/portal/receptionist';
+                            if (role === 'PHARMACY') return '/portal/pharmacy';
+                            if (role === 'STAFF') return '/portal/staff';
+                            return '/patient';
+                        })()}>
+                            <button className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem', borderRadius: '8px' }}>
+                                Portal
+                            </button>
+                        </Link>
+                    )}
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         aria-label="Toggle navigation menu"
                         style={{
-                            background: 'transparent',
-                            border: 'none',
+                            background: '#f8fafc',
+                            border: '1px solid #cbd5e1',
+                            borderRadius: '8px',
                             cursor: 'pointer',
-                            padding: '0.4rem',
-                            color: '#0f172a'
+                            padding: '0.45rem',
+                            color: '#0f172a',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}
-                        className="mobile-toggle"
                     >
-                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>
                 </div>
             </div>
@@ -170,10 +203,11 @@ const Navbar = () => {
                 <div style={{
                     backgroundColor: '#ffffff',
                     borderTop: '1px solid #e2e8f0',
-                    padding: '1rem 1.5rem 1.5rem',
-                    boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
+                    padding: '1.25rem 1.25rem 1.5rem',
+                    boxShadow: '0 15px 30px rgba(0,0,0,0.12)',
+                    animation: 'fadeIn 0.2s ease-out'
                 }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                         {navItems.map((item) => (
                             <Link
                                 key={item.href}
@@ -181,8 +215,9 @@ const Navbar = () => {
                                 onClick={() => setMobileMenuOpen(false)}
                                 style={{
                                     padding: '0.75rem 1rem',
-                                    borderRadius: '8px',
-                                    fontWeight: '600',
+                                    borderRadius: '10px',
+                                    fontWeight: '700',
+                                    fontSize: '0.95rem',
                                     color: isActive(item.href) ? '#0284c7' : '#334155',
                                     background: isActive(item.href) ? '#f0f9ff' : 'transparent',
                                     textDecoration: 'none'
@@ -191,6 +226,48 @@ const Navbar = () => {
                                 {item.label}
                             </Link>
                         ))}
+
+                        <hr style={{ border: 'none', borderTop: '1px solid #f1f5f9', margin: '0.75rem 0' }} />
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                            <Link to="/doctors" onClick={() => setMobileMenuOpen(false)} style={{ textDecoration: 'none' }}>
+                                <button className="btn btn-outline" style={{ width: '100%', padding: '0.75rem', justifyContent: 'center', borderRadius: '10px', borderColor: '#0284c7', color: '#0284c7', fontWeight: '700' }}>
+                                    <Stethoscope size={16} />
+                                    <span>Book Specialist Visit</span>
+                                </button>
+                            </Link>
+
+                            {!user ? (
+                                <>
+                                    <Link to="/register" onClick={() => setMobileMenuOpen(false)} style={{ textDecoration: 'none' }}>
+                                        <button className="btn btn-outline" style={{ width: '100%', padding: '0.75rem', justifyContent: 'center', borderRadius: '10px', color: '#0f172a', borderColor: '#cbd5e1', fontWeight: '600' }}>
+                                            Register Patient Account
+                                        </button>
+                                    </Link>
+                                    <Link to="/login" onClick={() => setMobileMenuOpen(false)} style={{ textDecoration: 'none' }}>
+                                        <button className="btn btn-primary" style={{ width: '100%', padding: '0.75rem', justifyContent: 'center', borderRadius: '10px', fontWeight: '700' }}>
+                                            <ShieldCheck size={16} />
+                                            <span>Staff / Patient Sign In</span>
+                                        </button>
+                                    </Link>
+                                </>
+                            ) : (
+                                <Link to={(() => {
+                                    const role = (user.role || '').toUpperCase();
+                                    if (role === 'ADMIN') return '/portal/admin';
+                                    if (role === 'DOCTOR') return '/portal/doctor';
+                                    if (role === 'RECEPTION' || role === 'RECEPTIONIST') return '/portal/receptionist';
+                                    if (role === 'PHARMACY') return '/portal/pharmacy';
+                                    if (role === 'STAFF') return '/portal/staff';
+                                    return '/patient';
+                                })()} onClick={() => setMobileMenuOpen(false)} style={{ textDecoration: 'none' }}>
+                                    <button className="btn btn-primary" style={{ width: '100%', padding: '0.75rem', justifyContent: 'center', borderRadius: '10px', fontWeight: '700' }}>
+                                        <UserCheck size={16} />
+                                        <span>Open {user.role} Dashboard</span>
+                                    </button>
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

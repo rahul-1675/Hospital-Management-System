@@ -115,8 +115,8 @@ const Login = () => {
     };
 
     return (
-        <div className="login-wrapper" style={{ backgroundImage: `url(${LoginBg})` }}>
-            <div className="login-glass-card" style={{ maxWidth: '450px', width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.25)' }}>
+        <div className="login-wrapper" style={{ background: '#ffffff', backgroundColor: '#ffffff', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="login-glass-card" style={{ maxWidth: '450px', width: '100%', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.12)' }}>
                 {/* Official Brand Logo */}
                 <div className="login-header" style={{ textAlign: 'center', marginBottom: '1.75rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <BrandLogo size={68} href="/" style={{ marginBottom: '1rem' }} />

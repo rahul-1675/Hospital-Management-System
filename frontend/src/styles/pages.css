@@ -14,11 +14,8 @@
     padding: var(--spacing-md);
     position: relative;
     overflow: hidden;
-    /* Clean Login Background */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    /* Background Image will be set inline in Login.jsx or assume it's set there */
+    background: #ffffff;
+    background-color: #ffffff;
 }
 
 /* Floating Blob 1 - Teal/Cyan (Top Left) */

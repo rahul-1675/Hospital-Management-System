@@ -92,8 +92,8 @@ const Register = () => {
     const isPatientRole = (submittedUser?.role || formData.role).toLowerCase() === 'patient';
 
     return (
-        <div className="login-wrapper" style={{ backgroundImage: `url(${LoginBg})`, minHeight: '100vh', padding: '2.5rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="login-glass-card" style={{ maxWidth: '520px', width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.25)' }}>
+        <div className="login-wrapper" style={{ background: '#ffffff', backgroundColor: '#ffffff', minHeight: '100vh', padding: '2.5rem 1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="login-glass-card" style={{ maxWidth: '520px', width: '100%', background: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 20px 45px -10px rgba(15, 23, 42, 0.12)' }}>
                 {/* Official Brand Logo */}
                 <div className="login-header" style={{ textAlign: 'center', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <BrandLogo size={58} href="/" style={{ marginBottom: '0.75rem' }} />

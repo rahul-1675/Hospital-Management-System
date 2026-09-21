@@ -17,6 +17,8 @@ import {
     Building2
 } from 'lucide-react';
 import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
+import { RectangleButtons } from '../../shaders/RectangleButtons';
+import '../../shaders/threeui.css';
 
 const DEPARTMENTS = [
     { name: 'Cardiology', icon: HeartPulse, count: '14 Specialists', desc: 'Comprehensive cardiac care, ECG, angioplasty, and cardiac rehab.', color: '#ef4444', bg: '#fef2f2' },
@@ -111,9 +113,22 @@ const Home = () => {
                             display: 'flex',
                             flexWrap: 'wrap',
                             justifyContent: 'center',
+                            alignItems: 'center',
                             gap: '1rem',
                             marginBottom: '3rem'
                         }}>
+                            <Link to="/login" style={{ textDecoration: 'none' }}>
+                                <div className="shader-frame" style={{ display: 'inline-flex' }}>
+                                    <RectangleButtons
+                                        variant="floating-dots-cta"
+                                        mode="dark"
+                                        hue={0}
+                                        saturation={1.00}
+                                        brightness={1.00}
+                                        style={{ width: '160px', height: '52px' }}
+                                    />
+                                </div>
+                            </Link>
                             <Link to="/patient">
                                 <button style={{
                                     padding: '0.85rem 1.85rem',
@@ -128,7 +143,8 @@ const Home = () => {
                                     boxShadow: '0 8px 20px rgba(2, 132, 199, 0.35)',
                                     border: 'none',
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    height: '52px'
                                 }}>
                                     <Calendar size={18} />
                                     <span>Book an Appointment</span>
@@ -147,7 +163,8 @@ const Home = () => {
                                     border: '1.5px solid #cbd5e1',
                                     boxShadow: '0 4px 14px rgba(15, 23, 42, 0.08)',
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    height: '52px'
                                 }}>
                                     Hospital Facilities
                                 </button>
@@ -157,12 +174,12 @@ const Home = () => {
                         {/* LIVE STATS BAR */}
                         <div style={{
                             display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-                            gap: '1.25rem',
+                            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+                            gap: '1rem',
                             background: '#ffffff',
                             backgroundColor: '#ffffff',
                             color: '#0f172a',
-                            padding: '1.75rem 1.5rem',
+                            padding: '1.5rem 1.25rem',
                             borderRadius: '18px',
                             border: '1.5px solid #e2e8f0',
                             boxShadow: '0 15px 35px -5px rgba(0, 0, 0, 0.2)'
@@ -223,8 +240,8 @@ const Home = () => {
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))',
-                        gap: '1.5rem'
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+                        gap: '1.25rem'
                     }}>
                         {DEPARTMENTS.map((dept, index) => {
                             const IconComponent = dept.icon;

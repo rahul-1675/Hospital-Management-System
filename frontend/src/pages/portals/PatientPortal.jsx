@@ -283,6 +283,9 @@ const PatientPortal = () => {
                     {/* Navigation Sub-Tabs */}
                     <div style={{
                         display: 'inline-flex',
+                        maxWidth: '100%',
+                        overflowX: 'auto',
+                        WebkitOverflowScrolling: 'touch',
                         background: '#ffffff',
                         padding: '5px',
                         borderRadius: '9999px',
