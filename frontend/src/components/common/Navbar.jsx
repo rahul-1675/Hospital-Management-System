@@ -4,8 +4,6 @@ import { PhoneCall, ShieldCheck, UserCheck, Stethoscope, Menu, X } from 'lucide-
 import { useAuth } from '../../hooks/useAuth';
 import BrandLogo from './BrandLogo';
 import GooeyNav from '../ui/GooeyNav';
-import { RectangleButtons } from '../../shaders/RectangleButtons';
-import '../../shaders/threeui.css';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -140,15 +138,11 @@ const Navbar = () => {
                                     <span>Register</span>
                                 </button>
                             </Link>
-                            <Link to="/login" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
-                                <RectangleButtons
-                                    variant="floating-dots-cta"
-                                    mode="dark"
-                                    hue={0}
-                                    saturation={1.00}
-                                    brightness={1.00}
-                                    style={{ width: '130px', height: '38px', borderRadius: '8px' }}
-                                />
+                            <Link to="/login" style={{ textDecoration: 'none' }}>
+                                <button className="btn btn-primary" style={{ padding: '0.45rem 1.1rem', fontSize: '0.85rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                    <ShieldCheck size={15} />
+                                    <span>Sign In</span>
+                                </button>
                             </Link>
                         </div>
                     )}

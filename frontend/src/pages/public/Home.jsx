@@ -17,8 +17,6 @@ import {
     Building2
 } from 'lucide-react';
 import AnimatedGlassBackground from '../../components/common/AnimatedGlassBackground';
-import { RectangleButtons } from '../../shaders/RectangleButtons';
-import '../../shaders/threeui.css';
 
 const DEPARTMENTS = [
     { name: 'Cardiology', icon: HeartPulse, count: '14 Specialists', desc: 'Comprehensive cardiac care, ECG, angioplasty, and cardiac rehab.', color: '#ef4444', bg: '#fef2f2' },
@@ -118,16 +116,26 @@ const Home = () => {
                             marginBottom: '3rem'
                         }}>
                             <Link to="/login" style={{ textDecoration: 'none' }}>
-                                <div className="shader-frame" style={{ display: 'inline-flex' }}>
-                                    <RectangleButtons
-                                        variant="floating-dots-cta"
-                                        mode="dark"
-                                        hue={0}
-                                        saturation={1.00}
-                                        brightness={1.00}
-                                        style={{ width: '160px', height: '52px' }}
-                                    />
-                                </div>
+                                <button style={{
+                                    padding: '0.85rem 1.85rem',
+                                    borderRadius: '12px',
+                                    background: '#ffffff',
+                                    backgroundColor: '#ffffff',
+                                    color: '#0284c7',
+                                    fontWeight: '700',
+                                    fontSize: '1rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.6rem',
+                                    border: '1.5px solid #e2e8f0',
+                                    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.08)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    height: '52px'
+                                }}>
+                                    <Shield size={18} color="#0284c7" />
+                                    <span>Sign In to Portal</span>
+                                </button>
                             </Link>
                             <Link to="/patient">
                                 <button style={{
